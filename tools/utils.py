@@ -12,8 +12,14 @@ def sync_dnt():
     """
     context = bpy.context
     obj = context.active_object
+        
     
+    # TODO may be a better way
+    orig_mode = obj.mode
+    bpy.ops.object.mode_set(mode='OBJECT')
+    myu.select_only(obj)
     bpy.ops.object.shade_smooth()
+    bpy.ops.object.mode_set(mode=orig_mode)
     
     # Setup bevel and data transfer modifiers
     modifier_names = [m.name for m in obj.modifiers]
@@ -56,6 +62,9 @@ def sync_dnt():
         part_collection = context.scene.collection # use as fallback
 
     dnt_collection = get_mk_collection(name=f"{ct.DNT_COLLECTION}-{part_collection.name}", parent=part_collection)
+    dnt_collection.hide_render = True
+    dnt_collection.hide_viewport = True
+    dnt_collection.color_tag = 'COLOR_05'
 
 
 
