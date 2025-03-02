@@ -7,7 +7,7 @@ from pprint import pprint
 
 
 @register_wrap
-class MDHARD_OT_setup_dnt(bpy.types.Operator):
+class MDHARD_OT_sync_dnt(bpy.types.Operator):
     """Setup Dual Normal Transfer (DNT)
     Setup modefier stack for DNT workflow. This includes
     - Weighted Normal
@@ -27,18 +27,18 @@ class MDHARD_OT_setup_dnt(bpy.types.Operator):
 
 
 
-@register_wrap
-class MDHARD_OT_update_dnt(bpy.types.Operator):
-    """Update Dual Normal Transfer Counterpart Object
-    """
-    bl_idname = "md_hard.update_dnt"
-    bl_label = "Update DNT"
-    bl_options = {'REGISTER', 'UNDO'}
+# @register_wrap
+# class MDHARD_OT_update_dnt(bpy.types.Operator):
+#     """Update Dual Normal Transfer Counterpart Object
+#     """
+#     bl_idname = "md_hard.update_dnt"
+#     bl_label = "Update DNT"
+#     bl_options = {'REGISTER', 'UNDO'}
 
-    def execute(self, context):
-        self.report({"INFO"}, f"Update DNT called")
+#     def execute(self, context):
+#         self.report({"INFO"}, f"Update DNT called")
 
-        return {"FINISHED"}
+#         return {"FINISHED"}
 
 
 

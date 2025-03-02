@@ -24,8 +24,8 @@ class MDHARD_PT_md_hard(bpy.types.Panel):
 
         layout.separator()
         layout.label(text="Dual Normal Transfer")
-        layout.operator(ot.MDHARD_OT_setup_dnt.bl_idname, text="Setup DNT", icon="MODIFIER")
-        layout.operator(ot.MDHARD_OT_update_dnt.bl_idname, text="Update DNT", icon="FILE_REFRESH")
+        layout.operator(ot.MDHARD_OT_sync_dnt.bl_idname, text="Sync DNT", icon="FILE_REFRESH")
+        # layout.operator(ot.MDHARD_OT_update_dnt.bl_idname, text="Update DNT", icon="FILE_REFRESH")
 
 
 

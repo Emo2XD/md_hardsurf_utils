@@ -12,10 +12,18 @@ def sync_dnt():
     """
     context = bpy.context
     obj = context.active_object
-
+    
+    bpy.ops.object.shade_smooth()
     
     # Setup bevel and data transfer modifiers
     modifier_names = [m.name for m in obj.modifiers]
+
+    if ct.DNT_WEIGHTED_NORMAL_NAME not in modifier_names:
+        mod_w_norm = obj.modifiers.new(name=ct.DNT_WEIGHTED_NORMAL_NAME, type="WEIGHTED_NORMAL")
+        mod_w_norm.mode = 'CORNER_ANGLE'
+        mod_w_norm.keep_sharp = True
+        mod_w_norm.use_face_influence = True
+
 
     if ct.DNT_NORMAL_TRANSFER_NAME not in modifier_names:
         mod_dnt_nromal = obj.modifiers.new(name=ct.DNT_NORMAL_TRANSFER_NAME, type="DATA_TRANSFER")
@@ -39,6 +47,7 @@ def sync_dnt():
 
     else:
         mod_dnt_bevel = obj.modifiers.get(ct.DNT_BEVEL_NAME)
+
 
 
     # Generate collection to store generated DNT normal source object.
