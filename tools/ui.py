@@ -14,11 +14,18 @@ class MDHARD_PT_md_hard(bpy.types.Panel):
     bl_label = "Hard Surface Utils"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "MDHard" # tab name
+    bl_category = "MD Hard" # tab name
 
     def draw(self, context):
         layout = self.layout
         layout.operator(ot.MDHARD_OT_test_x.bl_idname, text="Test X")
+        layout.operator(ot.MDHARD_OT_setup_part_collection.bl_idname, text="Setup Part", icon="OUTLINER_COLLECTION")
+        layout.operator(ot.MDHARD_OT_normal_transfer.bl_idname, text="Normal Transfer", icon="MOD_DATA_TRANSFER")
+
+        layout.separator()
+        layout.label(text="Dual Normal Transfer")
+        layout.operator(ot.MDHARD_OT_setup_dnt.bl_idname, text="Setup DNT", icon="MODIFIER")
+        layout.operator(ot.MDHARD_OT_update_dnt.bl_idname, text="Update DNT", icon="FILE_REFRESH")
 
 
 

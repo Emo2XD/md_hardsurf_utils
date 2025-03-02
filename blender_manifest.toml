@@ -2,7 +2,7 @@ schema_version = "1.0.0"
 id = "md_hardsurf_utils"
 version = "1.0.0"
 name = "MD Hard Surface Utils"
-tagline = "Hard Surface Modeling"
+tagline = "Hard Surface Modeling Utilities and Workflow Setup"
 maintainer = "Emo2xd <emo2xd@gmail.com>"
 
 type = "add-on"
