@@ -1,0 +1,45 @@
+schema_version = "1.0.0"
+id = "md_hardsurf_utils"
+version = "1.0.0"
+name = "MD Hard Surface Utils"
+tagline = "Hard Surface Modeling"
+maintainer = "Emo2xd <emo2xd@gmail.com>"
+
+type = "add-on"
+
+
+# website = "https://extensions.blender.org/add-ons/my-example-package/"
+# tags = ["Material", "Paint"]
+
+blender_version_min = "4.3.0"
+
+license = [
+  "SPDX:GPL-3.0-or-later",
+]
+
+# copyright = [
+#   "2002-2024 Developer Name",
+#   "1998 Company Name",
+# ]
+
+# platforms = ["windows-x64", "macos-arm64", "linux-x64"]
+
+# wheels = [
+#   "./wheels/hexdump-3.3-py3-none-any.whl",
+#   "./wheels/jsmin-3.0.1-py3-none-any.whl",
+# ]
+
+
+# [permissions]
+# network = "Need to sync motion-capture data to server"
+# files = "Import/export FBX from/to disk"
+# clipboard = "Copy and paste bone transforms"
+
+# [build]
+# # These are the default build excluded patterns.
+# # You only need to edit them if you want different options.
+# paths_exclude_pattern = [
+#   "__pycache__/",
+#   "/.git/",
+#   "/*.zip",
+# ]

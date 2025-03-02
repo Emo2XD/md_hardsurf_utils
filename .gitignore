@@ -1,0 +1,13 @@
+**/__pycache__/
+*.blend1
+*.blend_*
+.pylintrc
+
+.start.bat
+.start_cmd.bat
+.start_pwsh.bat
+.start_tui.bat
+pyrightconfig.json
+
+**/*.pyc
+*.pyc

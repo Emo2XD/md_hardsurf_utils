@@ -1,0 +1,3 @@
+[submodule "myblendrc_utils"]
+	path = myblendrc_utils
+	url = git@github.com:Emo2XD/myblendrc_utils.git
