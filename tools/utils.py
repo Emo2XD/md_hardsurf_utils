@@ -29,6 +29,7 @@ def sync_dnt():
         mod_w_norm.mode = 'CORNER_ANGLE'
         mod_w_norm.keep_sharp = True
         mod_w_norm.use_face_influence = True
+        mod_w_norm.show_in_editmode = True
 
 
     if ct.DNT_NORMAL_TRANSFER_NAME not in modifier_names:
@@ -39,6 +40,7 @@ def sync_dnt():
         mod_dnt_nromal.use_loop_data = True
         mod_dnt_nromal.data_types_loops = {'CUSTOM_NORMAL'}
         mod_dnt_nromal.loop_mapping = 'POLYINTERP_NEAREST'
+        mod_dnt_nromal.show_in_editmode = True
 
     else:
         mod_dnt_nromal = obj.modifiers.get(ct.DNT_NORMAL_TRANSFER_NAME)
@@ -50,6 +52,7 @@ def sync_dnt():
         mod_dnt_bevel.limit_method = 'WEIGHT'
         mod_dnt_bevel.loop_slide = False
         mod_dnt_bevel.use_clamp_overlap = False
+        mod_dnt_bevel.show_in_editmode = True
 
     else:
         mod_dnt_bevel = obj.modifiers.get(ct.DNT_BEVEL_NAME)
