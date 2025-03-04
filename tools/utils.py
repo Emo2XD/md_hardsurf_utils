@@ -60,11 +60,12 @@ def sync_dnt():
 
 
     # Generate collection to store generated DNT normal source object.
-    part_collection = get_parent_part_collection(obj)
-    if part_collection is None:
-        part_collection = context.scene.collection # use as fallback
+    # part_collection = get_parent_part_collection(obj)
+    # if part_collection is None:
+    #     part_collection = context.scene.collection # use as fallback
 
-    dnt_collection = get_mk_collection(name=f"{ct.DNT_COLLECTION}-{part_collection.name}", parent=part_collection)
+    # dnt_collection = get_mk_collection(name=f"{ct.DNT_COLLECTION}-{part_collection.name}", parent=part_collection)
+    dnt_collection = get_mk_reserved_collection_under_part(obj, ct.DNT_COLLECTION)
     dnt_collection.hide_render = True
     dnt_collection.hide_viewport = True
     dnt_collection.color_tag = 'COLOR_05'
@@ -74,13 +75,15 @@ def sync_dnt():
     # create normal transfer source object.
 
     # remove previously created DNT normal source object
-    normal_ref_obj_name = f"{ct.DNT_NORMAL_TRANSFER_NAME}-{obj.name}"
-    prev_normal_ref_obj = bpy.data.objects.get(normal_ref_obj_name) 
+    # TODO use pointer property to naming problem.
+    # normal_ref_obj_name = f"{ct.DNT_NORMAL_TRANSFER_NAME}-{obj.name}"
+    # prev_normal_ref_obj = bpy.data.objects.get(normal_ref_obj_name)
+    prev_normal_ref_obj = obj.modifiers.get(ct.DNT_NORMAL_TRANSFER_NAME).object
     if prev_normal_ref_obj is not None:
         bpy.data.objects.remove(prev_normal_ref_obj)
 
     normal_ref_obj = obj.copy()
-    normal_ref_obj.name = normal_ref_obj_name
+    normal_ref_obj.name = f"{ct.DNT_NORMAL_TRANSFER_NAME}-{obj.name}"
     normal_ref_obj.modifiers.remove(normal_ref_obj.modifiers.get(ct.DNT_NORMAL_TRANSFER_NAME))
     normal_ref_obj.modifiers.remove(normal_ref_obj.modifiers.get(ct.DNT_BEVEL_NAME))
     dnt_collection.objects.link(normal_ref_obj)
@@ -111,13 +114,41 @@ def get_mk_collection(name:str, parent:bpy.types.Collection=None)->bpy.types.Col
     return target_collection
 
 
+def get_mk_reserved_collection_under_part(obj:bpy.types.Object, prefix:str):
+    """ Create or get reserved collection under part collection using prefix. (from given object) 
+    Create: Just create using prefix. {prefix}-{part_name} e.g. NORMAL-{part.name} under part collection.
+    Get: Get collection with specified prefix. Ignoring rest of the string.
+
+    By specifying only prefix you don't have to worry about digit after collection name e.g. .001
+
+    Args:
+        obj: try to find parent part collection from this object
+        prefix: Create or get collection, whose name starts with this prefix, under parent part collection.
+    """
+    part_collection = get_parent_part_collection(obj, fallback=bpy.context.scene.collection)
+
+    # if already created, then return existing.
+    for c in part_collection.children[:]:
+        if c.name.startswith(f"{prefix}-"):
+            return c
+        else:
+            continue
+
+    # if there is no collection starts with prefix, then create new one.
+    new_collection = bpy.data.collections.new(name=f"{prefix}-{part_collection.name}")
+    part_collection.children.link(new_collection)
+    return new_collection
+
+
+
     
-def get_parent_part_collection(obj:bpy.types.Object)->bpy.types.Collection:
+def get_parent_part_collection(obj:bpy.types.Object, fallback:bpy.types.Collection=None)->bpy.types.Collection:
     """Get parent hard surface modeling part collection
     This searches which part collection does given object belong to.
     
     Args:
         obj: check if part collection contains this object
+        fallback: if there is no valid part collection found, then use this as fallback collection.
 
     Return:
         collection which has IS_MD_HARDSURF_PART_COLLECTION == True property, and it contains given object.
@@ -130,7 +161,7 @@ def get_parent_part_collection(obj:bpy.types.Object)->bpy.types.Collection:
         else:
             continue
 
-    return None
+    return fallback
 
 
 def setup_part_collection(part_name:str="Part"):
@@ -147,10 +178,10 @@ def setup_part_collection(part_name:str="Part"):
     
     final_collection  = get_mk_collection(name=f"{ct.FINAL_COLLECTION}-{part_collection.name}", parent=part_collection)
     design_collection = get_mk_collection(name=f"{ct.DESIGN_COLLECTION}-{part_collection.name}", parent=part_collection)
-    normal_collection = get_mk_collection(name=f"{ct.NORMAL_COLLECTION}-{part_collection.name}", parent=part_collection)
+    # normal_collection = get_mk_collection(name=f"{ct.NORMAL_COLLECTION}-{part_collection.name}", parent=part_collection) # TODO:might not need at setup. Create at Normal transfer operator?
 
-    normal_collection.color_tag = 'COLOR_05'
-    normal_collection.hide_render = True
+    # normal_collection.color_tag = 'COLOR_05'
+    # normal_collection.hide_render = True
     design_collection.color_tag = 'COLOR_06'
     design_collection.hide_render = True
 
@@ -158,4 +189,5 @@ def setup_part_collection(part_name:str="Part"):
     
 
     print(f"given name is {part_name}, and {part_collection.name} was created")
-    pass
+
+    return
