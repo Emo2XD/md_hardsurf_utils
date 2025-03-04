@@ -58,30 +58,18 @@ def sync_dnt():
         mod_dnt_bevel = obj.modifiers.get(ct.DNT_BEVEL_NAME)
 
 
-
     # Generate collection to store generated DNT normal source object.
-    # part_collection = get_parent_part_collection(obj)
-    # if part_collection is None:
-    #     part_collection = context.scene.collection # use as fallback
-
-    # dnt_collection = get_mk_collection(name=f"{ct.DNT_COLLECTION}-{part_collection.name}", parent=part_collection)
     dnt_collection = get_mk_reserved_collection_under_part(obj, ct.DNT_COLLECTION)
     dnt_collection.hide_render = True
     dnt_collection.hide_viewport = True
     dnt_collection.color_tag = 'COLOR_05'
 
-
-
-    # create normal transfer source object.
-
     # remove previously created DNT normal source object
-    # TODO use pointer property to naming problem.
-    # normal_ref_obj_name = f"{ct.DNT_NORMAL_TRANSFER_NAME}-{obj.name}"
-    # prev_normal_ref_obj = bpy.data.objects.get(normal_ref_obj_name)
     prev_normal_ref_obj = obj.modifiers.get(ct.DNT_NORMAL_TRANSFER_NAME).object
     if prev_normal_ref_obj is not None:
         bpy.data.objects.remove(prev_normal_ref_obj)
 
+    # create normal transfer source object.
     normal_ref_obj = obj.copy()
     normal_ref_obj.name = f"{ct.DNT_NORMAL_TRANSFER_NAME}-{obj.name}"
     normal_ref_obj.modifiers.remove(normal_ref_obj.modifiers.get(ct.DNT_NORMAL_TRANSFER_NAME))
