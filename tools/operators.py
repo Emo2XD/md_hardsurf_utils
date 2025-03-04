@@ -50,9 +50,32 @@ class MDHARD_OT_normal_transfer(bpy.types.Operator):
     bl_label = "MD Normal Transfer"
     bl_options = {'REGISTER', 'UNDO'}
 
+
+
     def execute(self, context):
         self.report({"INFO"}, f"Add normal transfer modefier along with DNT")
         return {"FINISHED"}
+
+
+    # def invoke(self, context, event):
+    #     wm = context.window_manager
+    #     return wm.invoke_props_dialog(self)
+
+    # def draw(self, context):
+    #     layout = self.layout
+    #     layout.use_property_split = True
+        
+    #     col = layout.column()
+    #     col.prop(self, "layer_name_str")
+    #     col.prop(self, "enum_mip_type")
+
+    #     row = col.row()
+    #     row.prop(self, "size_enum", expand=True)
+        
+    #     col = layout.column()
+    #     col.prop(self, "is_use_gpen")
+
+
 
 
 @register_wrap
@@ -63,9 +86,27 @@ class MDHARD_OT_setup_part_collection(bpy.types.Operator):
     bl_label = "Setup Part Collection"
     bl_options = {'REGISTER', 'UNDO'}
 
+    part_name: bpy.props.StringProperty(name='Name', default='Part') # type: ignore
+
     def execute(self, context):
-        self.report({"INFO"}, f"setup part collection was called")
+        ut.setup_part_collection(self.part_name)
+        # self.report({"INFO"}, f"setup part collection was called")
         return {"FINISHED"}
+    
+    def invoke(self, context, event):
+        wm = context.window_manager
+        return wm.invoke_props_dialog(self)
+
+    def draw(self, context):
+        layout = self.layout
+        layout.use_property_split = True
+        
+        col = layout.column()
+        col.prop(self, "part_name")
+
+        
+
+
 
 
 

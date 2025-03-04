@@ -3,14 +3,14 @@ from .setup_tools.register import register_prop, register_wrap
 from .tools import constants as ct
 from .tools import utils as ut
 
+# TODO: Add filter funciton to only show objects in active part collection?
+def poll_is_obj_in_part_collection(self, obj):
+    return obj.type == 'MESH'
 
-# def poll_is_collection_in_active_scene(self, collection):
-#     return collection in bpy.context.scene.collection.children_recursive
-
-# register_prop(
-#         bpy.types.Scene,
-#         ct.DEPENDENCY_COLLECTION, bpy.props.PointerProperty(type=bpy.types.Collection, description="Collection which contains dependency objects e.g. objects for normal transfer.")
-#         )
+register_prop(
+        bpy.types.Collection,
+        ct.NORMAL_TRANSFER_SRC_OBJ_PER_COLLECTION, bpy.props.PointerProperty(type=bpy.types.Object, description="Source object for normal transfer modifier defined per part collection.", poll=poll_is_obj_in_part_collection)
+        )
 
 register_prop(
         bpy.types.Collection,

@@ -131,3 +131,31 @@ def get_parent_part_collection(obj:bpy.types.Object)->bpy.types.Collection:
             continue
 
     return None
+
+
+def setup_part_collection(part_name:str="Part"):
+    """Setup Part Collection
+    Create collections
+    - F-Part: final cleaned up model will be stored
+    - Design-Part: design and draft models will be stored
+    - Normal-Part: Normal transfer reference objects will be stored
+    - DNT-Part: DNT generated object will be stored
+    """
+    part_collection = bpy.data.collections.new(name=part_name)
+    setattr(part_collection, ct.IS_MD_HARDSURF_PART_COLLECTION, True)
+    bpy.context.scene.collection.children.link(part_collection)
+    
+    final_collection  = get_mk_collection(name=f"{ct.FINAL_COLLECTION}-{part_collection.name}", parent=part_collection)
+    design_collection = get_mk_collection(name=f"{ct.DESIGN_COLLECTION}-{part_collection.name}", parent=part_collection)
+    normal_collection = get_mk_collection(name=f"{ct.NORMAL_COLLECTION}-{part_collection.name}", parent=part_collection)
+
+    normal_collection.color_tag = 'COLOR_05'
+    normal_collection.hide_render = True
+    design_collection.color_tag = 'COLOR_06'
+    design_collection.hide_render = True
+
+
+    
+
+    print(f"given name is {part_name}, and {part_collection.name} was created")
+    pass
