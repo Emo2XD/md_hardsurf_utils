@@ -52,6 +52,12 @@ def normal_transfer(self):
         normal_transfer_vg.add([i], 1.0, 'REPLACE')
     bpy.ops.object.mode_set(mode='EDIT')
 
+
+    # sync DNT if there is corresponding modifiers
+    modifiers_name_list = [m.name for m in obj.modifiers]
+    if (ct.DNT_NORMAL_TRANSFER_NAME in modifiers_name_list) or (ct.DNT_BEVEL_NAME in modifiers_name_list):
+        sync_dnt()
+
     return 0
 
 
