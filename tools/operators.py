@@ -50,11 +50,22 @@ class MDHARD_OT_normal_transfer(bpy.types.Operator):
     bl_label = "MD Normal Transfer"
     bl_options = {'REGISTER', 'UNDO'}
 
-
-
+    @classmethod
+    def poll(self, context:bpy.types.Context):
+        active_obj = context.active_object
+        if active_obj is None:
+            return False
+        else:
+            return active_obj.type == 'MESH' and active_obj.mode == 'EDIT'
+        
+        
     def execute(self, context):
-        self.report({"INFO"}, f"Add normal transfer modefier along with DNT")
-        return {"FINISHED"}
+        result = ut.normal_transfer(self)
+        if result == 1:
+            return {"CANCELLED"}
+        else:
+            self.report({"INFO"}, f"Normal transfer added")
+            return {"FINISHED"}
 
 
     # def invoke(self, context, event):

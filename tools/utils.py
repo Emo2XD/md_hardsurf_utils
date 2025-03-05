@@ -1,10 +1,95 @@
 import bpy
+import bmesh
 import os
 from pathlib import Path
 from typing import List
 from ..myblendrc_utils import utils as myu
 from . import constants as ct
 
+def normal_transfer(self):
+    """Setup normal transfer from object.
+    """
+    context = bpy.context
+    obj = context.active_object
+
+    # Get source object and validate.
+    part_collection = get_parent_part_collection(obj=obj, fallback=context.scene.collection)
+    normal_src_obj = getattr(part_collection, ct.NORMAL_TRANSFER_SRC_OBJ_PER_COLLECTION)
+    if normal_src_obj == obj:
+        self.report({"WARNING"}, f"Source Object '{normal_src_obj.name}' has to be different from target. Abort")
+        return 1
+    
+    # Setup Normal Transfer Modifier, reuse existing normal transfer if found.
+    existing_normal_transfer_mods = [m for m in obj.modifiers if m.name.startswith(f"{ct.MD_NORMAL_TRANSFER_NAME}-")]
+    for m in existing_normal_transfer_mods:
+        if m.object == normal_src_obj:
+            normal_transfer_mod = m
+            break
+    else:
+        normal_transfer_mod = obj.modifiers.new(name=f"{ct.MD_NORMAL_TRANSFER_NAME}-{normal_src_obj.name}", type='DATA_TRANSFER')
+        normal_transfer_mod.use_object_transform = False
+        normal_transfer_mod.use_loop_data = True
+        normal_transfer_mod.data_types_loops = {'CUSTOM_NORMAL'}
+        normal_transfer_mod.loop_mapping = 'POLYINTERP_NEAREST'
+        normal_transfer_mod.show_in_editmode = True
+        normal_transfer_mod.object = normal_src_obj
+
+
+    # Get vertex group and set as Normal transfer modifier vertex group.
+    normal_transfer_vg_name = normal_transfer_mod.vertex_group # this is string property.
+    if normal_transfer_vg_name == '':
+        vg_name = f"{ct.MD_NORMAL_TRANSFER_NAME}-{normal_src_obj.name}"
+        normal_transfer_vg = get_or_create_vertex_group(obj, vg_name)
+        normal_transfer_mod.vertex_group = normal_transfer_vg.name # you should use generated name to handle digit like .001
+    else:
+        normal_transfer_vg = obj.vertex_groups.get(normal_transfer_vg_name)
+    
+    # Assign to vertex group
+    selected_v_indices = get_selected_vertex_indices_bmesh(obj)
+
+    bpy.ops.object.mode_set(mode='OBJECT')
+    for i in selected_v_indices:
+        normal_transfer_vg.add([i], 1.0, 'REPLACE')
+    bpy.ops.object.mode_set(mode='EDIT')
+
+    return 0
+
+
+def get_or_create_vertex_group(obj:bpy.types.Object, name:str)->bpy.types.VertexGroup:
+    """Get vertex group, if not found, then create new one.
+    """
+    vg = obj.vertex_groups.get(name)
+    if vg is not None:
+        return vg
+    else:
+        vg = obj.vertex_groups.new(name=name)
+        return vg
+
+
+
+
+
+def get_selected_vertex_indices_bmesh(obj:bpy.types.Object):
+    """
+    Returns a list of indices of selected vertices using bmesh. More efficient for large meshes.
+    Returns an empty list if no mesh object is active or no vertices are selected.
+    """
+    if obj and obj.type == 'MESH':
+        bm = bmesh.from_edit_mesh(obj.data) if bpy.context.object.mode == 'EDIT' else bmesh.new()
+
+        if bpy.context.object.mode == 'OBJECT':
+           bm.from_mesh(obj.data)
+
+        selected_vertices = [v.index for v in bm.verts if v.select]
+
+        if bpy.context.object.mode == 'OBJECT':
+            bm.free() #free bmesh when mode is object.
+
+        return selected_vertices
+    else:
+        return []
+
+    
 
 
 def sync_dnt():
