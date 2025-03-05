@@ -5,7 +5,16 @@ from .tools import utils as ut
 
 # TODO: Add filter funciton to only show objects in active part collection?
 def poll_is_obj_in_part_collection(self, obj):
-    return obj.type == 'MESH'
+    """Poll function to filter object, nly show when active object exist."""
+    active_obj = bpy.context.active_object
+    if active_obj is None:
+        return False
+    
+    normal_collection = ut.get_mk_reserved_collection_under_part(obj=obj, prefix=ct.NORMAL_COLLECTION, create=False)
+    if normal_collection == None:
+        return obj.type == 'MESH' and active_obj != obj # if no normal collection found, then show every object with mesh
+    else:
+        return (obj.type == 'MESH' and active_obj != obj) and (obj in normal_collection.all_objects[:]) 
 
 register_prop(
         bpy.types.Collection,

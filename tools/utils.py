@@ -82,6 +82,16 @@ def sync_dnt():
     return
 
 
+def regenerate_reserved_collection_under_part():
+    """Regenerate reserved collection under part (when accidentally removed some of them)
+    """
+    part_collection = bpy.context.collection
+    setup_reserved_part_collection(part_collection)
+    return
+
+
+
+
 def get_mk_collection(name:str, parent:bpy.types.Collection=None)->bpy.types.Collection:
     """Get collection and return. If not exists, create.
     Args:
@@ -102,7 +112,7 @@ def get_mk_collection(name:str, parent:bpy.types.Collection=None)->bpy.types.Col
     return target_collection
 
 
-def get_mk_reserved_collection_under_part(obj:bpy.types.Object, prefix:str):
+def get_mk_reserved_collection_under_part(obj:bpy.types.Object, prefix:str, create:bool=True)->bpy.types.Collection:
     """ Create or get reserved collection under part collection using prefix. (from given object) 
     Create: Just create using prefix. {prefix}-{part_name} e.g. NORMAL-{part.name} under part collection.
     Get: Get collection with specified prefix. Ignoring rest of the string.
@@ -112,6 +122,7 @@ def get_mk_reserved_collection_under_part(obj:bpy.types.Object, prefix:str):
     Args:
         obj: try to find parent part collection from this object
         prefix: Create or get collection, whose name starts with this prefix, under parent part collection.
+        create: If False, suppress creation of new collection
     """
     part_collection = get_parent_part_collection(obj, fallback=bpy.context.scene.collection)
 
@@ -123,9 +134,12 @@ def get_mk_reserved_collection_under_part(obj:bpy.types.Object, prefix:str):
             continue
 
     # if there is no collection starts with prefix, then create new one.
-    new_collection = bpy.data.collections.new(name=f"{prefix}-{part_collection.name}")
-    part_collection.children.link(new_collection)
-    return new_collection
+    if create == True:
+        new_collection = bpy.data.collections.new(name=f"{prefix}-{part_collection.name}")
+        part_collection.children.link(new_collection)
+        return new_collection
+    else:
+        return None
 
 
 
@@ -164,18 +178,21 @@ def setup_part_collection(part_name:str="Part"):
     setattr(part_collection, ct.IS_MD_HARDSURF_PART_COLLECTION, True)
     bpy.context.scene.collection.children.link(part_collection)
     
-    final_collection  = get_mk_collection(name=f"{ct.FINAL_COLLECTION}-{part_collection.name}", parent=part_collection)
-    design_collection = get_mk_collection(name=f"{ct.DESIGN_COLLECTION}-{part_collection.name}", parent=part_collection)
-    # normal_collection = get_mk_collection(name=f"{ct.NORMAL_COLLECTION}-{part_collection.name}", parent=part_collection) # TODO:might not need at setup. Create at Normal transfer operator?
-
-    # normal_collection.color_tag = 'COLOR_05'
-    # normal_collection.hide_render = True
-    design_collection.color_tag = 'COLOR_06'
-    design_collection.hide_render = True
-
-
-    
-
+    setup_reserved_part_collection(part_collection)
     print(f"given name is {part_name}, and {part_collection.name} was created")
 
+    return
+
+def setup_reserved_part_collection(part_collection:bpy.types.Collection):
+    """Create Final-, Design-, Normal- collection under given part_collection
+    """
+    # you have to use get_mk_collection because you do not have object inside part collection at this point.
+    final_collection  = get_mk_collection(name=f"{ct.FINAL_COLLECTION}-{part_collection.name}", parent=part_collection)
+    design_collection = get_mk_collection(name=f"{ct.DESIGN_COLLECTION}-{part_collection.name}", parent=part_collection)
+    normal_collection = get_mk_collection(name=f"{ct.NORMAL_COLLECTION}-{part_collection.name}", parent=part_collection) # needs to be generated because you need this before do normal transfer to put source object in it
+
+    normal_collection.color_tag = 'COLOR_05'
+    normal_collection.hide_render = True
+    design_collection.color_tag = 'COLOR_06'
+    design_collection.hide_render = True
     return

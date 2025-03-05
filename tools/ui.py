@@ -29,7 +29,10 @@ class MDHARD_PT_md_hard(bpy.types.Panel):
 
         layout = self.layout
         layout.operator(ot.MDHARD_OT_test_x.bl_idname, text="Test X")
-        layout.operator(ot.MDHARD_OT_setup_part_collection.bl_idname, text="Setup Part", icon="OUTLINER_COLLECTION")
+        row = layout.row(align=True)
+        split = row.split(factor=0.8, align=True)
+        split.operator(ot.MDHARD_OT_setup_part_collection.bl_idname, text="Setup Part", icon="OUTLINER_COLLECTION")
+        split.operator(ot.MDHARD_OT_regenerate_collections_under_part.bl_idname, text="", icon="FILE_REFRESH")
 
         layout.prop(part_collection, ct.NORMAL_TRANSFER_SRC_OBJ_PER_COLLECTION, text="Source")
         layout.operator(ot.MDHARD_OT_normal_transfer.bl_idname, text="Normal Transfer", icon="MOD_DATA_TRANSFER")

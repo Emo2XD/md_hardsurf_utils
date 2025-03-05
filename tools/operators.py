@@ -106,7 +106,23 @@ class MDHARD_OT_setup_part_collection(bpy.types.Operator):
 
         
 
+@register_wrap
+class MDHARD_OT_regenerate_collections_under_part(bpy.types.Operator):
+    """Regenerate reserved collection under active part collection
+    """
+    bl_idname = "md_hard.regenerate_collections_under_part"
+    bl_label = "MD Regenerate Collection"
+    bl_options = {'REGISTER', 'UNDO'}
 
+
+    @classmethod
+    def poll(self, context:bpy.types.Context):
+        return getattr(context.collection, ct.IS_MD_HARDSURF_PART_COLLECTION)
+        
+    def execute(self, context):
+        ut.regenerate_reserved_collection_under_part()
+        self.report({"INFO"}, f"Reserved collection regenerated")
+        return {"FINISHED"}
 
 
 
