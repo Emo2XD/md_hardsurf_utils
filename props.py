@@ -10,11 +10,12 @@ def poll_is_obj_in_part_collection(self, obj):
     if active_obj is None:
         return False
     
-    normal_collection = ut.get_mk_reserved_collection_under_part(obj=obj, prefix=ct.NORMAL_COLLECTION, create=False)
+    normal_collection = ut.get_mk_reserved_collection_under_part(obj=active_obj, prefix=ct.NORMAL_COLLECTION, create=False)
     if normal_collection == None:
-        return obj.type == 'MESH' and active_obj != obj # if no normal collection found, then show every object with mesh
+        # return obj.type == 'MESH' and active_obj != obj # if no normal collection found, then show every object with mesh
+        return False
     else:
-        return (obj.type == 'MESH' and active_obj != obj) and (obj in normal_collection.all_objects[:]) 
+        return obj.type == 'MESH' and (obj in normal_collection.all_objects[:]) 
 
 register_prop(
         bpy.types.Collection,
