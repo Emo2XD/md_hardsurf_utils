@@ -3,6 +3,7 @@ import bpy
 __bl_classes = []
 __extend_menu = []
 __props = []
+__other_register = [] # List(register_func, unregister_func)
 
 def register_wrap(cls):
     __bl_classes.append(cls)
@@ -25,3 +26,9 @@ def register_prop(obj, prop_name, prop):
     """
     __props.append((obj, prop_name, prop))
     return
+
+
+def register_other(register_func, unregister_func):
+    """Register, unregister custom function.
+    """
+    __other_register.append((register_func, unregister_func))

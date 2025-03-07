@@ -27,6 +27,9 @@ def register():
     for obj, name, prop in setup_tools.register.__props:
         setattr(obj, name, prop)
 
+    for register_func, _ in setup_tools.register.__other_register:
+        register_func()
+
 def unregister():
     for cls in setup_tools.register.__bl_classes:
         bpy.utils.unregister_class(cls)
@@ -36,6 +39,9 @@ def unregister():
 
     for obj, name, _ in setup_tools.register.__props:
         delattr(obj, name)
+
+    for _, unregister_func in setup_tools.register.__other_register:
+        unregister_func()
 
 if __name__ == '__main__':
     register()

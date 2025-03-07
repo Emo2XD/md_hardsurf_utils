@@ -6,6 +6,10 @@ from typing import List
 from ..myblendrc_utils import utils as myu
 from . import constants as ct
 
+
+#-------------------------------------------------------------------------------
+# Normal Transfer
+#-------------------------------------------------------------------------------
 def normal_transfer(self):
     """Setup normal transfer from object.
     """
@@ -95,9 +99,10 @@ def get_selected_vertex_indices_bmesh(obj:bpy.types.Object):
     else:
         return []
 
-    
 
-
+#-------------------------------------------------------------------------------
+# Sync DNT
+#-------------------------------------------------------------------------------
 def sync_dnt():
     """Setup and sync DNT
     """
