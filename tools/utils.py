@@ -100,6 +100,18 @@ def get_selected_vertex_indices_bmesh(obj:bpy.types.Object):
         return []
 
 
+def poll_is_obj_in_part_collection(self, obj):
+    """Poll function to filter object, nly show when active object exist."""
+    active_obj = bpy.context.active_object
+    if active_obj is None:
+        return False
+    
+    normal_collection = get_mk_reserved_collection_under_part(obj=active_obj, prefix=ct.NORMAL_COLLECTION, create=False)
+    if normal_collection == None:
+        return False
+    else:
+        return obj.type == 'MESH' and (obj in normal_collection.all_objects[:]) 
+
 #-------------------------------------------------------------------------------
 # Sync DNT
 #-------------------------------------------------------------------------------
