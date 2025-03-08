@@ -95,6 +95,7 @@ class MDHARD_OT_separate_normal_source(bpy.types.Operator):
 
     src_obj_name: bpy.props.StringProperty(name="Source", default=f'Normal_Source') #type: ignore
     set_as_normal_source: bpy.props.BoolProperty(name="Set As Source", default=True, description="If True, this separated object will be set as src object. You can then use this object in normal transfer") # type:ignore
+    shade_smooth: bpy.props.BoolProperty(name="Shade Smooth", default=True, description="If True, force shade smooth on split.") # type: ignore
 
     @classmethod
     def poll(self, context:bpy.types.Context):
@@ -113,7 +114,7 @@ class MDHARD_OT_separate_normal_source(bpy.types.Operator):
             self.report({"WARNING"}, f"Please Setup Valid Part Collection.")
             return {"CANCELLED"}
 
-        ut.separate_as_normal_source_object(self.src_obj_name, self.set_as_normal_source)
+        ut.separate_as_normal_source_object(self.src_obj_name, self.set_as_normal_source, self.shade_smooth)
         
         self.report({"INFO"}, f"MD Normal transfer")
         return {"FINISHED"}
@@ -186,6 +187,22 @@ class MDHARD_OT_regenerate_collections_under_part(bpy.types.Operator):
         return {"FINISHED"}
 
 
+@register_wrap
+class MDHARD_OT_set_bevel_weight(bpy.types.Operator):
+    """Set bevel weight with prefix and mark as sharp option
+    """
+    bl_idname = "md_hard.set_bevel_weight"
+    bl_label = "MD Set Bevel Weight"
+    bl_options = {'REGISTER', 'UNDO'}
+
+
+    @classmethod
+    def poll(self, context:bpy.types.Context):
+        return bpy.context.active_object is not None
+        
+    def execute(self, context):
+        
+        return {"FINISHED"}
 
 
 

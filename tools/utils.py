@@ -141,7 +141,7 @@ def remove_from_normal_transfer(obj:bpy.types.Object, v_indices:List[int]):
 #-------------------------------------------------------------------------------
 # Separate As Normal Transfer
 #-------------------------------------------------------------------------------
-def separate_as_normal_source_object(name:str, assign_as_src:bool=True):
+def separate_as_normal_source_object(name:str, assign_as_src:bool=True, shade_smooth:bool=True):
     """Separate as normal source object. Then you can use separated object in normal transfer.
     if there is DNT bevel and normal transfer modifier, then it will be removed.
     """
@@ -150,6 +150,8 @@ def separate_as_normal_source_object(name:str, assign_as_src:bool=True):
 
     # Separate
     object_set_before = set(bpy.context.selected_objects)
+    if shade_smooth:
+        bpy.ops.mesh.faces_shade_smooth() # Automatic shade smooth.
     bpy.ops.mesh.separate(type='SELECTED')
     object_set_after = set(bpy.context.selected_objects)
 
