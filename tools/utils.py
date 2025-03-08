@@ -266,6 +266,40 @@ def set_edge_bevel_weight_with_sharp(weight:float, modify_sharp:bool=True):
     
     return
 
+#-------------------------------------------------------------------------------
+# Toggle DNT Visibility
+#-------------------------------------------------------------------------------
+
+def toggle_dnt_visibility(obj:bpy.types.Object):
+    """Toggle DNT modifier visibility.
+    Specifics:
+    -Only when all the DNT modifiers are visible, then hides all DNT modifiers.
+    -If one or more DNT modifiers are hidden, then shows all DNT modifiers.
+    """
+    mod_dnt_bevel = obj.modifiers.get(ct.DNT_BEVEL_NAME)
+    mod_dnt_nromal = obj.modifiers.get(ct.DNT_NORMAL_TRANSFER_NAME)
+
+    # by using list, it is easy to manage toggle at once
+    mods_to_toggle:List[bpy.types.Modifier] = [m for m in [mod_dnt_bevel, mod_dnt_nromal] if m is not None]
+
+    if len(mods_to_toggle) == 0:
+        print("No DNT modifiers to toggle")
+        return 1
+    
+    is_visible_all = True
+    for m in mods_to_toggle:
+        is_visible_all &= m.show_viewport
+
+    if is_visible_all:
+        for m in mods_to_toggle:
+            m.show_viewport = False
+    else:
+        for m in mods_to_toggle:
+            m.show_viewport = True
+
+    return
+
+
 
 #-------------------------------------------------------------------------------
 # Sync DNT

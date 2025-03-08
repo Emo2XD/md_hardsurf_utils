@@ -27,6 +27,33 @@ class MDHARD_OT_sync_dnt(bpy.types.Operator):
 
 
 
+@register_wrap
+class MDHARD_OT_toggle_dnt_visibility(bpy.types.Operator):
+    """Toggle DNT visibility
+    Toggles following two modifier visibility
+    - DNT Bevel
+    - DNT Data transfer
+    """
+    bl_idname = "md_hard.toggle_dnt_visibility"
+    bl_label = "Toggle DNT Visibility"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(self, context:bpy.types.Context):
+        return context.active_object is not None
+
+    def execute(self, context):
+        obj = bpy.context.active_object
+        result = ut.toggle_dnt_visibility(obj)
+        
+        if result == 1:
+            self.report({"WARNING"}, f"This object does not have DNT modifiers.")
+            return {"CANCELLED"}
+
+
+        return {"FINISHED"}
+
+
 # @register_wrap
 # class MDHARD_OT_update_dnt(bpy.types.Operator):
 #     """Update Dual Normal Transfer Counterpart Object

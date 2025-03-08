@@ -87,6 +87,7 @@ class MDHARD_MT_md_hard_surface(bpy.types.Menu):
             if context.area.type == 'VIEW_3D':
                 layout.menu(MDHARD_MT_face_strength_submenu.bl_idname, text="F Face Strength...", icon="FACESEL")
                 layout.menu(MDHARD_MT_edge_bevel_weight_submenu.bl_idname, text="B Bevel Weight...", icon="MOD_BEVEL")
+                layout.menu(MDHARD_MT_toggle_submenu.bl_idname, text="T Toggle Vibility...")
             
 
         except AttributeError:
@@ -144,7 +145,19 @@ class MDHARD_MT_edge_bevel_weight_submenu(bpy.types.Menu):
             pass
 
       
-        
+@register_wrap
+class MDHARD_MT_toggle_submenu(bpy.types.Menu):
+    bl_label = "Hard Surface Toggle Menu"
+    bl_idname = "MDHARD_MT_toggle_submenu"
+
+    def draw(self, context):
+        layout = self.layout
+        try:
+            if context.object.type == 'MESH':
+                layout.operator(ot.MDHARD_OT_toggle_dnt_visibility.bl_idname, text="T Toggle DNT visibility")
+                
+        except AttributeError:
+            pass
 
         
         # layout.menu("MYBLENDRC_MT_MIP_SUBMENU", text="M MIP/MTS operators...")
