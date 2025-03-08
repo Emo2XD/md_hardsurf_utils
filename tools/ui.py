@@ -67,3 +67,58 @@ class MDHARD_PT_md_normal_transfer(bpy.types.Panel):
         layout.operator(ot.MDHARD_OT_sync_dnt.bl_idname, text="Sync DNT", icon="FILE_REFRESH")    
 
         return
+    
+
+
+
+@register_wrap
+class MDHARD_MT_md_hard_surface(bpy.types.Menu):
+    bl_label = "MD Hard Surface Menu"
+    bl_idname = "MDHARD_MT_md_hard_surface"
+
+    def draw(self, context):
+        layout = self.layout
+        try:
+            if context.object.type == 'MESH':
+                if context.active_object.mode=='EDIT':
+                    layout.menu(MDHARD_MT_face_strength_submenu.bl_idname, text="F Face Strength...")
+
+
+        except AttributeError:
+            # Exception when you have not selected anything.
+            # When you have not selected mesh, you cannot check the line
+            # "context.object.type"  but this error doesn't do anything so ignore it.
+            pass
+
+
+@register_wrap
+class MDHARD_MT_face_strength_submenu(bpy.types.Menu):
+    bl_label = "Face Strength Menu"
+    bl_idname = "MDHARD_MT_face_strength_submenu"
+
+    def draw(self, context):
+        layout = self.layout
+        if context.area.type == 'VIEW_3D':
+            try:
+                ops_face_weak = layout.operator("mesh.mod_weighted_strength", text="W Weak")
+                ops_face_weak.set = True
+                ops_face_weak.face_strength = 'WEAK'
+
+                ops_face_medium = layout.operator("mesh.mod_weighted_strength", text="M Medium")
+                ops_face_medium.set = True
+                ops_face_medium.face_strength = 'MEDIUM'
+
+                ops_face_strong = layout.operator("mesh.mod_weighted_strength", text="S Strong")
+                ops_face_strong.set = True
+                ops_face_strong.face_strength = 'STRONG'
+
+            except AttributeError:
+                pass
+
+
+         
+        
+
+        
+        # layout.menu("MYBLENDRC_MT_MIP_SUBMENU", text="M MIP/MTS operators...")
+
