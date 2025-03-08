@@ -59,13 +59,18 @@ class MDHARD_PT_md_normal_transfer(bpy.types.Panel):
         if part_collection is not None:
             layout.label(text=f"Active Part: {part_collection.name}", icon="OUTLINER_COLLECTION")
             layout.prop(part_collection, ct.NORMAL_TRANSFER_SRC_OBJ_PER_COLLECTION, text="Source")
-            layout.operator(ot.MDHARD_OT_normal_transfer.bl_idname, text="Normal Transfer", icon="MOD_DATA_TRANSFER")
+            row = layout.row(align=True)
+            split = row.split(factor=0.2)
+            split.operator(ot.MDHARD_OT_separate_normal_source.bl_idname, text="", icon="MOD_EXPLODE")
+            split.operator(ot.MDHARD_OT_normal_transfer.bl_idname, text="Normal Transfer", icon="MOD_DATA_TRANSFER")
+
         else:
             layout.label(text=f"Active Part: None")
 
         layout.separator()
         layout.operator(ot.MDHARD_OT_sync_dnt.bl_idname, text="Sync DNT", icon="FILE_REFRESH")    
 
+        
         return
     
 

@@ -141,22 +141,42 @@ def remove_from_normal_transfer(obj:bpy.types.Object, v_indices:List[int]):
 #-------------------------------------------------------------------------------
 # Separate As Normal Transfer
 #-------------------------------------------------------------------------------
-def separate_as_normal_sourc_object():
+def separate_as_normal_source_object(name:str, assign_as_src:bool=True):
     """Separate as normal source object. Then you can use separated object in normal transfer.
     if there is DNT bevel and normal transfer modifier, then it will be removed.
     """
     active_obj = bpy.context.active_object
     part_collection = get_parent_part_collection(obj=active_obj)
 
+    # Separate
     object_set_before = set(bpy.context.selected_objects)
     bpy.ops.mesh.separate(type='SELECTED')
     object_set_after = set(bpy.context.selected_objects)
 
-    separated_objects = list(object_set_after - object_set_before)
+    separated_objects = list(object_set_after - object_set_before) # might be multiple object is separated. the last one will be used.
+
+    # Set as normal transfer source object.
+    if len(separated_objects) == 1 and assign_as_src == True:
+        setattr(part_collection, ct.NORMAL_TRANSFER_SRC_OBJ_PER_COLLECTION, separated_objects[0])
+
+    normal_collection = get_mk_reserved_collection_under_part(active_obj, ct.NORMAL_COLLECTION)
     for obj in separated_objects:
-        obj
-    pass
-    
+        obj.name = name
+        remove_dnt_modifiers(obj)
+        remove_normal_transfer_modifiers(obj)
+        for col in  obj.users_collection:
+            col.objects.unlink(obj)
+        normal_collection.objects.link(obj)
+        
+    return
+
+def remove_normal_transfer_modifiers(obj:bpy.types.Object):
+    """Remove normal transfer modifiers from given object (remove only generated through this Addon.)
+    """
+    normal_transfer_modifiers:List[bpy.types.Object] = [m for m in obj.modifiers if m.name.startswith(f"{ct.MD_NORMAL_TRANSFER_NAME}-")]
+    for m in normal_transfer_modifiers:
+        obj.modifiers.remove(m)
+    return
 
 #-------------------------------------------------------------------------------
 # Sync DNT
@@ -238,6 +258,7 @@ def sync_dnt():
 
 def remove_dnt_modifiers(obj:bpy.types.Object):
     """Remove DNT modifiers from given object
+    
     Remove DNT bevel modifier and DNT normal transfer modifier from given object.
     """
     dnt_bevel = obj.modifiers.get(ct.DNT_NORMAL_TRANSFER_NAME)
