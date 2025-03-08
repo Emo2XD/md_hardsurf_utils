@@ -79,10 +79,10 @@ class MDHARD_MT_md_hard_surface(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         try:
-            if context.object.type == 'MESH':
-                if context.active_object.mode=='EDIT':
-                    layout.menu(MDHARD_MT_face_strength_submenu.bl_idname, text="F Face Strength...")
+            if context.area.type == 'VIEW_3D':
+                layout.menu(MDHARD_MT_face_strength_submenu.bl_idname, text="F Face Strength...")
 
+            
 
         except AttributeError:
             # Exception when you have not selected anything.
@@ -98,22 +98,23 @@ class MDHARD_MT_face_strength_submenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        if context.area.type == 'VIEW_3D':
-            try:
-                ops_face_weak = layout.operator("mesh.mod_weighted_strength", text="W Weak")
-                ops_face_weak.set = True
-                ops_face_weak.face_strength = 'WEAK'
+        try:
+            if context.object.type == 'MESH':
+                if context.active_object.mode=='EDIT':
+                    ops_face_weak = layout.operator("mesh.mod_weighted_strength", text="W Weak")
+                    ops_face_weak.set = True
+                    ops_face_weak.face_strength = 'WEAK'
 
-                ops_face_medium = layout.operator("mesh.mod_weighted_strength", text="M Medium")
-                ops_face_medium.set = True
-                ops_face_medium.face_strength = 'MEDIUM'
+                    ops_face_medium = layout.operator("mesh.mod_weighted_strength", text="M Medium")
+                    ops_face_medium.set = True
+                    ops_face_medium.face_strength = 'MEDIUM'
 
-                ops_face_strong = layout.operator("mesh.mod_weighted_strength", text="S Strong")
-                ops_face_strong.set = True
-                ops_face_strong.face_strength = 'STRONG'
+                    ops_face_strong = layout.operator("mesh.mod_weighted_strength", text="S Strong")
+                    ops_face_strong.set = True
+                    ops_face_strong.face_strength = 'STRONG'
 
-            except AttributeError:
-                pass
+        except AttributeError:
+            pass
 
 
          
