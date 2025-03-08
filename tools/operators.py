@@ -45,6 +45,9 @@ class MDHARD_OT_sync_dnt(bpy.types.Operator):
 @register_wrap
 class MDHARD_OT_normal_transfer(bpy.types.Operator):
     """Add Normal Transfer Modifier along with DNT
+    If there is no source object, then those vertices will be removed from normal transfer.
+    Each vertex must be in only one normal transfer vertex group. This operator automatically
+    cleans up vertex group.
     """
     bl_idname = "md_hard.normal_transfer"
     bl_label = "MD Normal Transfer"
@@ -67,15 +70,15 @@ class MDHARD_OT_normal_transfer(bpy.types.Operator):
             self.report({"WARNING"}, f"Please Setup Valid Part Collection.")
             return {"CANCELLED"}
 
-        normal_src_obj = getattr(part_collection, ct.NORMAL_TRANSFER_SRC_OBJ_PER_COLLECTION)
+        normal_src_obj = getattr(part_collection, ct.NORMAL_TRANSFER_SRC_OBJ_PER_COLLECTION, None)
 
-        if normal_src_obj is None:
-            self.report({"WARNING"}, f"Please Select Source Object.")
-            return {"CANCELLED"}
+        # if normal_src_obj is None:
+        #     self.report({"WARNING"}, f"Please Select Source Object.")
+        #     return {"CANCELLED"}
 
         ut.normal_transfer(target_obj=target_obj, normal_src_obj=normal_src_obj)
         
-        self.report({"INFO"}, f"Normal transfer modifier added")
+        self.report({"INFO"}, f"MD Normal transfer")
         return {"FINISHED"}
 
 
