@@ -76,7 +76,11 @@ class MDHARD_OT_normal_transfer(bpy.types.Operator):
         #     self.report({"WARNING"}, f"Please Select Source Object.")
         #     return {"CANCELLED"}
 
-        ut.normal_transfer(target_obj=target_obj, normal_src_obj=normal_src_obj)
+        result = ut.normal_transfer(target_obj=target_obj, normal_src_obj=normal_src_obj)
+
+        if result == 1:
+            self.report({"WARNING"}, f"No vertex is selected")
+            return {"CANCELLED"}
         
         self.report({"INFO"}, f"MD Normal transfer")
         return {"FINISHED"}
@@ -114,7 +118,10 @@ class MDHARD_OT_separate_normal_source(bpy.types.Operator):
             self.report({"WARNING"}, f"Please Setup Valid Part Collection.")
             return {"CANCELLED"}
 
-        ut.separate_as_normal_source_object(self.src_obj_name, self.set_as_normal_source, self.shade_smooth)
+        result = ut.separate_as_normal_source_object(self.src_obj_name, self.set_as_normal_source, self.shade_smooth)
+        if result == 1:
+            self.report({"WARNING"}, f"No vertex is selected")
+            return {"CANCELLED"}
         
         self.report({"INFO"}, f"MD Normal transfer")
         return {"FINISHED"}

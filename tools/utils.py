@@ -16,6 +16,10 @@ def normal_transfer(target_obj:bpy.types.Object, normal_src_obj:bpy.types.Object
     """
 
     selected_v_indices = get_selected_vertex_indices_bmesh(target_obj)
+    if len(selected_v_indices) == 0:
+        print("No vertex is selected.")
+        return 1
+
     remove_from_normal_transfer(target_obj, selected_v_indices)
 
     if normal_src_obj is None: # early out, just remove from exixsting normal transfer modifier.
@@ -146,6 +150,10 @@ def separate_as_normal_source_object(name:str, assign_as_src:bool=True, shade_sm
     if there is DNT bevel and normal transfer modifier, then it will be removed.
     """
     active_obj = bpy.context.active_object
+    if len(get_selected_vertex_indices_bmesh(active_obj)) == 0:
+        print("No vertex is selected.")
+        return 1
+    
     part_collection = get_parent_part_collection(obj=active_obj)
 
     # Separate
@@ -179,6 +187,16 @@ def remove_normal_transfer_modifiers(obj:bpy.types.Object):
     for m in normal_transfer_modifiers:
         obj.modifiers.remove(m)
     return
+
+
+#-------------------------------------------------------------------------------
+# Set bevel weight
+#-------------------------------------------------------------------------------
+def set_edge_bevel_weight_with_sharp():
+    """Set edge bevel weight with preset and shapr option for convenience
+    """
+    return
+
 
 #-------------------------------------------------------------------------------
 # Sync DNT
