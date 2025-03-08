@@ -299,6 +299,15 @@ def toggle_dnt_visibility(obj:bpy.types.Object):
 
     return
 
+#-------------------------------------------------------------------------------
+# Face Strength Material Override
+#-------------------------------------------------------------------------------
+def face_strength_material_override_update(self, context):
+    """Callback function for material override property
+    """
+    print(f"face_strength_material_override_update called, value: {getattr(self, ct.IS_MD_FACE_STRENGTH_MATERIAL_OVERRIDE)}")
+    
+    return
 
 
 #-------------------------------------------------------------------------------

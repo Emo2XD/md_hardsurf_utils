@@ -15,7 +15,15 @@ register_prop(
         ct.IS_MD_HARDSURF_PART_COLLECTION, bpy.props.BoolProperty(name=ct.IS_MD_HARDSURF_PART_COLLECTION, default = False, description="If True, then this collection is considered to be a 'MD Hard surface collection'")
         )
 
-
+register_prop(
+        bpy.types.Scene,
+        ct.IS_MD_FACE_STRENGTH_MATERIAL_OVERRIDE, bpy.props.BoolProperty(
+            name=ct.IS_MD_FACE_STRENGTH_MATERIAL_OVERRIDE, 
+            default = False, 
+            description="If True, then override current material with face strength",
+            update=ut.face_strength_material_override_update
+            )
+        )
 
 # def msgbus_callback(*arg):
 #     # in console will be print selected_objects 
