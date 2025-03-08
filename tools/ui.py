@@ -52,14 +52,18 @@ class MDHARD_PT_md_normal_transfer(bpy.types.Panel):
     def draw(self, context):
         active_obj = context.active_object
         if active_obj is not None:
-            part_collection = ut.get_parent_part_collection(active_obj)
-            if part_collection is None:
-                part_collection = context.scene.collection
+            part_collection = ut.get_parent_part_collection(active_obj, fallback=None)
         else:
-            part_collection = context.scene.collection
+            part_collection = None
 
         layout = self.layout
-        layout.prop(part_collection, ct.NORMAL_TRANSFER_SRC_OBJ_PER_COLLECTION, text="Source")
-        layout.operator(ot.MDHARD_OT_normal_transfer.bl_idname, text="Normal Transfer", icon="MOD_DATA_TRANSFER")
+        if part_collection is not None:
+            layout.label(text=f"Active Part: {part_collection.name}")
+            layout.prop(part_collection, ct.NORMAL_TRANSFER_SRC_OBJ_PER_COLLECTION, text="Source")
+            layout.operator(ot.MDHARD_OT_normal_transfer.bl_idname, text="Normal Transfer", icon="MOD_DATA_TRANSFER")
+        else:
+            layout.label(text=f"Active Part: None")
+            
+            
 
         return

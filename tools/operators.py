@@ -60,12 +60,23 @@ class MDHARD_OT_normal_transfer(bpy.types.Operator):
         
         
     def execute(self, context):
-        result = ut.normal_transfer(self)
-        if result == 1:
+
+        target_obj = context.active_object
+        part_collection = ut.get_parent_part_collection(obj=target_obj, fallback=None)
+        if part_collection is None:
+            self.report({"WARNING"}, f"Please Setup Valid Part Collection.")
             return {"CANCELLED"}
-        else:
-            self.report({"INFO"}, f"Normal transfer added")
-            return {"FINISHED"}
+
+        normal_src_obj = getattr(part_collection, ct.NORMAL_TRANSFER_SRC_OBJ_PER_COLLECTION)
+
+        if normal_src_obj is None:
+            self.report({"WARNING"}, f"Please Select Source Object.")
+            return {"CANCELLED"}
+
+        ut.normal_transfer(target_obj=target_obj, normal_src_obj=normal_src_obj)
+        
+        self.report({"INFO"}, f"Normal transfer modifier added")
+        return {"FINISHED"}
 
 
     # def invoke(self, context, event):

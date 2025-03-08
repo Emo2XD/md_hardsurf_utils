@@ -10,27 +10,22 @@ from . import constants as ct
 #-------------------------------------------------------------------------------
 # Normal Transfer
 #-------------------------------------------------------------------------------
-def normal_transfer(self):
+def normal_transfer(target_obj:bpy.types.Object, normal_src_obj:bpy.types.Object):
     """Setup normal transfer from object.
     """
-    context = bpy.context
-    obj = context.active_object
-
-    # Get source object and validate.
-    part_collection = get_parent_part_collection(obj=obj, fallback=context.scene.collection)
-    normal_src_obj = getattr(part_collection, ct.NORMAL_TRANSFER_SRC_OBJ_PER_COLLECTION)
-    if normal_src_obj == obj:
-        self.report({"WARNING"}, f"Source Object '{normal_src_obj.name}' has to be different from target. Abort")
-        return 1
+    
+    # if normal_src_obj == obj:
+        # self.report({"WARNING"}, f"Source Object '{normal_src_obj.name}' has to be different from target. Abort")
+        # return 1
     
     # Setup Normal Transfer Modifier, reuse existing normal transfer if found.
-    existing_normal_transfer_mods = [m for m in obj.modifiers if m.name.startswith(f"{ct.MD_NORMAL_TRANSFER_NAME}-")]
+    existing_normal_transfer_mods = [m for m in target_obj.modifiers if m.name.startswith(f"{ct.MD_NORMAL_TRANSFER_NAME}-")]
     for m in existing_normal_transfer_mods:
         if m.object == normal_src_obj:
             normal_transfer_mod = m
             break
     else:
-        normal_transfer_mod = obj.modifiers.new(name=f"{ct.MD_NORMAL_TRANSFER_NAME}-{normal_src_obj.name}", type='DATA_TRANSFER')
+        normal_transfer_mod = target_obj.modifiers.new(name=f"{ct.MD_NORMAL_TRANSFER_NAME}-{normal_src_obj.name}", type='DATA_TRANSFER')
         normal_transfer_mod.use_object_transform = False
         normal_transfer_mod.use_loop_data = True
         normal_transfer_mod.data_types_loops = {'CUSTOM_NORMAL'}
@@ -43,13 +38,13 @@ def normal_transfer(self):
     normal_transfer_vg_name = normal_transfer_mod.vertex_group # this is string property.
     if normal_transfer_vg_name == '':
         vg_name = f"{ct.MD_NORMAL_TRANSFER_NAME}-{normal_src_obj.name}"
-        normal_transfer_vg = get_or_create_vertex_group(obj, vg_name)
+        normal_transfer_vg = get_or_create_vertex_group(target_obj, vg_name)
         normal_transfer_mod.vertex_group = normal_transfer_vg.name # you should use generated name to handle digit like .001
     else:
-        normal_transfer_vg = obj.vertex_groups.get(normal_transfer_vg_name)
+        normal_transfer_vg = target_obj.vertex_groups.get(normal_transfer_vg_name)
     
     # Assign to vertex group
-    selected_v_indices = get_selected_vertex_indices_bmesh(obj)
+    selected_v_indices = get_selected_vertex_indices_bmesh(target_obj)
 
     bpy.ops.object.mode_set(mode='OBJECT')
     for i in selected_v_indices:
@@ -58,11 +53,11 @@ def normal_transfer(self):
 
 
     # sync DNT if there is corresponding modifiers
-    modifiers_name_list = [m.name for m in obj.modifiers]
+    modifiers_name_list = [m.name for m in target_obj.modifiers]
     if (ct.DNT_NORMAL_TRANSFER_NAME in modifiers_name_list) or (ct.DNT_BEVEL_NAME in modifiers_name_list):
         sync_dnt()
 
-    return 0
+    return
 
 
 def get_or_create_vertex_group(obj:bpy.types.Object, name:str)->bpy.types.VertexGroup:
