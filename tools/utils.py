@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import List
 from ..myblendrc_utils import utils as myu
 from . import constants as ct
+# import numpy as np
 
 
 #-------------------------------------------------------------------------------
@@ -97,6 +98,27 @@ def get_selected_vertex_indices_bmesh(obj:bpy.types.Object):
             bm.free() #free bmesh when mode is object.
 
         return selected_vertices
+    else:
+        return []
+    
+
+def get_selected_edge_indices_bmesh(obj:bpy.types.Object):
+    """
+    Returns a list of indices of selected edges using bmesh. More efficient for large meshes.
+    Returns an empty list if no mesh object is active or no edges are selected.
+    """
+    if obj and obj.type == 'MESH':
+        bm = bmesh.from_edit_mesh(obj.data) if bpy.context.object.mode == 'EDIT' else bmesh.new()
+
+        if bpy.context.object.mode == 'OBJECT':
+           bm.from_mesh(obj.data)
+
+        selected_edges = [e.index for e in bm.edges if e.select]
+
+        if bpy.context.object.mode == 'OBJECT':
+            bm.free() #free bmesh when mode is object.
+
+        return selected_edges
     else:
         return []
 
@@ -192,9 +214,56 @@ def remove_normal_transfer_modifiers(obj:bpy.types.Object):
 #-------------------------------------------------------------------------------
 # Set bevel weight
 #-------------------------------------------------------------------------------
-def set_edge_bevel_weight_with_sharp():
+def set_edge_bevel_weight_with_sharp(weight:float, modify_sharp:bool=True):
     """Set edge bevel weight with preset and shapr option for convenience
+
+    Args:
+        weight: edge_bevel_weight
+        modify_sharp: If True, it automatically mark as sharp on bevel weight > 0, clear sharp from bevel weight == 0
     """
+    obj = bpy.context.active_object
+
+    mesh = obj.data
+
+    # get edge bevel weight attribute
+    edge_bevel_weight_attribute = mesh.attributes.get('bevel_weight_edge')
+    if edge_bevel_weight_attribute is None:
+        edge_bevel_weight_attribute = mesh.attributes.new(name="bevel_weight_edge", type="FLOAT", domain="EDGE")
+    
+    orig_attr = mesh.attributes.active
+    mesh.attributes.active = edge_bevel_weight_attribute
+    bpy.ops.mesh.attribute_set(value_float=weight)
+
+    if modify_sharp and weight > 0.0:
+        bpy.ops.mesh.mark_sharp()
+    elif modify_sharp and weight == 0.0:
+        bpy.ops.mesh.mark_sharp(clear=True)
+
+    mesh.attributes.active = orig_attr
+
+
+    
+    #TODO: really slow on dense mesh with mora than 100k polygons. Use bpy.ops instead.
+    # mesh = obj.data
+    # selected_edge_indices = get_selected_edge_indices_bmesh(obj=obj)
+
+    # edge_bevel_weight_arr = np.full(len(mesh.edges), 0.0, dtype='float32')
+    # edge_bevel_weight_arr[selected_edge_indices] = weight
+
+    # orig_mode = obj.mode
+    # bpy.ops.object.mode_set(mode='OBJECT')
+
+    # # get edge bevel weight attribute
+    # edge_bevel_weight_attribute = mesh.attributes.get('bevel_weight_edge')
+    # if edge_bevel_weight_attribute is None:
+    #     edge_bevel_weight_attribute = mesh.attributes.new(name="bevel_weight_edge", type="FLOAT", domain="EDGE")
+    
+    # edge_bevel_weight_attribute.data.foreach_set("value", list(edge_bevel_weight_arr))
+
+    # bpy.ops.object.mode_set(mode=orig_mode)
+
+
+    
     return
 
 

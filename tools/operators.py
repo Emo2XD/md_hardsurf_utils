@@ -202,13 +202,15 @@ class MDHARD_OT_set_bevel_weight(bpy.types.Operator):
     bl_label = "MD Set Bevel Weight"
     bl_options = {'REGISTER', 'UNDO'}
 
+    weight: bpy.props.FloatProperty(name='Weight', default=1.0, description='Edge Bevel Weight', subtype='FACTOR', min=0.0, max=1.0) #type: ignore
+    modify_sharp: bpy.props.BoolProperty(name='Modify sharp', default=True, description='If True, edge sharp will be automatically modified for DNT') # type: ignore
 
     @classmethod
     def poll(self, context:bpy.types.Context):
         return bpy.context.active_object is not None
         
     def execute(self, context):
-        
+        ut.set_edge_bevel_weight_with_sharp(self.weight, self.modify_sharp)
         return {"FINISHED"}
 
 
