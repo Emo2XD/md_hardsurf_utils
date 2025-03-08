@@ -138,7 +138,25 @@ def remove_from_normal_transfer(obj:bpy.types.Object, v_indices:List[int]):
 
     return
 
+#-------------------------------------------------------------------------------
+# Separate As Normal Transfer
+#-------------------------------------------------------------------------------
+def separate_as_normal_sourc_object():
+    """Separate as normal source object. Then you can use separated object in normal transfer.
+    if there is DNT bevel and normal transfer modifier, then it will be removed.
+    """
+    active_obj = bpy.context.active_object
+    part_collection = get_parent_part_collection(obj=active_obj)
 
+    object_set_before = set(bpy.context.selected_objects)
+    bpy.ops.mesh.separate(type='SELECTED')
+    object_set_after = set(bpy.context.selected_objects)
+
+    separated_objects = list(object_set_after - object_set_before)
+    for obj in separated_objects:
+        obj
+    pass
+    
 
 #-------------------------------------------------------------------------------
 # Sync DNT
@@ -208,14 +226,30 @@ def sync_dnt():
     # create normal transfer source object.
     normal_ref_obj = obj.copy()
     normal_ref_obj.name = f"{ct.DNT_NORMAL_TRANSFER_NAME}-{obj.name}"
-    normal_ref_obj.modifiers.remove(normal_ref_obj.modifiers.get(ct.DNT_NORMAL_TRANSFER_NAME))
-    normal_ref_obj.modifiers.remove(normal_ref_obj.modifiers.get(ct.DNT_BEVEL_NAME))
+    remove_dnt_modifiers(normal_ref_obj)
     dnt_collection.objects.link(normal_ref_obj)
 
 
     # setup data transfer modifier rerference object
     mod_dnt_nromal.object = normal_ref_obj
     return
+
+
+
+def remove_dnt_modifiers(obj:bpy.types.Object):
+    """Remove DNT modifiers from given object
+    Remove DNT bevel modifier and DNT normal transfer modifier from given object.
+    """
+    dnt_bevel = obj.modifiers.get(ct.DNT_NORMAL_TRANSFER_NAME)
+    dnt_normal_transfer = obj.modifiers.get(ct.DNT_BEVEL_NAME)
+
+    if dnt_bevel is not None:
+        obj.modifiers.remove(dnt_bevel)    
+    if dnt_normal_transfer is not None:
+        obj.modifiers.remove(dnt_normal_transfer)
+
+    return
+
 
 
 def regenerate_reserved_collection_under_part():
@@ -292,9 +326,19 @@ def get_parent_part_collection(obj:bpy.types.Object, fallback:bpy.types.Collecti
         collection which has IS_MD_HARDSURF_PART_COLLECTION == True property, and it contains given object.
     """
     md_hard_surface_part_collections = [c for c in bpy.data.collections if getattr(c, ct.IS_MD_HARDSURF_PART_COLLECTION) == True]
+    users_collections = obj.users_collection
+
+    if len(users_collections) != 1: # not assign to valid collection or multiple collection uses this this object
+        return fallback
+    else:
+        user_collection = users_collections[0]
+
+    # when object is directly under part collection
+    if getattr(user_collection, ct.IS_MD_HARDSURF_PART_COLLECTION):
+        return user_collection
 
     for c in md_hard_surface_part_collections:
-        if obj in myu.get_objects_in_collection(c, recursive=True):
+        if user_collection in c.children_recursive:
             return c
         else:
             continue
