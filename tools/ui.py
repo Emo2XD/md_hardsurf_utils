@@ -85,8 +85,8 @@ class MDHARD_MT_md_hard_surface(bpy.types.Menu):
         layout = self.layout
         try:
             if context.area.type == 'VIEW_3D':
-                layout.menu(MDHARD_MT_face_strength_submenu.bl_idname, text="F Face Strength...")
-
+                layout.menu(MDHARD_MT_face_strength_submenu.bl_idname, text="F Face Strength...", icon="FACESEL")
+                layout.menu(MDHARD_MT_edge_bevel_weight_submenu.bl_idname, text="B Bevel Weight...", icon="MOD_BEVEL")
             
 
         except AttributeError:
@@ -122,7 +122,28 @@ class MDHARD_MT_face_strength_submenu(bpy.types.Menu):
             pass
 
 
-         
+@register_wrap
+class MDHARD_MT_edge_bevel_weight_submenu(bpy.types.Menu):
+    bl_label = "Edge Bevel Weight Menu"
+    bl_idname = "MDHARD_MT_edge_bevel_weight_submenu"
+
+    def draw(self, context):
+        layout = self.layout
+        try:
+            if context.object.type == 'MESH':
+                if context.active_object.mode=='EDIT':
+                    layout.operator(ot.MDHARD_OT_set_bevel_weight.bl_idname, text="Z set 0.00").weight = 0.0
+                    layout.operator(ot.MDHARD_OT_set_bevel_weight.bl_idname, text="A set 0.10").weight = 0.1
+                    layout.operator(ot.MDHARD_OT_set_bevel_weight.bl_idname, text="S set 0.25").weight = 0.25
+                    layout.operator(ot.MDHARD_OT_set_bevel_weight.bl_idname, text="D set 0.50").weight = 0.5
+                    layout.operator(ot.MDHARD_OT_set_bevel_weight.bl_idname, text="F set 0.75").weight = 0.75
+                    layout.operator(ot.MDHARD_OT_set_bevel_weight.bl_idname, text="G set 1.00").weight = 1.0
+                    layout.operator(ot.MDHARD_OT_set_bevel_weight.bl_idname, text="B Set Previous")
+
+        except AttributeError:
+            pass
+
+      
         
 
         
