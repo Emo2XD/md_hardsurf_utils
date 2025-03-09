@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import List
 from ..myblendrc_utils import utils as myu
 from . import constants as ct
+from ..prefs import get_preferences
 # import numpy as np
 
 
@@ -194,7 +195,7 @@ def separate_as_normal_source_object(name:str, assign_as_src:bool=True, shade_sm
     normal_collection = get_mk_reserved_collection_under_part(active_obj, ct.NORMAL_COLLECTION)
     for obj in separated_objects:
         obj.name = name
-        remove_dnt_modifiers(obj)
+        clean_up_dnt_modifiers(obj)
         remove_normal_transfer_modifiers(obj)
         for col in  obj.users_collection:
             col.objects.unlink(obj)
@@ -434,6 +435,7 @@ def sync_dnt():
     
     # Setup bevel and data transfer modifiers
     modifier_names = [m.name for m in obj.modifiers]
+    prefs = get_preferences()
 
     if ct.DNT_WEIGHTED_NORMAL_NAME not in modifier_names:
         mod_w_norm = obj.modifiers.new(name=ct.DNT_WEIGHTED_NORMAL_NAME, type="WEIGHTED_NORMAL")
@@ -461,6 +463,8 @@ def sync_dnt():
         mod_dnt_bevel.use_pin_to_last = True
 
         mod_dnt_bevel.limit_method = 'WEIGHT'
+        mod_dnt_bevel.offset_type = prefs.default_bevel_width_type
+        mod_dnt_bevel.width = prefs.default_bevel_width
         mod_dnt_bevel.loop_slide = False
         mod_dnt_bevel.use_clamp_overlap = False
         mod_dnt_bevel.show_in_editmode = True
@@ -483,7 +487,7 @@ def sync_dnt():
     # create normal transfer source object.
     normal_ref_obj = obj.copy()
     normal_ref_obj.name = f"{ct.DNT_NORMAL_TRANSFER_NAME}-{obj.name}"
-    remove_dnt_modifiers(normal_ref_obj)
+    clean_up_dnt_modifiers(normal_ref_obj)
     dnt_collection.objects.link(normal_ref_obj)
 
 
@@ -493,10 +497,12 @@ def sync_dnt():
 
 
 
-def remove_dnt_modifiers(obj:bpy.types.Object):
+def clean_up_dnt_modifiers(obj:bpy.types.Object):
     """Remove DNT modifiers from given object
-    
     Remove DNT bevel modifier and DNT normal transfer modifier from given object.
+    
+    Args:
+        obj: DNT modifiers on this object is cleaned up.
     """
     dnt_bevel = obj.modifiers.get(ct.DNT_NORMAL_TRANSFER_NAME)
     dnt_normal_transfer = obj.modifiers.get(ct.DNT_BEVEL_NAME)

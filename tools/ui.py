@@ -118,7 +118,7 @@ class MDHARD_MT_edge_bevel_weight_submenu(bpy.types.Menu):
             if context.object.type == 'MESH':
                 if context.active_object.mode=='EDIT':
                     layout.operator(ot.MDHARD_OT_set_bevel_weight.bl_idname, text="Z set 0.00").weight = 0.0
-                    layout.operator(ot.MDHARD_OT_set_bevel_weight.bl_idname, text="A set 0.10").weight = 0.1
+                    layout.operator(ot.MDHARD_OT_set_bevel_weight.bl_idname, text="A set 0.125").weight = 0.125
                     layout.operator(ot.MDHARD_OT_set_bevel_weight.bl_idname, text="S set 0.25").weight = 0.25
                     layout.operator(ot.MDHARD_OT_set_bevel_weight.bl_idname, text="D set 0.50").weight = 0.5
                     layout.operator(ot.MDHARD_OT_set_bevel_weight.bl_idname, text="F set 0.75").weight = 0.75
