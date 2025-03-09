@@ -18,6 +18,14 @@ class MDHARD_OT_sync_dnt(bpy.types.Operator):
     bl_label = "Setup DNT"
     bl_options = {'REGISTER', 'UNDO'}
 
+    @classmethod
+    def poll(self, context:bpy.types.Context):
+        active_obj = context.active_object
+        if active_obj is None:
+            return False
+        else:
+            return active_obj.type == 'MESH'
+
     def execute(self, context):
         ut.sync_dnt()
         self.report({"INFO"}, f"Setup DNT was called")
