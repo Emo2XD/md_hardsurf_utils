@@ -1,4 +1,5 @@
 """constants"""
+from ..blender_files import BLEND_PATH
 
 # custom property name
 IS_MD_HARDSURF_PART_COLLECTION = 'is_md_hardsrf_part_collection'
@@ -17,3 +18,10 @@ DNT_COLLECTION = "DNT"
 NORMAL_COLLECTION = "NORMAL"
 DESIGN_COLLECTION = "D"
 FINAL_COLLECTION = "F"
+
+# blender file path
+FACE_STRENGTH_MATERIAL_BLEND_PATH = f"{BLEND_PATH}/face_strength_material.blend"
+
+# face strength material override
+FACE_STRENGTH_MAT_NAME = f"__MD_FaceStrength" # Node tree name, material name, node name uses the same.
+FACE_STRENGTH_TEMP_OUTPUT_NODE = f"__MD_TempOutput" # material output node name.

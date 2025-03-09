@@ -305,9 +305,114 @@ def toggle_dnt_visibility(obj:bpy.types.Object):
 def face_strength_material_override_update(self, context):
     """Callback function for material override property
     """
+    current_face_strength_visibility = getattr(self, ct.IS_MD_FACE_STRENGTH_MATERIAL_OVERRIDE)
     print(f"face_strength_material_override_update called, value: {getattr(self, ct.IS_MD_FACE_STRENGTH_MATERIAL_OVERRIDE)}")
+
+    fs_mat_manager = FaceStrengthMaterialOverrideManager()
+    fs_mat_manager.initialize_material() # you have to check everytime to initialize.
+    
+    if current_face_strength_visibility == True:
+        fs_mat_manager.setup()
+    
+    else:
+        fs_mat_manager.restore()
     
     return
+
+
+class FaceStrengthMaterialOverrideManager:
+    """Face Strength Material Override Manager class
+    Imports material and node tree, setup, restore original.
+
+    For objects which have no materials:
+        Face strength materials will be generated.
+    For objects which have materials:
+        For each existing material, material output node will be newlly generated and temprarilly make active.
+    """
+    face_strength_material:bpy.types.Material = None
+    face_strength_node_tree:bpy.types.ShaderNodeTree = None
+    
+    @classmethod
+    def initialize_material(cls):
+        """import face strength material and node tree if not exist in current file.
+        """
+        cls.face_strength_material = bpy.data.materials.get(ct.FACE_STRENGTH_MAT_NAME)
+        if cls.face_strength_material == None:
+            cls.face_strength_material = myu.load_from_lib_and_return(ct.FACE_STRENGTH_MATERIAL_BLEND_PATH, 'materials', ct.FACE_STRENGTH_MAT_NAME, link=True)
+
+        cls.face_strength_node_tree = bpy.data.node_groups.get(ct.FACE_STRENGTH_MAT_NAME)
+        if cls.face_strength_node_tree == None:
+            cls.face_strength_node_tree = myu.load_from_lib_and_return(ct.FACE_STRENGTH_MATERIAL_BLEND_PATH, 'node_groups', ct.FACE_STRENGTH_MAT_NAME, link=True)
+
+        return
+
+    
+    @classmethod
+    def setup(cls):
+        all_mesh_obj = [o for o in bpy.data.objects if o.type == 'MESH']
+        for obj in all_mesh_obj:
+            if len(obj.data.materials) == 0:
+                obj.data.materials.append(material=cls.face_strength_material)
+
+        for m in bpy.data.materials:
+            if not m.is_grease_pencil:
+                cls._setup_node(m)
+
+
+    @classmethod
+    def restore(cls):
+        all_mesh_obj = [o for o in bpy.data.objects if o.type == 'MESH'] # you have to check each time for removal of object etc. Might be changed.
+        for obj in all_mesh_obj:
+            generated_mat = obj.data.materials.get(cls.face_strength_material.name)
+            if generated_mat is not None:
+                obj.data.materials.pop(index=obj.material_slots[cls.face_strength_material.name].slot_index)
+                if len(obj.data.materials) == 0 and len(obj.material_slots) == 1: # pop leaves empty slot. Clean up.
+                    obj.data.materials.clear()
+
+        for m in bpy.data.materials:
+            if not m.is_grease_pencil:
+                cls._restore_node(m)
+
+
+
+    @classmethod
+    def _setup_node(cls, mat:bpy.types.Material):
+        """Set up face strength temporal material node
+        """
+        node_tree = mat.node_tree
+        nodes = mat.node_tree.nodes
+
+        fs_group_node = nodes.new("ShaderNodeGroup")
+        fs_group_node.node_tree = cls.face_strength_node_tree
+        fs_group_node.location=(0, 0)
+        fs_group_node.name = ct.FACE_STRENGTH_MAT_NAME
+
+        temp_mat_output = nodes.new("ShaderNodeOutputMaterial")
+        temp_mat_output.name = ct.FACE_STRENGTH_TEMP_OUTPUT_NODE
+        temp_mat_output.location=(+200,0)
+
+        node_tree.links.new(fs_group_node.outputs[0], temp_mat_output.inputs[0])
+        nodes.active = temp_mat_output
+
+
+    @classmethod
+    def _restore_node(cls, mat:bpy.types.Material):
+        """Restore face strenth temporal material node
+        """
+        node_tree = mat.node_tree
+        nodes = mat.node_tree.nodes
+
+        fs_group_node = nodes.get(ct.FACE_STRENGTH_MAT_NAME)
+        temp_mat_output = nodes.get(ct.FACE_STRENGTH_TEMP_OUTPUT_NODE)
+
+        if fs_group_node is not None:
+            nodes.remove(fs_group_node)
+        if temp_mat_output is not None:
+            nodes.remove(temp_mat_output)
+        return
+
+
+
 
 
 #-------------------------------------------------------------------------------
