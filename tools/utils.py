@@ -6,7 +6,6 @@ from typing import List
 from ..myblendrc_utils import utils as myu
 from . import constants as ct
 from ..prefs import get_preferences
-# import numpy as np
 
 
 #-------------------------------------------------------------------------------
@@ -77,8 +76,6 @@ def get_or_create_vertex_group(obj:bpy.types.Object, name:str)->bpy.types.Vertex
     else:
         vg = obj.vertex_groups.new(name=name)
         return vg
-
-
 
 
 
@@ -203,6 +200,7 @@ def separate_as_normal_source_object(name:str, assign_as_src:bool=True, shade_sm
         
     return
 
+
 def remove_normal_transfer_modifiers(obj:bpy.types.Object):
     """Remove normal transfer modifiers from given object (remove only generated through this Addon.)
     """
@@ -241,30 +239,6 @@ def set_edge_bevel_weight_with_sharp(weight:float, modify_sharp:bool=True):
         bpy.ops.mesh.mark_sharp(clear=True)
 
     mesh.attributes.active = orig_attr
-
-
-    
-    #TODO: really slow on dense mesh with mora than 100k polygons. Use bpy.ops instead.
-    # mesh = obj.data
-    # selected_edge_indices = get_selected_edge_indices_bmesh(obj=obj)
-
-    # edge_bevel_weight_arr = np.full(len(mesh.edges), 0.0, dtype='float32')
-    # edge_bevel_weight_arr[selected_edge_indices] = weight
-
-    # orig_mode = obj.mode
-    # bpy.ops.object.mode_set(mode='OBJECT')
-
-    # # get edge bevel weight attribute
-    # edge_bevel_weight_attribute = mesh.attributes.get('bevel_weight_edge')
-    # if edge_bevel_weight_attribute is None:
-    #     edge_bevel_weight_attribute = mesh.attributes.new(name="bevel_weight_edge", type="FLOAT", domain="EDGE")
-    
-    # edge_bevel_weight_attribute.data.foreach_set("value", list(edge_bevel_weight_arr))
-
-    # bpy.ops.object.mode_set(mode=orig_mode)
-
-
-    
     return
 
 #-------------------------------------------------------------------------------
@@ -375,7 +349,6 @@ class FaceStrengthMaterialOverrideManager:
                 cls._restore_node(m)
 
 
-
     @classmethod
     def _setup_node(cls, mat:bpy.types.Material):
         """Set up face strength temporal material node
@@ -411,9 +384,6 @@ class FaceStrengthMaterialOverrideManager:
         if temp_mat_output is not None:
             nodes.remove(temp_mat_output)
         return
-
-
-
 
 
 #-------------------------------------------------------------------------------
@@ -477,7 +447,7 @@ def sync_dnt():
     dnt_collection = get_mk_reserved_collection_under_part(obj, ct.DNT_COLLECTION)
     dnt_collection.hide_render = True
     dnt_collection.hide_viewport = True
-    dnt_collection.color_tag = 'COLOR_05'
+    # dnt_collection.color_tag = 'COLOR_05'
 
     # remove previously created DNT normal source object
     prev_normal_ref_obj = obj.modifiers.get(ct.DNT_NORMAL_TRANSFER_NAME).object
@@ -619,6 +589,7 @@ def setup_part_collection(part_name:str="Part"):
     - DNT-Part: DNT generated object will be stored
     """
     part_collection = bpy.data.collections.new(name=part_name)
+    part_collection.color_tag = 'COLOR_01'
     setattr(part_collection, ct.IS_MD_HARDSURF_PART_COLLECTION, True)
     bpy.context.scene.collection.children.link(part_collection)
     
@@ -635,8 +606,9 @@ def setup_reserved_part_collection(part_collection:bpy.types.Collection):
     design_collection = get_mk_collection(name=f"{ct.DESIGN_COLLECTION}-{part_collection.name}", parent=part_collection)
     normal_collection = get_mk_collection(name=f"{ct.NORMAL_COLLECTION}-{part_collection.name}", parent=part_collection) # needs to be generated because you need this before do normal transfer to put source object in it
 
-    normal_collection.color_tag = 'COLOR_05'
+    final_collection.color_tag = 'COLOR_05'
+    # normal_collection.color_tag = 'COLOR_05'
     normal_collection.hide_render = True
-    design_collection.color_tag = 'COLOR_06'
+    # design_collection.color_tag = 'COLOR_06'
     design_collection.hide_render = True
     return

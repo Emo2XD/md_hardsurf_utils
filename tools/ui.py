@@ -18,9 +18,11 @@ class MDHARD_PT_md_hard(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         row = layout.row(align=True)
+        row.scale_y = 1.7
         split = row.split(factor=0.8, align=True)
-        split.operator(ot.MDHARD_OT_setup_part_collection.bl_idname, text="Setup Part", icon="OUTLINER_COLLECTION")
+        split.operator(ot.MDHARD_OT_setup_part_collection.bl_idname, text="Setup Part", icon="COLLECTION_COLOR_01")
         split.operator(ot.MDHARD_OT_regenerate_collections_under_part.bl_idname, text="", icon="FILE_REFRESH")
+        layout.separator(factor=2.0)
         layout.prop(bpy.context.scene, ct.IS_MD_FACE_STRENGTH_MATERIAL_OVERRIDE, text="Face Strength Override", icon="MATERIAL", expand=True)
         return
     
@@ -43,20 +45,25 @@ class MDHARD_PT_md_normal_transfer(bpy.types.Panel):
             part_collection = None
 
         layout = self.layout
+        col = layout.column(heading="Normal Transfer")
 
         if part_collection is not None:
-            layout.label(text=f"Active Part: {part_collection.name}", icon="OUTLINER_COLLECTION")
-            layout.prop(part_collection, ct.NORMAL_TRANSFER_SRC_OBJ_PER_COLLECTION, text="Source")
-            row = layout.row(align=True)
+            col.label(text=f"Active Part: {part_collection.name}", icon="COLLECTION_COLOR_01")
+            col.prop(part_collection, ct.NORMAL_TRANSFER_SRC_OBJ_PER_COLLECTION, text="Source")
+            row = col.row(align=True)
+            row.scale_y = 1.7
             split = row.split(factor=0.2)
             split.operator(ot.MDHARD_OT_separate_normal_source.bl_idname, text="", icon="MOD_EXPLODE")
             split.operator(ot.MDHARD_OT_normal_transfer.bl_idname, text="Normal Transfer", icon="MOD_DATA_TRANSFER")
 
         else:
-            layout.label(text=f"Active Part: None")
+            col.label(text=f"Active Part: None")
 
         layout.separator()
-        layout.operator(ot.MDHARD_OT_sync_dnt.bl_idname, text="Sync DNT", icon="FILE_REFRESH")    
+        
+        row = layout.row()
+        row.scale_y = 1.7
+        row.operator(ot.MDHARD_OT_sync_dnt.bl_idname, text="Sync DNT", icon="FILE_REFRESH")    
 
         return
     

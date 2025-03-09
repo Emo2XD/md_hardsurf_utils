@@ -107,10 +107,6 @@ class MDHARD_OT_normal_transfer(bpy.types.Operator):
 
         normal_src_obj = getattr(part_collection, ct.NORMAL_TRANSFER_SRC_OBJ_PER_COLLECTION, None)
 
-        # if normal_src_obj is None:
-        #     self.report({"WARNING"}, f"Please Select Source Object.")
-        #     return {"CANCELLED"}
-
         result = ut.normal_transfer(target_obj=target_obj, normal_src_obj=normal_src_obj)
 
         if result == 1:
@@ -124,9 +120,9 @@ class MDHARD_OT_normal_transfer(bpy.types.Operator):
 
 @register_wrap
 class MDHARD_OT_separate_normal_source(bpy.types.Operator):
-    """Separate selection as normal transfer source object 
-    It separates selection and you can name it. This automatically move to normal collection.
-    If there is DNT modifier, then remove them.
+    """Separates selection as normal transfer source object 
+    After separation, newly created object will be automatically moved to normal collection.
+    If there are DNT modifiers, they will be removed.
     """
     bl_idname = "md_hard.separate_normal_source"
     bl_label = "MD Separate as Normal Source"
@@ -160,26 +156,6 @@ class MDHARD_OT_separate_normal_source(bpy.types.Operator):
         
         self.report({"INFO"}, f"MD Normal transfer")
         return {"FINISHED"}
-
-    # def invoke(self, context, event):
-    #     wm = context.window_manager
-    #     return wm.invoke_props_dialog(self)
-
-    # def draw(self, context):
-    #     layout = self.layout
-    #     layout.use_property_split = True
-        
-    #     col = layout.column()
-    #     col.prop(self, "layer_name_str")
-    #     col.prop(self, "enum_mip_type")
-
-    #     row = col.row()
-    #     row.prop(self, "size_enum", expand=True)
-        
-    #     col = layout.column()
-    #     col.prop(self, "is_use_gpen")
-
-
 
 
 @register_wrap
