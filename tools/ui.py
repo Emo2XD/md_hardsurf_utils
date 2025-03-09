@@ -5,8 +5,6 @@ from . import operators as ot
 from . import utils as ut
 
 
-
-
 @register_wrap
 class MDHARD_PT_md_hard(bpy.types.Panel):
     """Panel for MD hard surface modeling utils
@@ -18,24 +16,15 @@ class MDHARD_PT_md_hard(bpy.types.Panel):
     bl_category = "MD Hard" # tab name
 
     def draw(self, context):
-        
-
         layout = self.layout
-        # layout.operator(ot.MDHARD_OT_test_x.bl_idname, text="Test X")
         row = layout.row(align=True)
         split = row.split(factor=0.8, align=True)
         split.operator(ot.MDHARD_OT_setup_part_collection.bl_idname, text="Setup Part", icon="OUTLINER_COLLECTION")
         split.operator(ot.MDHARD_OT_regenerate_collections_under_part.bl_idname, text="", icon="FILE_REFRESH")
         layout.prop(bpy.context.scene, ct.IS_MD_FACE_STRENGTH_MATERIAL_OVERRIDE, text="Face Strength Override", icon="MATERIAL", expand=True)
-
-        
-
-        
-        # layout.operator(ot.MDHARD_OT_update_dnt.bl_idname, text="Update DNT", icon="FILE_REFRESH")
-
-
-
         return
+    
+    
 @register_wrap
 class MDHARD_PT_md_normal_transfer(bpy.types.Panel):
     """Panel for normal transfer
@@ -45,8 +34,6 @@ class MDHARD_PT_md_normal_transfer(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "MD Hard" # tab name
-
-
 
     def draw(self, context):
         active_obj = context.active_object
@@ -71,11 +58,8 @@ class MDHARD_PT_md_normal_transfer(bpy.types.Panel):
         layout.separator()
         layout.operator(ot.MDHARD_OT_sync_dnt.bl_idname, text="Sync DNT", icon="FILE_REFRESH")    
 
-        
         return
     
-
-
 
 @register_wrap
 class MDHARD_MT_md_hard_surface(bpy.types.Menu):
@@ -89,7 +73,6 @@ class MDHARD_MT_md_hard_surface(bpy.types.Menu):
                 layout.menu(MDHARD_MT_face_strength_submenu.bl_idname, text="F Face Strength...", icon="FACESEL")
                 layout.menu(MDHARD_MT_edge_bevel_weight_submenu.bl_idname, text="B Bevel Weight...", icon="MOD_BEVEL")
                 layout.menu(MDHARD_MT_toggle_submenu.bl_idname, text="T Toggle Vibility...")
-            
 
         except AttributeError:
             # Exception when you have not selected anything.
@@ -159,7 +142,3 @@ class MDHARD_MT_toggle_submenu(bpy.types.Menu):
                 
         except AttributeError:
             pass
-
-        
-        # layout.menu("MYBLENDRC_MT_MIP_SUBMENU", text="M MIP/MTS operators...")
-
