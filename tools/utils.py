@@ -600,6 +600,8 @@ def setup_part_collection(part_name:str="Part"):
 
 def setup_reserved_part_collection(part_collection:bpy.types.Collection):
     """Create Final-, Design-, Normal- collection under given part_collection
+    Args:
+        part_collection: Under this collection, final, design, normal collections will be created.
     """
     # you have to use get_mk_collection because you do not have object inside part collection at this point.
     final_collection  = get_mk_collection(name=f"{ct.FINAL_COLLECTION}-{part_collection.name}", parent=part_collection)
@@ -612,3 +614,63 @@ def setup_reserved_part_collection(part_collection:bpy.types.Collection):
     # design_collection.color_tag = 'COLOR_06'
     design_collection.hide_render = True
     return
+
+
+#-------------------------------------------------------------------------------
+# Rename part collection
+#-------------------------------------------------------------------------------
+def rename_part_collection(part_collection:bpy.types.Collection, new_name:str)->int:
+    """Rename currently selected part col
+    """
+    current_name = part_collection.name
+
+    if new_name == current_name:
+        print("Given name is same with the current one.")
+        return 1
+    elif not new_name:
+        print("Given name is empty")
+        return 1
+    elif new_name.isspace():
+        print("Given name only contains space")
+        return 1
+
+    reserved_collection = PartManager.get_collections(part_collection=part_collection)
+
+    part_collection.name = new_name
+    for col in reserved_collection:
+        col.name = f"{col.name.split('-', 1)[0]}-{new_name}"
+
+    print("rename part is called")
+    return
+
+
+class PartManager:
+    """Manages Part Collection"""
+    reserved_collection_prefix = [
+        ct.FINAL_COLLECTION,
+        ct.DESIGN_COLLECTION,
+        ct.NORMAL_COLLECTION,
+        ct.DNT_COLLECTION,
+    ]
+
+    @classmethod
+    def get_collections(cls, part_collection:bpy.types.Collection)->List[bpy.types.Collection]:
+        """Get reserved collections under part collection
+        It returns final collection, design collection, normal collections etc. Under given part collection.
+        It assumes part collection contains no duplicate collection with reserved collection prefix.
+
+        Args:
+            part_collection: Under this part collection, reserved collection will be searched and returned
+
+        Returns:
+            reserved_collections: Returns reserved collections if found, else, returns empty list. []
+        """
+        reserved_collections = []
+        child_collections = part_collection.children
+
+        for prefix in cls.reserved_collection_prefix:
+            for key, value in child_collections.items():
+                if key.startswith(f"{prefix}-"):
+                    reserved_collections.append(value)
+        
+        return reserved_collections

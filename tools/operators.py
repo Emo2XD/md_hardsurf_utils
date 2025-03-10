@@ -203,6 +203,40 @@ class MDHARD_OT_regenerate_collections_under_part(bpy.types.Operator):
         ut.regenerate_reserved_collection_under_part()
         self.report({"INFO"}, f"Reserved collection regenerated")
         return {"FINISHED"}
+    
+
+@register_wrap
+class MDHARD_OT_rename_part_collection(bpy.types.Operator):
+    """Regenerate reserved collection under active part collection
+    """
+    bl_idname = "md_hard.rename_part_collection"
+    bl_label = "MD Rename Collection"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    new_part_name: bpy.props.StringProperty(
+        name="New Part Name",
+        description="New part name, if the given name is empty or same, the name will not be changed.") # type: ignore
+
+    @classmethod
+    def poll(self, context:bpy.types.Context):
+        return getattr(context.collection, ct.IS_MD_HARDSURF_PART_COLLECTION)
+    
+    def invoke(self, context, event):
+        wm = context.window_manager
+        self.new_part_name = context.collection.name
+        return wm.invoke_props_dialog(self)
+
+    def execute(self, context):
+        result = ut.rename_part_collection(context.collection, self.new_part_name)
+
+        if result == 1:
+            self.report({"WARNING"}, f"Part collection name was not changed: See system console for more detail.")
+            return {"CANCELLED"}
+
+        self.report({"INFO"}, f"Part collection renamed")
+        return {"FINISHED"}
+    
+    
 
 
 @register_wrap
