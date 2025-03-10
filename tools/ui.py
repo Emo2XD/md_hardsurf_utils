@@ -82,6 +82,7 @@ class MDHARD_MT_md_hard_surface(bpy.types.Menu):
                 layout.menu(MDHARD_MT_face_strength_submenu.bl_idname, text="F Face Strength...", icon="FACESEL")
                 layout.menu(MDHARD_MT_edge_bevel_weight_submenu.bl_idname, text="B Bevel Weight...", icon="MOD_BEVEL")
                 layout.menu(MDHARD_MT_toggle_submenu.bl_idname, text="T Toggle Vibility...")
+                layout.operator(ot.MDHARD_OT_shade_smooth_anywhere.bl_idname, text="S Shade Smooth Anywhere")
 
         except AttributeError:
             # Exception when you have not selected anything.

@@ -674,3 +674,17 @@ class PartManager:
                     reserved_collections.append(value)
         
         return reserved_collections
+    
+
+#-------------------------------------------------------------------------------
+# Shade smooth anywhere
+#-------------------------------------------------------------------------------
+def shade_smooth_anywhere():
+    """Shade smooth anywhere"""
+    orig_mode = bpy.context.active_object.mode
+
+    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.shade_smooth()
+    bpy.ops.object.mode_set(mode=orig_mode)
+
+    return

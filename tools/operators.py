@@ -266,6 +266,27 @@ class MDHARD_OT_set_bevel_weight(bpy.types.Operator):
 
 
 @register_wrap
+class MDHARD_OT_shade_smooth_anywhere(bpy.types.Operator):
+    """shade smooth. it even works in edit mode.
+    """
+    bl_idname = "md_hard.shade_smooth_anywhere"
+    bl_label = "MD Shade Smooth Anywhere"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(self, context:bpy.types.Context):
+        return context.active_object is not None
+        
+    def execute(self, context):
+        ut.shade_smooth_anywhere()
+        return {"FINISHED"}
+
+
+
+
+
+
+@register_wrap
 class MDHARD_OT_test_x(bpy.types.Operator):
     """Test"""
     bl_idname = "md_hard.test_x"
