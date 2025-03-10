@@ -605,6 +605,7 @@ def setup_reserved_part_collection(part_collection:bpy.types.Collection):
     """
     # you have to use get_mk_collection because you do not have object inside part collection at this point.
     final_collection  = get_mk_collection(name=f"{ct.FINAL_COLLECTION}-{part_collection.name}", parent=part_collection)
+    dependency_collection = get_mk_collection(name=f"{ct.DEP_COLLECTION}-{part_collection.name}", parent=part_collection) # needs to be generated because you need this before do normal transfer to put source object in it
     design_collection = get_mk_collection(name=f"{ct.DESIGN_COLLECTION}-{part_collection.name}", parent=part_collection)
     normal_collection = get_mk_collection(name=f"{ct.NORMAL_COLLECTION}-{part_collection.name}", parent=part_collection) # needs to be generated because you need this before do normal transfer to put source object in it
 
@@ -613,6 +614,7 @@ def setup_reserved_part_collection(part_collection:bpy.types.Collection):
     normal_collection.hide_render = True
     # design_collection.color_tag = 'COLOR_06'
     design_collection.hide_render = True
+    dependency_collection.color_tag = 'COLOR_06'
     return
 
 
@@ -647,6 +649,7 @@ def rename_part_collection(part_collection:bpy.types.Collection, new_name:str)->
 class PartManager:
     """Manages Part Collection"""
     reserved_collection_prefix = [
+        ct.DEP_COLLECTION,
         ct.FINAL_COLLECTION,
         ct.DESIGN_COLLECTION,
         ct.NORMAL_COLLECTION,

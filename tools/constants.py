@@ -18,6 +18,7 @@ DNT_COLLECTION = "DNT"
 NORMAL_COLLECTION = "NORMAL"
 DESIGN_COLLECTION = "D"
 FINAL_COLLECTION = "F"
+DEP_COLLECTION = "DEP" # other dependency file needed for final render.
 
 # blender file path
 FACE_STRENGTH_MATERIAL_BLEND_PATH = f"{BLEND_PATH}/face_strength_material.blend"
