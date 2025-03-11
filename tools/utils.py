@@ -6,6 +6,7 @@ from typing import List
 from ..myblendrc_utils import utils as myu
 from . import constants as ct
 from ..prefs import get_preferences
+import numpy as np
 
 
 #-------------------------------------------------------------------------------
@@ -261,9 +262,11 @@ def set_dnt_bevel_modifier_width(modifier_width:float, keep_visual_width:bool):
         if edge_bevel_weight_attribute is None:
             edge_bevel_weight_attribute = mesh.attributes.new(name="bevel_weight_edge", type="FLOAT", domain="EDGE")
         
-        edge_bevel_weights = [0.0] * len(obj.data.edges)
+        edge_bevel_weights = np.full(len(obj.data.edges), 0.0)
+        # edge_bevel_weights = [0.0] * len(obj.data.edges)
         edge_bevel_weight_attribute.data.foreach_get("value", edge_bevel_weights)
-        edge_bevel_weights = [ old_width/modifier_width * w for w in edge_bevel_weights]
+        # edge_bevel_weights = [ old_width/modifier_width * w for w in edge_bevel_weights]
+        edge_bevel_weights = old_width/modifier_width * edge_bevel_weights
         edge_bevel_weight_attribute.data.foreach_set("value", edge_bevel_weights)
         
     dnt_bevel_mod.width = modifier_width
