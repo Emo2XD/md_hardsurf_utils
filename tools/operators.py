@@ -264,6 +264,46 @@ class MDHARD_OT_set_bevel_weight(bpy.types.Operator):
         return {"FINISHED"}
 
 
+@register_wrap
+class MDHARD_OT_set_dnt_bevel_modifier_width(bpy.types.Operator):
+    """Set bevel modifier width with the option of keeping the visual thickness.
+    This is effective only for DNT bevel.
+    """
+    bl_idname = "md_hard.set_dnt_bevel_modifier_width"
+    bl_label = "Set DNT Bevel Modifier Width"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    modifier_width: bpy.props.FloatProperty(name='Modifier Width', description='Bevel modifier width ', min=0.0, precision=5, unit='LENGTH') #type: ignore
+    keep_visual_width: bpy.props.BoolProperty(name='Keep Visual Width', default=False, description='Bevel Modifier Width.') # type: ignore
+
+    @classmethod
+    def poll(self, context:bpy.types.Context):
+        active_object = bpy.context.active_object
+        if active_object is None:
+            return False
+        else:
+            return active_object.type == 'MESH'
+    
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        active_obj = context.active_object
+        dnt_bevel_mod = active_obj.modifiers.get(ct.DNT_BEVEL_NAME) 
+        if dnt_bevel_mod is None:
+            self.report({"WARNING"}, f"'{active_obj.name}' does not have {ct.DNT_BEVEL_NAME} modifier. Create before use this operator.")
+            return {"CANCELLED"}
+        else:
+            self.modifier_width = dnt_bevel_mod.width # use as initial value
+        return wm.invoke_props_dialog(self)
+        
+
+    def execute(self, context):
+
+        ut.set_dnt_bevel_modifier_width(self.modifier_width, self.keep_visual_width)
+        return {"FINISHED"}
+
+
+
 
 @register_wrap
 class MDHARD_OT_shade_smooth_anywhere(bpy.types.Operator):

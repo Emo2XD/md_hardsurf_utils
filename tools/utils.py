@@ -241,6 +241,38 @@ def set_edge_bevel_weight_with_sharp(weight:float, modify_sharp:bool=True):
     mesh.attributes.active = orig_attr
     return
 
+
+#-------------------------------------------------------------------------------
+# Set Modifier Bevel Width
+#-------------------------------------------------------------------------------
+def set_dnt_bevel_modifier_width(modifier_width:float, keep_visual_width:bool):
+    print("set dnt bevel modifier width was called")
+    obj = bpy.context.active_object
+    dnt_bevel_mod = obj.modifiers.get(ct.DNT_BEVEL_NAME)
+    old_width = dnt_bevel_mod.width
+
+    mesh = obj.data
+    orig_mode = obj.mode
+    bpy.ops.object.mode_set(mode='OBJECT')
+
+    if keep_visual_width == True and modifier_width > 0.0: # zero division guard
+        # get edge bevel weight attribute
+        edge_bevel_weight_attribute = mesh.attributes.get('bevel_weight_edge')
+        if edge_bevel_weight_attribute is None:
+            edge_bevel_weight_attribute = mesh.attributes.new(name="bevel_weight_edge", type="FLOAT", domain="EDGE")
+        
+        edge_bevel_weights = [0.0] * len(obj.data.edges)
+        edge_bevel_weight_attribute.data.foreach_get("value", edge_bevel_weights)
+        edge_bevel_weights = [ old_width/modifier_width * w for w in edge_bevel_weights]
+        edge_bevel_weight_attribute.data.foreach_set("value", edge_bevel_weights)
+        
+    dnt_bevel_mod.width = modifier_width
+
+    bpy.ops.object.mode_set(mode=orig_mode)
+
+    return
+
+
 #-------------------------------------------------------------------------------
 # Toggle DNT Visibility
 #-------------------------------------------------------------------------------
