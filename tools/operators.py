@@ -275,6 +275,7 @@ class MDHARD_OT_set_dnt_bevel_modifier_width(bpy.types.Operator):
 
     modifier_width: bpy.props.FloatProperty(name='Modifier Width', description='Bevel modifier width ', min=0.0, precision=5, unit='LENGTH') #type: ignore
     keep_visual_width: bpy.props.BoolProperty(name='Keep Visual Width', default=False, description='Bevel Modifier Width.') # type: ignore
+    orig_width:float = 0.0
 
     @classmethod
     def poll(self, context:bpy.types.Context):
@@ -293,13 +294,13 @@ class MDHARD_OT_set_dnt_bevel_modifier_width(bpy.types.Operator):
             self.report({"WARNING"}, f"'{active_obj.name}' does not have {ct.DNT_BEVEL_NAME} modifier. Create before use this operator.")
             return {"CANCELLED"}
         else:
-            self.modifier_width = dnt_bevel_mod.width # use as initial value
+            self.modifier_width = dnt_bevel_mod.width # use as initial value, this is updated during "Adjust last operator."
+            self.orig_width = dnt_bevel_mod.width # this is constant through out "Adunst last operator".
         return wm.invoke_props_dialog(self)
         
 
     def execute(self, context):
-
-        ut.set_dnt_bevel_modifier_width(self.modifier_width, self.keep_visual_width)
+        ut.set_dnt_bevel_modifier_width(self.modifier_width, self.keep_visual_width, self.orig_width)
         return {"FINISHED"}
 
 
