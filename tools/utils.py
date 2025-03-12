@@ -247,7 +247,12 @@ def set_edge_bevel_weight_with_sharp(weight:float, modify_sharp:bool=True):
 # Set Modifier Bevel Width
 #-------------------------------------------------------------------------------
 def set_dnt_bevel_modifier_width(modifier_width:float, keep_visual_width:bool, orig_width:float):
-    print("set dnt bevel modifier width was called")
+    """Set DNT bevel modifier width with keep visual width option.
+    Args:
+        modifier_width: This value is set as bevel modifier 'Amount' paramete.
+        keep_visual_width: If true, it tries to keep visual width of the bevel.
+        orig_width: This is necessary in edit mode. It stores original modifier width through out 'Adjust last operation'.
+    """
     obj = bpy.context.active_object
     mesh = obj.data
     orig_mode = obj.mode
