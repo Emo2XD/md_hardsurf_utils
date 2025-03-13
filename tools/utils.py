@@ -455,7 +455,6 @@ def sync_dnt():
 
     if ct.DNT_NORMAL_TRANSFER_NAME not in modifier_names:
         mod_dnt_nromal = obj.modifiers.new(name=ct.DNT_NORMAL_TRANSFER_NAME, type="DATA_TRANSFER")
-        mod_dnt_nromal.use_pin_to_last = True
 
         mod_dnt_nromal.use_object_transform = False
         mod_dnt_nromal.use_loop_data = True
@@ -468,7 +467,6 @@ def sync_dnt():
 
     if ct.DNT_BEVEL_NAME not in modifier_names:
         mod_dnt_bevel = obj.modifiers.new(name=ct.DNT_BEVEL_NAME, type="BEVEL")
-        mod_dnt_bevel.use_pin_to_last = True
 
         mod_dnt_bevel.limit_method = 'WEIGHT'
         mod_dnt_bevel.offset_type = prefs.default_bevel_width_type
@@ -479,6 +477,15 @@ def sync_dnt():
 
     else:
         mod_dnt_bevel = obj.modifiers.get(ct.DNT_BEVEL_NAME)
+
+    
+    # by toggling False -> True, you can ensure the use_pin_to_last order
+    mod_dnt_nromal.use_pin_to_last = False
+    mod_dnt_bevel.use_pin_to_last = False
+
+    mod_dnt_nromal.use_pin_to_last = True
+    mod_dnt_bevel.use_pin_to_last = True
+
 
 
     # Generate collection to store generated DNT normal source object.
