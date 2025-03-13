@@ -502,6 +502,7 @@ def sync_dnt():
     # create normal transfer source object.
     normal_ref_obj = obj.copy()
     normal_ref_obj.name = f"{ct.DNT_NORMAL_TRANSFER_NAME}-{obj.name}"
+    setattr(normal_ref_obj, ct.IS_DNT_NORMAL_OBJECT, True)
     clean_up_dnt_modifiers(normal_ref_obj)
     dnt_collection.objects.link(normal_ref_obj)
 
@@ -538,6 +539,14 @@ def regenerate_reserved_collection_under_part():
     setup_reserved_part_collection(part_collection)
     return
 
+
+def remove_unused_dnt_normal_object(unused_objs:List[bpy.types.Object]):
+    """Cleanup unused generated DNT Normal object
+    Remove unused DNT Normal source objects.
+    """
+    for obj in unused_objs:
+        bpy.data.objects.remove(obj)
+    return
 
 
 

@@ -323,6 +323,56 @@ class MDHARD_OT_shade_smooth_anywhere(bpy.types.Operator):
         return {"FINISHED"}
 
 
+@register_wrap
+class MDHARD_OT_md_remove_unused_dnt_normal_objects(bpy.types.Operator):
+    """Remove unused DNT normal objects in DNT-{Part.name} collection
+    """
+    bl_idname = "md_hard.md_remove_unused_dnt_normal_objects"
+    bl_label = "Remove Unused DNT Normal Objects"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    # @classmethod
+    # def poll(self, context:bpy.types.Context):
+    #     return context.active_object is not None
+    unused_dnt_objs = []
+    used_dnt_objs = []
+
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        self.unused_dnt_objs = []
+        self.used_dnt_objs = []
+        dnt_normal_objs = [o for o in context.scene.objects if getattr(o, ct.IS_DNT_NORMAL_OBJECT)]
+
+
+
+        scene_mesh_objs = [o for o in context.scene.objects if o.type == 'MESH']
+        for o in scene_mesh_objs:
+            dnt_normal_mod = o.modifiers.get(ct.DNT_NORMAL_TRANSFER_NAME)
+            if dnt_normal_mod is not None:
+                self.used_dnt_objs.append(dnt_normal_mod.object)
+        
+        
+        self.unused_dnt_objs = list(set(dnt_normal_objs) - set(self.used_dnt_objs))
+        return wm.invoke_props_dialog(self)
+        
+    def execute(self, context):
+        ut.remove_unused_dnt_normal_object(self.unused_dnt_objs)
+        self.report({"INFO"}, "Remove Unused DNT Normal Objects Excecuted")
+        return {"FINISHED"}
+    
+    
+    def draw(self, context):
+        layout = self.layout
+        layout.label(text="Remove Following Objects.")
+        for o in self.unused_dnt_objs:
+            try:
+                layout.label(text=f"{o.name}", icon="OBJECT_DATA")
+            except ReferenceError:
+                print("Already cleanedup unused DNT Normal Source")
+
+        
+
 
 
 

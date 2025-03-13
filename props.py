@@ -25,6 +25,15 @@ register_prop(
             )
         )
 
+register_prop(
+        bpy.types.Object,
+        ct.IS_DNT_NORMAL_OBJECT, bpy.props.BoolProperty(
+            name=ct.IS_DNT_NORMAL_OBJECT, 
+            default = False, 
+            description="If True, then this object is considered to be generated and automatically cleaned up when not referenced by DNT modifier",
+            )
+        )
+
 # def msgbus_callback(*arg):
 #     # in console will be print selected_objects 
 #     print(bpy.context.selected_objects)
