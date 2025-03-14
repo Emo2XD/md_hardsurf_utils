@@ -755,8 +755,46 @@ class PartManager:
 # Show part collection
 #-------------------------------------------------------------------------------
 def show_part_collection(part_collection:bpy.types.Collection):
-    """Show given_part_collection. If not found, then link to current scene."""
-    scene_col = bpy.context.scene.collection
+    """Show given_part_collection. Jump to scene. If not found, then link to current scene.
+    It is similar consept with opening file in new tab.
+    """
+    scene = get_scene_which_has_this_part_collection(part_collection=part_collection, fallback=bpy.context.scene)
+    bpy.context.window.scene = scene
+    _isolate_part_collection_in_scene(part_collection, scene)
+
+    return
+
+
+def get_scene_which_has_this_part_collection(part_collection:bpy.types.Collection, fallback:bpy.types.Scene=None)->bpy.types.Scene:
+    """Get scene which has given part collections in it. If None, returns fallback scene
+    Known issue is, if there are more than two scene which have given part_collection, you cannot determin which scene to jump.
+
+    Args:
+        part_collection: Search Scene which has this part collection.
+        fallback: If there is no scene which has given part collection, then return this fallback
+    """
+    # search is starting from this scene
+    if part_collection in bpy.context.scene.collection.children[:]:
+        return bpy.context.scene
+
+    for s in bpy.data.scenes:
+        if part_collection in s.collection.children[:]:
+            return s
+    
+    return fallback
+        
+
+
+def _isolate_part_collection_in_scene(part_collection:bpy.types.Collection, scene:bpy.types.Scene):
+    """Isolate Part Collection in Given Scene
+    Args:
+        part_collection: this collection will be isolated:
+        scene: In this scene, part collection will be searched and linked.
+    Returns:
+        None
+    """
+    scene_col = scene.collection
+
     try:
         index = scene_col.children[:].index(part_collection) + 1
     except ValueError:
@@ -766,7 +804,6 @@ def show_part_collection(part_collection:bpy.types.Collection):
     
     bpy.ops.object.hide_collection(collection_index=index)
 
-    return
 
 #-------------------------------------------------------------------------------
 # Shade smooth anywhere
