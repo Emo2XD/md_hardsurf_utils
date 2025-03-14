@@ -123,7 +123,7 @@ def get_selected_edge_indices_bmesh(obj:bpy.types.Object):
 
 
 def poll_is_obj_in_part_collection(self, obj):
-    """Poll function to filter object, nly show when active object exist."""
+    """Poll function to filter object, only show when active object exist."""
     active_obj = bpy.context.active_object
     if active_obj is None:
         return False
@@ -134,6 +134,13 @@ def poll_is_obj_in_part_collection(self, obj):
         return False
     else:
         return obj.type == 'MESH' and (obj in normal_collection.all_objects[:]) 
+
+
+
+def poll_is_part_collection(self, col):
+    """Poll function to filter collection, only show part collection
+    """
+    return getattr(col, ct.IS_MD_HARDSURF_PART_COLLECTION)
 
 
 
@@ -745,21 +752,20 @@ class PartManager:
     
 
 #-------------------------------------------------------------------------------
-# Outliner Visibility manipulation
+# Show part collection
 #-------------------------------------------------------------------------------
-#TODO
-def isolate_part():
-    obj = bpy.context.active_object
-    part_col = get_parent_part_collection(obj)
-    if obj is not None:
-        users_cols = obj.users_collection
-        if len(users_cols) == 1:
-            override = bpy.context.copy()
-            override['collection'] = part_col
-            override['layer_collection'] = bpy.context.view_layer.layer_collection.children[part_col.name]
-            with bpy.context.temp_override(**override):
-                bpy.context.collection = users_cols[0]
-                bpy.ops.outliner.collection_isolate(extend=False)
+def show_part_collection(part_collection:bpy.types.Collection):
+    """Show given_part_collection. If not found, then link to current scene."""
+    scene_col = bpy.context.scene.collection
+    try:
+        index = scene_col.children[:].index(part_collection) + 1
+    except ValueError:
+        scene_col.children.link(part_collection)
+        index = len(scene_col.children) # last one is the target index index is start from 1
+        
+    
+    bpy.ops.object.hide_collection(collection_index=index)
+
     return
 
 #-------------------------------------------------------------------------------

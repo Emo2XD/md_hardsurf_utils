@@ -34,6 +34,13 @@ register_prop(
             )
         )
 
+register_prop(
+        bpy.types.WindowManager,
+        ct.OPEN_PART_COLLECTION_PLACEHOLDER, bpy.props.PointerProperty(type=bpy.types.Collection, description="Part Collection inside this Blender.", poll=ut.poll_is_part_collection)
+        )
+
+
+
 # def msgbus_callback(*arg):
 #     # in console will be print selected_objects 
 #     print(bpy.context.selected_objects)

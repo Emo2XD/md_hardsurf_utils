@@ -303,20 +303,41 @@ class MDHARD_OT_shade_smooth_anywhere(bpy.types.Operator):
 
 
 @register_wrap
-class MDHARD_OT_md_isolate_part(bpy.types.Operator):
-    """Isolate given part collection
+class MDHARD_OT_md_show_only_this_part(bpy.types.Operator):
+    """Show and Isolate given part collection in a scene.
     """
-    bl_idname = "md_hard.md_isolate_part"
-    bl_label = "Isolate Part"
+    bl_idname = "md_hard.md_show_only_this_part"
+    bl_label = "Show Only This Part"
     bl_options = {'REGISTER', 'UNDO'}
 
     # @classmethod
     # def poll(self, context:bpy.types.Context):
     #     return context.active_object is not None
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        setattr(wm, ct.OPEN_PART_COLLECTION_PLACEHOLDER, None)
+        return wm.invoke_props_dialog(self)
         
     def execute(self, context):
-        ut.isolate_part()
+        wm = context.window_manager
+        part_col = getattr(wm, ct.OPEN_PART_COLLECTION_PLACEHOLDER)
+        if part_col is not None:
+            ut.show_part_collection(part_col)
+        else:
+            self.report({"WARNING"}, f"Part Collection is not selected.")
+            return {"CANCELLED"}
+
+        self.report({"INFO"}, f"Show Part Collection")
         return {"FINISHED"}
+    
+
+    def draw(self, context):
+        wm = context.window_manager
+        layout = self.layout
+
+        layout.prop(wm, ct.OPEN_PART_COLLECTION_PLACEHOLDER, text="Part Collection")
+        
 
 
 
