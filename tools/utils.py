@@ -491,11 +491,9 @@ def sync_dnt():
 
 
     # Generate collection to store generated DNT normal source object.
-    # dnt_collection = get_mk_reserved_collection_under_part(obj, ct.DNT_COLLECTION)
     dnt_collection = PartManager.get_mk_reserved_collection_from_obj(obj, ct.DNT_COLLECTION, fallback=bpy.context.scene.collection)
     dnt_collection.hide_render = True
     dnt_collection.hide_viewport = True
-    # dnt_collection.color_tag = 'COLOR_05'
 
     # remove previously created DNT normal source object
     prev_normal_ref_obj = obj.modifiers.get(ct.DNT_NORMAL_TRANSFER_NAME).object
@@ -552,59 +550,6 @@ def remove_unused_dnt_normal_object(unused_objs:List[bpy.types.Object]):
     return
 
 
-
-# def get_mk_collection(name:str, parent:bpy.types.Collection=None)->bpy.types.Collection:
-#     """Get collection and return. If not exists, create.
-#     Args:
-#         name: collection name
-#         parent: create under this parent collection
-#     """
-    
-#     target_collection = bpy.data.collections.get(name)
-
-#     if target_collection is None:
-#         target_collection = bpy.data.collections.new(name)
-
-#         if parent == None:
-#             parent = bpy.context.scene.collection
-#         parent.children.link(target_collection)
-
-
-#     return target_collection
-
-
-# def get_mk_reserved_collection_under_part(obj:bpy.types.Object, prefix:str, create:bool=True)->bpy.types.Collection:
-#     """ Create or get reserved collection under part collection using prefix. (from given object) 
-#     Create: Just create using prefix. {prefix}-{part_name} e.g. NORMAL-{part.name} under part collection.
-#     Get: Get collection with specified prefix. Ignoring rest of the string.
-
-#     By specifying only prefix you don't have to worry about digit after collection name e.g. .001
-
-#     Args:
-#         obj: try to find parent part collection from this object
-#         prefix: Create or get collection, whose name starts with this prefix, under parent part collection.
-#         create: If False, suppress creation of new collection
-#     """
-#     part_collection = get_parent_part_collection(obj, fallback=bpy.context.scene.collection)
-
-#     # if already created, then return existing.
-#     for c in part_collection.children[:]:
-#         if c.name.startswith(f"{prefix}-"):
-#             return c
-#         else:
-#             continue
-
-#     # if there is no collection starts with prefix, then create new one.
-#     if create == True:
-#         new_collection = bpy.data.collections.new(name=f"{prefix}-{part_collection.name}")
-#         part_collection.children.link(new_collection)
-#         return new_collection
-#     else:
-#         return None
-
-
-
-    
 def get_parent_part_collection(obj:bpy.types.Object, fallback:bpy.types.Collection=None)->bpy.types.Collection:
     """Get parent hard surface modeling part collection
     This searches which part collection does given object belong to.
@@ -660,11 +605,7 @@ def setup_reserved_part_collection(part_collection:bpy.types.Collection):
     Args:
         part_collection: Under this collection, final, design, normal collections will be created.
     """
-    # you have to use get_mk_collection because you do not have object inside part collection at this point.
-    # final_collection  = get_mk_collection(name=f"{ct.FINAL_COLLECTION}-{part_collection.name}", parent=part_collection)
-    # dependency_collection = get_mk_collection(name=f"{ct.DEP_COLLECTION}-{part_collection.name}", parent=part_collection) # needs to be generated because you need this before do normal transfer to put source object in it
-    # design_collection = get_mk_collection(name=f"{ct.DESIGN_COLLECTION}-{part_collection.name}", parent=part_collection)
-    # normal_collection = get_mk_collection(name=f"{ct.NORMAL_COLLECTION}-{part_collection.name}", parent=part_collection) # needs to be generated because you need this before do normal transfer to put source object in it
+    part_collection.use_fake_user = True # ensure keep even if part is not linked to any scene.
 
     final_collection      = PartManager.get_mk_reserved_collection_from_part(part_collection, ct.FINAL_COLLECTION, create=True)
     dependency_collection = PartManager.get_mk_reserved_collection_from_part(part_collection, ct.DEP_COLLECTION, create=True)
