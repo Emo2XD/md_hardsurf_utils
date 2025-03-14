@@ -34,7 +34,6 @@ class MDHARD_OT_sync_dnt(bpy.types.Operator):
         return {"FINISHED"}
 
 
-
 @register_wrap
 class MDHARD_OT_toggle_dnt_visibility(bpy.types.Operator):
     """Toggle DNT visibility
@@ -60,21 +59,6 @@ class MDHARD_OT_toggle_dnt_visibility(bpy.types.Operator):
 
 
         return {"FINISHED"}
-
-
-# @register_wrap
-# class MDHARD_OT_update_dnt(bpy.types.Operator):
-#     """Update Dual Normal Transfer Counterpart Object
-#     """
-#     bl_idname = "md_hard.update_dnt"
-#     bl_label = "Update DNT"
-#     bl_options = {'REGISTER', 'UNDO'}
-
-#     def execute(self, context):
-#         self.report({"INFO"}, f"Update DNT called")
-
-#         return {"FINISHED"}
-
 
 
 @register_wrap
@@ -170,7 +154,6 @@ class MDHARD_OT_setup_part_collection(bpy.types.Operator):
 
     def execute(self, context):
         ut.setup_part_collection(self.part_name)
-        # self.report({"INFO"}, f"setup part collection was called")
         return {"FINISHED"}
     
     def invoke(self, context, event):
@@ -184,7 +167,6 @@ class MDHARD_OT_setup_part_collection(bpy.types.Operator):
         col = layout.column()
         col.prop(self, "part_name")
 
-        
 
 @register_wrap
 class MDHARD_OT_regenerate_collections_under_part(bpy.types.Operator):
@@ -235,7 +217,6 @@ class MDHARD_OT_rename_part_collection(bpy.types.Operator):
 
         self.report({"INFO"}, f"Part collection renamed")
         return {"FINISHED"}
-    
     
 
 
@@ -304,8 +285,6 @@ class MDHARD_OT_set_dnt_bevel_modifier_width(bpy.types.Operator):
         return {"FINISHED"}
 
 
-
-
 @register_wrap
 class MDHARD_OT_shade_smooth_anywhere(bpy.types.Operator):
     """shade smooth. it even works in edit mode.
@@ -321,6 +300,24 @@ class MDHARD_OT_shade_smooth_anywhere(bpy.types.Operator):
     def execute(self, context):
         ut.shade_smooth_anywhere()
         return {"FINISHED"}
+
+
+@register_wrap
+class MDHARD_OT_md_isolate_part(bpy.types.Operator):
+    """Isolate given part collection
+    """
+    bl_idname = "md_hard.md_isolate_part"
+    bl_label = "Isolate Part"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    # @classmethod
+    # def poll(self, context:bpy.types.Context):
+    #     return context.active_object is not None
+        
+    def execute(self, context):
+        ut.isolate_part()
+        return {"FINISHED"}
+
 
 
 @register_wrap

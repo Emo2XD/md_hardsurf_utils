@@ -50,7 +50,7 @@ class MDHARD_PT_md_normal_transfer(bpy.types.Panel):
         col = layout.column(heading="Normal Transfer")
 
         if part_collection is not None:
-            col.label(text=f"Active Part: {part_collection.name}", icon="COLLECTION_COLOR_01")
+            col.label(text=f"Active Object in: {part_collection.name}", icon="COLLECTION_COLOR_01")
             col.prop(part_collection, ct.NORMAL_TRANSFER_SRC_OBJ_PER_COLLECTION, text="Source")
             row = col.row(align=True)
             row.scale_y = 1.7
@@ -83,7 +83,7 @@ class MDHARD_MT_md_hard_surface(bpy.types.Menu):
                 layout.menu(MDHARD_MT_edge_bevel_weight_submenu.bl_idname, text="B Bevel Weight...", icon="MOD_BEVEL")
                 layout.menu(MDHARD_MT_toggle_submenu.bl_idname, text="T Toggle Vibility...")
                 layout.operator(ot.MDHARD_OT_shade_smooth_anywhere.bl_idname, text="S Shade Smooth Anywhere")
-
+            layout.menu(MDHARD_MT_outliner_viusibility_submenu.bl_idname, text="V Visibility...")
         except AttributeError:
             # Exception when you have not selected anything.
             # When you have not selected mesh, you cannot check the line
@@ -151,6 +151,21 @@ class MDHARD_MT_toggle_submenu(bpy.types.Menu):
         try:
             if context.object.type == 'MESH':
                 layout.operator(ot.MDHARD_OT_toggle_dnt_visibility.bl_idname, text="T Toggle DNT visibility")
+                
+        except AttributeError:
+            pass
+
+
+@register_wrap
+class MDHARD_MT_outliner_viusibility_submenu(bpy.types.Menu):
+    bl_label = "Hard Surface Outliner Visibility Menu"
+    bl_idname = "MDHARD_MT_outliner_viusibility_submenu"
+
+    def draw(self, context):
+        layout = self.layout
+        try:
+            layout.operator(ot.MDHARD_OT_md_isolate_part.bl_idname, text="V Outliner Visibility")
+            # if context.object.type == 'MESH':
                 
         except AttributeError:
             pass
