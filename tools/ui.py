@@ -99,6 +99,7 @@ class MDHARD_MT_face_strength_submenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         try:
+            layout.operator(ot.MDHARD_OT_face_strength_material_override_toggle.bl_idname, text="F Toggle Material Override", icon="MATERIAL")
             if context.object.type == 'MESH':
                 if context.active_object.mode=='EDIT':
                     ops_face_weak = layout.operator("mesh.mod_weighted_strength", text="W Weak")

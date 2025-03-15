@@ -391,7 +391,21 @@ class MDHARD_OT_md_remove_unused_dnt_normal_objects(bpy.types.Operator):
 
         
 
+@register_wrap
+class MDHARD_OT_face_strength_material_override_toggle(bpy.types.Operator):
+    """Toggle Face Strength Material Override"""
+    bl_idname = "md_hard.face_strength_material_override_toggle"
+    bl_label = "Toggle Face Strength Material Override"
+    bl_options = {'REGISTER', 'UNDO'}
 
+
+    def execute(self, context):
+        is_fs_mat_override = getattr(context.scene, ct.IS_MD_FACE_STRENGTH_MATERIAL_OVERRIDE)
+        
+        setattr(context.scene, ct.IS_MD_FACE_STRENGTH_MATERIAL_OVERRIDE, not is_fs_mat_override)
+
+
+        return {"FINISHED"}
 
 
 

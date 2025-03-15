@@ -6,7 +6,7 @@ IS_MD_HARDSURF_PART_COLLECTION = 'is_md_hardsrf_part_collection'
 NORMAL_TRANSFER_SRC_OBJ_PER_COLLECTION = 'nromal_transfer_src_obj_per_collection'
 IS_MD_FACE_STRENGTH_MATERIAL_OVERRIDE = 'is_md_face_strength_material_override'
 IS_DNT_NORMAL_OBJECT = 'is_dnt_normal_object'
-OPEN_PART_COLLECTION_PLACEHOLDER = 'open_part_collection_place_holder' # this is needed because property pointer cannot be added to operator its self.
+OPEN_PART_COLLECTION_PLACEHOLDER = 'open_part_collection_place_holder' # this is needed because property pointer cannot be added to operator its self. Used in show only part operator.
 
 # modifier name
 DNT_NORMAL_TRANSFER_NAME = "DNT_NORMAL"
