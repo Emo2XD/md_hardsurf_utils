@@ -57,7 +57,21 @@ register_prop(
             ))
 
 
+@register_wrap
+class ReservedPartCollectionVisibility(bpy.types.PropertyGroup):
+    final: bpy.props.BoolProperty(name=ct.FINAL_COLLECTION, default=True) # type: ignore
+    dependency:bpy.props.BoolProperty(name=ct.DEP_COLLECTION, default=False) # type: ignore
+    design:bpy.props.BoolProperty(name=ct.DESIGN_COLLECTION, default=False) # type: ignore
+    normal:bpy.props.BoolProperty(name=ct.NORMAL_COLLECTION, default=False) # type: ignore
 
+
+register_prop(
+        bpy.types.Collection,
+        ct.RESERVED_PART_COLLECTION_VISIBILITY,
+        bpy.props.PointerProperty(
+            type=ReservedPartCollectionVisibility, 
+            description="Store Visibility of reserved collection under Part collection", 
+            ))
 
 # def msgbus_callback(*arg):
 #     # in console will be print selected_objects 

@@ -748,13 +748,13 @@ class PartManager:
 #-------------------------------------------------------------------------------
 # Show part collection
 #-------------------------------------------------------------------------------
-def show_part_collection(part_collection:bpy.types.Collection):
+def go_to_part_collection(part_collection:bpy.types.Collection):
     """Show given_part_collection. Jump to scene. If not found, then link to current scene.
     It is similar consept with opening file in new tab.
     """
     scene = get_scene_which_has_this_part_collection(part_collection=part_collection, fallback=bpy.context.scene)
     bpy.context.window.scene = scene
-    _isolate_part_collection_in_scene(part_collection, scene)
+    set_this_part_active_in_scene(part_collection, scene)
 
     return
 
@@ -790,24 +790,25 @@ def get_scene_which_has_this_part_collection(part_collection:bpy.types.Collectio
         
 
 
-def _isolate_part_collection_in_scene(part_collection:bpy.types.Collection, scene:bpy.types.Scene):
-    """Isolate Part Collection in Given Scene
+def set_this_part_active_in_scene(part_collection:bpy.types.Collection, scene:bpy.types.Scene, create:bool=True):
+    """Set given part_collection active in scene. 
     Args:
-        part_collection: this collection will be isolated:
+        part_collection: this collection will be activated:
         scene: In this scene, part collection will be searched and linked.
+        create: If True and given part is not found in the scene, then create a new link between the part_collection and scene
     Returns:
         None
     """
     scene_col = scene.collection
 
     try:
-        index = scene_col.children[:].index(part_collection) + 1
+        index = scene_col.children[:].index(part_collection)
     except ValueError:
         scene_col.children.link(part_collection)
-        index = len(scene_col.children) # last one is the target index index is start from 1
+        index = len(scene_col.children) - 1
         
+    setattr(scene, ct.SCENE_COLLECTION_CHILD_INDEX, index)
     
-    bpy.ops.object.hide_collection(collection_index=index)
 
 
 #-------------------------------------------------------------------------------

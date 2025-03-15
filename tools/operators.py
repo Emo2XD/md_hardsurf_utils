@@ -317,11 +317,13 @@ class MDHARD_OT_shade_smooth_anywhere(bpy.types.Operator):
 
 # TODO: rename to Go To this part.
 @register_wrap
-class MDHARD_OT_md_show_only_this_part(bpy.types.Operator):
-    """Show and Isolate given part collection in a scene.
+class MDHARD_OT_go_to_part(bpy.types.Operator):
+    """Go to the Part Collection
+    First go to scene which contains specified part, then,
+    show and isolate given part collection in a scene. Making this part active
     """
-    bl_idname = "md_hard.md_show_only_this_part"
-    bl_label = "Show Only This Part"
+    bl_idname = "md_hard.go_to_part"
+    bl_label = "Go To Part"
     bl_options = {'REGISTER', 'UNDO'}
 
     # @classmethod
@@ -337,7 +339,7 @@ class MDHARD_OT_md_show_only_this_part(bpy.types.Operator):
         wm = context.window_manager
         part_col = getattr(wm, ct.OPEN_PART_COLLECTION_PLACEHOLDER)
         if part_col is not None:
-            ut.show_part_collection(part_col)
+            ut.go_to_part_collection(part_col)
         else:
             self.report({"WARNING"}, f"Part Collection is not selected.")
             return {"CANCELLED"}

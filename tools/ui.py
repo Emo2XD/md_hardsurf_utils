@@ -47,6 +47,17 @@ class MDHARD_PT_md_hard(bpy.types.Panel):
         row.operator(ot.MDHARD_OT_link_part_colleciton_to_scene.bl_idname, text="Link", icon='LINKED')
         row.operator(ot.MDHARD_OT_unlink_part_collection_to_scene.bl_idname, text="Unlink", icon='UNLINKED')
         
+        layout.separator()
+        row = layout.row(align=True)
+        row.scale_y = 1.5
+
+
+        if active_uilist_scene_collection is not None:
+            visibilities = getattr(active_uilist_scene_collection, ct.RESERVED_PART_COLLECTION_VISIBILITY)
+            row.prop(visibilities, 'final', text="F-", icon="COLLECTION_COLOR_05")
+            row.prop(visibilities, 'dependency', text="DEP-", icon="COLLECTION_COLOR_06")
+            row.prop(visibilities, 'design', text="D-", icon="OUTLINER_COLLECTION")
+            row.prop(visibilities, 'normal', text="NORMAL-", icon="OUTLINER_COLLECTION")
 
         return
     
@@ -229,7 +240,7 @@ class MDHARD_MT_part_collection_submenu(bpy.types.Menu):
         layout = self.layout
         try:
             if context.area.type == 'VIEW_3D':
-                layout.operator(ot.MDHARD_OT_md_show_only_this_part.bl_idname, text="S Show Only This Part")
+                layout.operator(ot.MDHARD_OT_go_to_part.bl_idname, text="G Go To This Part")
 
             # if context.area.type == 'OUTLINER':
             #     layout.operator(ot.MDHARD_OT_md_unlink_part.bl_idname, text="U Unlink This Part Collection")

@@ -12,6 +12,8 @@ OPEN_PART_COLLECTION_PLACEHOLDER = 'open_part_collection_place_holder' # this is
 SCENE_COLLECTION_CHILD_INDEX = 'scene_collection_child_index'
 ACTIVE_PART_COLLECTION = "active_part_collection" # read only property to keep track of active part collection.
 
+RESERVED_PART_COLLECTION_VISIBILITY = "reserved_part_collection_visibility"
+
 
 # modifier name
 DNT_NORMAL_TRANSFER_NAME = "DNT_NORMAL"
