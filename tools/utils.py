@@ -836,8 +836,42 @@ def update_scene_ui_list_active_part_collection(self, context):
 
     else:
         setattr(scene, ct.ACTIVE_PART_COLLECTION, active_col)
-        bpy.ops.object.hide_collection(collection_index=active_index+1) # collection_index is stargint from 1.
 
+    bpy.ops.object.hide_collection(collection_index=active_index+1) # collection_index is stargint from 1.
+
+    return
+
+
+def move_active_collection_in_ui_list(sn:bpy.types.Scene, move_type:str='UP'):
+    """Move Active Collection in UI List on scene collection.
+    """
+    scene_collection_children = list(sn.collection.children)
+    active_slot_index = getattr(sn, ct.SCENE_COLLECTION_CHILD_INDEX)
+    collection_len = len(scene_collection_children)
+    
+
+    move_from = active_slot_index
+    if move_type == 'UP':
+        move_to = (active_slot_index - 1) % collection_len
+        
+    elif move_type == 'DOWN':
+        move_to = (active_slot_index + 1) % collection_len
+    else:
+        print(f"WARNING: move_type must be 'UP' or 'DOWN', but {move_type} was given")
+        return
+    
+
+    # scene_collection doesn't have 'move()' method which exists in collection property. so you have to manually re construct collection.
+    for c in scene_collection_children:
+        sn.collection.children.unlink(c)
+
+    active_col = scene_collection_children.pop(move_from)
+    scene_collection_children.insert(move_to, active_col)
+
+    for c in scene_collection_children:
+        sn.collection.children.link(c)
+
+    setattr(sn, ct.SCENE_COLLECTION_CHILD_INDEX, move_to)
     return
 
 # def get_scene_active_part_collection(scene:bpy.types.Scene)->bpy.types.Collection:

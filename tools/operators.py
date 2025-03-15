@@ -362,14 +362,24 @@ class MDHARD_OT_md_unlink_part(bpy.types.Operator):
 
         return {"FINISHED"}
 
-    
 
-    # def draw(self, context):
-    #     wm = context.window_manager
-    #     layout = self.layout
+@register_wrap
+class MDHARD_OT_move_scene_collection_ui_list(bpy.types.Operator):
+    """Move Scene Collection Active Collection inside UI List
+    """
+    bl_idname = "md_hard.move_scene_collection_ui_list"
+    bl_label = "Move Active Collection in UI List"
+    bl_options = {'REGISTER', 'UNDO'}
 
-    #     layout.prop(wm, ct.OPEN_PART_COLLECTION_PLACEHOLDER, text="Part Collection")
+    move_type: bpy.props.EnumProperty(name='Type', items=[('UP', 'UP', ''), ('DOWN', 'DOWN', '')]) # type: ignore
 
+    @classmethod
+    def poll(self, context):
+        return len(context.scene.collection.children) > 0
+        
+    def execute(self, context):
+        ut.move_active_collection_in_ui_list(context.scene, self.move_type)
+        return {"FINISHED"}
 
 
 @register_wrap

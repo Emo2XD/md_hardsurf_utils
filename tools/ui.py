@@ -38,8 +38,9 @@ class MDHARD_PT_md_hard(bpy.types.Panel):
         # layout.label(text=f"Active: {sn.collection.children[getattr(sn, ct.SCENE_COLLECTION_CHILD_INDEX)]})
         row = layout.row()
         row.template_list(MDHARD_UL_scene_part.__name__, "", sn.collection, "children", sn, ct.SCENE_COLLECTION_CHILD_INDEX)
-
-
+        col = row.column(align=True)
+        col.operator(ot.MDHARD_OT_move_scene_collection_ui_list.bl_idname, text="", icon='TRIA_UP').move_type = 'UP'
+        col.operator(ot.MDHARD_OT_move_scene_collection_ui_list.bl_idname, text="", icon='TRIA_DOWN').move_type = 'DOWN'
 
         return
     
