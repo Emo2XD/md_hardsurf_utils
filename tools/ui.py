@@ -34,13 +34,19 @@ class MDHARD_PT_md_hard(bpy.types.Panel):
         if active_uilist_scene_collection is not None:
            active_collection_name = active_uilist_scene_collection.name
             
+        # UIList
         layout.label(text=f"Active: {active_collection_name}")
-        # layout.label(text=f"Active: {sn.collection.children[getattr(sn, ct.SCENE_COLLECTION_CHILD_INDEX)]})
         row = layout.row()
         row.template_list(MDHARD_UL_scene_part.__name__, "", sn.collection, "children", sn, ct.SCENE_COLLECTION_CHILD_INDEX)
         col = row.column(align=True)
         col.operator(ot.MDHARD_OT_move_scene_collection_ui_list.bl_idname, text="", icon='TRIA_UP').move_type = 'UP'
         col.operator(ot.MDHARD_OT_move_scene_collection_ui_list.bl_idname, text="", icon='TRIA_DOWN').move_type = 'DOWN'
+        col.separator()
+
+        row = layout.row(align=True)
+        row.operator(ot.MDHARD_OT_link_part_colleciton_to_scene.bl_idname, text="Link", icon='LINKED')
+        row.operator(ot.MDHARD_OT_unlink_part_collection_to_scene.bl_idname, text="Unlink", icon='UNLINKED')
+        
 
         return
     
@@ -96,12 +102,16 @@ class MDHARD_UL_scene_part(bpy.types.UIList):
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
             # layout.label(text=item.name)
             part_col = item # scene.collection.children ()
-            layout.prop(
-                part_col, 
-                'name', 
-                text="", 
-                icon="COLLECTION_COLOR_01" if getattr(part_col, ct.IS_MD_HARDSURF_PART_COLLECTION) else "OUTLINER_COLLECTION",  
-                emboss=False)
+            # layout.prop(
+            #     part_col, 
+            #     'name', 
+            #     text="", 
+            #     icon="COLLECTION_COLOR_01" if getattr(part_col, ct.IS_MD_HARDSURF_PART_COLLECTION) else "OUTLINER_COLLECTION",  
+            #     emboss=False)
+            layout.label(
+                text=part_col.name,
+                icon="COLLECTION_COLOR_01" if getattr(part_col, ct.IS_MD_HARDSURF_PART_COLLECTION) else "OUTLINER_COLLECTION")
+
             # split = layout.split(factor=0.5, align=False)
             # split.prop(item, 'name', text="", emboss=False)
             # row = split.row(align = True)
@@ -221,9 +231,9 @@ class MDHARD_MT_part_collection_submenu(bpy.types.Menu):
             if context.area.type == 'VIEW_3D':
                 layout.operator(ot.MDHARD_OT_md_show_only_this_part.bl_idname, text="S Show Only This Part")
 
-            if context.area.type == 'OUTLINER':
-                layout.operator(ot.MDHARD_OT_md_unlink_part.bl_idname, text="U Unlink This Part Collection")
-                # if context.object.type == 'MESH':
+            # if context.area.type == 'OUTLINER':
+            #     layout.operator(ot.MDHARD_OT_md_unlink_part.bl_idname, text="U Unlink This Part Collection")
+            #     # if context.object.type == 'MESH':
                     
         except AttributeError:
             pass

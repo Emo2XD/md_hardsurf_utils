@@ -597,12 +597,15 @@ def setup_part_collection(part_name:str="Part"):
     - Normal-Part: Normal transfer reference objects will be stored
     - DNT-Part: DNT generated object will be stored
     """
+    scene = bpy.context.scene
     part_collection = bpy.data.collections.new(name=part_name)
     part_collection.color_tag = 'COLOR_01'
     setattr(part_collection, ct.IS_MD_HARDSURF_PART_COLLECTION, True)
-    bpy.context.scene.collection.children.link(part_collection)
+    scene.collection.children.link(part_collection)
     
     setup_reserved_part_collection(part_collection)
+    setattr(scene, ct.SCENE_COLLECTION_CHILD_INDEX, len(scene.collection.children)-1) # activate after creation
+    
     print(f"given name is {part_name}, and {part_collection.name} was created")
 
     return

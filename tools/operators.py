@@ -302,6 +302,7 @@ class MDHARD_OT_shade_smooth_anywhere(bpy.types.Operator):
         return {"FINISHED"}
 
 
+# TODO: rename to Go To this part.
 @register_wrap
 class MDHARD_OT_md_show_only_this_part(bpy.types.Operator):
     """Show and Isolate given part collection in a scene.
@@ -337,30 +338,69 @@ class MDHARD_OT_md_show_only_this_part(bpy.types.Operator):
         layout = self.layout
 
         layout.prop(wm, ct.OPEN_PART_COLLECTION_PLACEHOLDER, text="Part Collection")
-        
 
 
 @register_wrap
-class MDHARD_OT_md_unlink_part(bpy.types.Operator):
-    """Unlink Part collection from current scene marking fake user.
+class MDHARD_OT_link_part_colleciton_to_scene(bpy.types.Operator):
+    """Link Part to this Scene
+    This function is similar concept of 'Open File' in tex editor.
     """
-    bl_idname = "md_hard.md_unlink_part"
-    bl_label = "Unlink Part Collection"
+    bl_idname = "md_hard.link_part_collection_to_scene"
+    bl_label = "Link Part Collection to Scene"
     bl_options = {'REGISTER', 'UNDO'}
 
-    @classmethod
-    def poll(self, context:bpy.types.Context):
-        # window = bpy.context.area
-        return bpy.context.area.type == 'OUTLINER' 
+    # @classmethod
+    # def poll(self, context:bpy.types.Context):
+    #     # window = bpy.context.area
+    #     return bpy.context.area.type == 'OUTLINER' 
 
+    def invoke(self, context, event):
+        wm = context.window_manager
+        setattr(wm, ct.OPEN_PART_COLLECTION_PLACEHOLDER, None)
+        return wm.invoke_props_dialog(self)
         
     def execute(self, context):
         # ut.unlink_part_collection()
-        bpy.ops.outliner.item_activate('INVOKE_DEFAULT', deselect_all=True)
-        self.report({"INFO"}, f"unlink part was called")
+        
+        self.report({"INFO"}, f"Link part was called")
 
 
+        return {"FINISHED"}      
+
+
+@register_wrap
+class MDHARD_OT_unlink_part_collection_to_scene(bpy.types.Operator):
+    """Unlink Part to this Scene
+    This function is similar concept of 'Close File' in tex editor.
+    """
+    bl_idname = "md_hard.unlink_part_collection_to_scene"
+    bl_label = "Unlink Part Collection to Scene"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    # @classmethod
+    # def poll(self, context:bpy.types.Context):
+    #     # window = bpy.context.area
+    #     return bpy.context.area.type == 'OUTLINER' 
+
+        
+    def execute(self, context):
+        self.report({"INFO"}, f"Unlink part was called")
         return {"FINISHED"}
+    
+
+@register_wrap
+class MDHARD_OT_remove_part_collection(bpy.types.Operator):
+    """Remove Part Collection
+    TODO: Implement a check function to ensure part collection is not referenced anywhere including external file.
+    """
+    bl_idname = "md_hard.remove_part_collection"
+    bl_label = "Remove Part Collection"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        self.report({"WARNING"}, f"Under Development, Nothing is done. : Remove part was called")
+        return {"FINISHED"}
+    
 
 
 @register_wrap
