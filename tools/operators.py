@@ -179,10 +179,14 @@ class MDHARD_OT_regenerate_collections_under_part(bpy.types.Operator):
 
     @classmethod
     def poll(self, context:bpy.types.Context):
-        return getattr(context.collection, ct.IS_MD_HARDSURF_PART_COLLECTION)
+        part_collection = getattr(context.scene, ct.ACTIVE_PART_COLLECTION)
+        if part_collection is None:
+            return False
+        return getattr(part_collection, ct.IS_MD_HARDSURF_PART_COLLECTION)
         
     def execute(self, context):
-        ut.regenerate_reserved_collection_under_part()
+        part_collection = getattr(context.scene, ct.ACTIVE_PART_COLLECTION)
+        ut.setup_reserved_part_collection(part_collection)
         self.report({"INFO"}, f"Reserved collection regenerated")
         return {"FINISHED"}
     
@@ -201,18 +205,27 @@ class MDHARD_OT_rename_part_collection(bpy.types.Operator):
 
     @classmethod
     def poll(self, context:bpy.types.Context):
-        return getattr(context.collection, ct.IS_MD_HARDSURF_PART_COLLECTION)
+        part_collection = getattr(context.scene, ct.ACTIVE_PART_COLLECTION)
+        if part_collection is None:
+            return False
+        return getattr(part_collection, ct.IS_MD_HARDSURF_PART_COLLECTION)
     
     def invoke(self, context, event):
         wm = context.window_manager
-        self.new_part_name = context.collection.name
+        self.new_part_name = getattr(context.scene, ct.ACTIVE_PART_COLLECTION).name
         return wm.invoke_props_dialog(self)
 
     def execute(self, context):
-        result = ut.rename_part_collection(context.collection, self.new_part_name)
+        scene = context.scene
+        part_collection = getattr(scene, ct.ACTIVE_PART_COLLECTION)
+        if part_collection is not None:
+            result = ut.rename_part_collection(part_collection, self.new_part_name)
 
-        if result == 1:
-            self.report({"WARNING"}, f"Part collection name was not changed: See system console for more detail.")
+            if result == 1:
+                self.report({"WARNING"}, f"Part collection name was not changed: See system console for more detail.")
+                return {"CANCELLED"}
+        else:
+            self.report({"WARNING"}, f"No Active Part Collection is selected")
             return {"CANCELLED"}
 
         self.report({"INFO"}, f"Part collection renamed")
@@ -343,7 +356,7 @@ class MDHARD_OT_md_show_only_this_part(bpy.types.Operator):
 @register_wrap
 class MDHARD_OT_link_part_colleciton_to_scene(bpy.types.Operator):
     """Link Part to this Scene
-    This function is similar concept of 'Open File' in tex editor.
+    This function is similar concept of 'Open File' in text editor.
     """
     bl_idname = "md_hard.link_part_collection_to_scene"
     bl_label = "Link Part Collection to Scene"

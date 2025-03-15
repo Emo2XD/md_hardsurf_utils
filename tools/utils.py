@@ -539,15 +539,6 @@ def clean_up_dnt_modifiers(obj:bpy.types.Object):
     return
 
 
-
-def regenerate_reserved_collection_under_part():
-    """Regenerate reserved collection under part (when accidentally removed some of them)
-    """
-    part_collection = bpy.context.collection
-    setup_reserved_part_collection(part_collection)
-    return
-
-
 def remove_unused_dnt_normal_object(unused_objs:List[bpy.types.Object]):
     """Cleanup unused generated DNT Normal object
     Remove unused DNT Normal source objects.
@@ -824,7 +815,7 @@ def _isolate_part_collection_in_scene(part_collection:bpy.types.Collection, scen
 #-------------------------------------------------------------------------------
 # pinter property cannot take getter/setter
 def update_scene_ui_list_active_part_collection(self, context):
-    """Callback for update active scene collection.
+    """Callback for update active scene collection children.
     """
     scene = bpy.context.scene
     active_index = getattr(self, ct.SCENE_COLLECTION_CHILD_INDEX)
@@ -837,8 +828,8 @@ def update_scene_ui_list_active_part_collection(self, context):
     if getattr(active_col, ct.IS_MD_HARDSURF_PART_COLLECTION) == False:
         active_col = None
 
-    else:
-        setattr(scene, ct.ACTIVE_PART_COLLECTION, active_col)
+    # else:
+    setattr(scene, ct.ACTIVE_PART_COLLECTION, active_col)
 
     bpy.ops.object.hide_collection(collection_index=active_index+1) # collection_index is stargint from 1.
 
