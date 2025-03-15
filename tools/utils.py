@@ -820,21 +820,31 @@ def update_scene_ui_list_active_part_collection(self, context):
     """
     scene = bpy.context.scene
     active_index = getattr(self, ct.SCENE_COLLECTION_CHILD_INDEX)
+    active_col = get_ui_list_active_collection_from_index(scene=scene, active_index=active_index)
+
+    setattr(scene, ct.ACTIVE_UILIST_COLLECTION, active_col)
+
+    if getattr(active_col, ct.IS_MD_HARDSURF_PART_COLLECTION) == False:
+        active_col = None
+
+    
+    setattr(scene, ct.ACTIVE_PART_COLLECTION, active_col)
+    bpy.ops.object.hide_collection(collection_index=active_index+1) # collection_index is stargint from 1.
+
+    return
+
+
+def get_ui_list_active_collection_from_index(scene:bpy.types.Scene, active_index:int):
+    """Get Scene UIList active collection safely. index out of range is treated.
+    """
     try:
         active_col = scene.collection.children[active_index]
     except Exception as e:
         print(f"No valid collection found in getter_scene_ui_list_active_collection: {e}")
         return None
     
-    if getattr(active_col, ct.IS_MD_HARDSURF_PART_COLLECTION) == False:
-        active_col = None
+    return active_col
 
-    # else:
-    setattr(scene, ct.ACTIVE_PART_COLLECTION, active_col)
-
-    bpy.ops.object.hide_collection(collection_index=active_index+1) # collection_index is stargint from 1.
-
-    return
 
 
 def move_active_collection_in_ui_list(sn:bpy.types.Scene, move_type:str='UP'):

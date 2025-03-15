@@ -54,7 +54,15 @@ register_prop(
         bpy.props.PointerProperty(
             type=bpy.types.Collection, 
             description="Readonly active part collection", 
-            ))
+            )) # this returns None if collection is not Part
+
+register_prop(
+        bpy.types.Scene,
+        ct.ACTIVE_UILIST_COLLECTION,
+        bpy.props.PointerProperty(
+            type=bpy.types.Collection, 
+            description="Readonly active UIList collection", 
+            )) # this return active collection.
 
 
 @register_wrap

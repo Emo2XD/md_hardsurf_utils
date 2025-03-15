@@ -29,10 +29,10 @@ class MDHARD_PT_md_hard(bpy.types.Panel):
         layout.prop(bpy.context.scene, ct.IS_MD_FACE_STRENGTH_MATERIAL_OVERRIDE, text="Face Strength Override", icon="MATERIAL", expand=True)
 
         layout.separator()
-        active_uilist_scene_collection = getattr(sn, ct.ACTIVE_PART_COLLECTION)
+        active_uilist_part_collection = getattr(sn, ct.ACTIVE_PART_COLLECTION)
         active_collection_name = ''
-        if active_uilist_scene_collection is not None:
-           active_collection_name = active_uilist_scene_collection.name
+        if active_uilist_part_collection is not None:
+           active_collection_name = active_uilist_part_collection.name
             
         # UIList
         layout.label(text=f"Active: {active_collection_name}")
@@ -52,12 +52,18 @@ class MDHARD_PT_md_hard(bpy.types.Panel):
         row.scale_y = 1.5
 
 
-        if active_uilist_scene_collection is not None:
-            visibilities = getattr(active_uilist_scene_collection, ct.RESERVED_PART_COLLECTION_VISIBILITY)
+        current_uilit_scene_collection = getattr(sn, ct.ACTIVE_UILIST_COLLECTION) # This scene property is both return part or non part collection.
+        if current_uilit_scene_collection is not None:
+            visibilities = getattr(current_uilit_scene_collection, ct.RESERVED_PART_COLLECTION_VISIBILITY)
             row.prop(visibilities, 'final', text="F-", icon="COLLECTION_COLOR_05")
             row.prop(visibilities, 'dependency', text="DEP-", icon="COLLECTION_COLOR_06")
             row.prop(visibilities, 'design', text="D-", icon="OUTLINER_COLLECTION")
             row.prop(visibilities, 'normal', text="NORMAL-", icon="OUTLINER_COLLECTION")
+
+            if getattr(current_uilit_scene_collection, ct.IS_MD_HARDSURF_PART_COLLECTION):
+                row.enabled = True
+            else:
+                row.enabled = False
 
         return
     

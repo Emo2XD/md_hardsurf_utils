@@ -11,6 +11,7 @@ OPEN_PART_COLLECTION_PLACEHOLDER = 'open_part_collection_place_holder' # this is
 # UIList custom property name
 SCENE_COLLECTION_CHILD_INDEX = 'scene_collection_child_index'
 ACTIVE_PART_COLLECTION = "active_part_collection" # read only property to keep track of active part collection.
+ACTIVE_UILIST_COLLECTION = "active_uilist_collection"
 
 RESERVED_PART_COLLECTION_VISIBILITY = "reserved_part_collection_visibility"
 
