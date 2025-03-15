@@ -17,6 +17,7 @@ class MDHARD_PT_md_hard(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
+        sn = context.scene
         row = layout.row(align=True)
         row.scale_y = 1.7
         split = row.split(factor=0.8, align=True)
@@ -26,6 +27,20 @@ class MDHARD_PT_md_hard(bpy.types.Panel):
 
         layout.separator(factor=2.0)
         layout.prop(bpy.context.scene, ct.IS_MD_FACE_STRENGTH_MATERIAL_OVERRIDE, text="Face Strength Override", icon="MATERIAL", expand=True)
+
+        layout.separator()
+        active_uilist_scene_collection = getattr(sn, ct.ACTIVE_PART_COLLECTION)
+        active_collection_name = ''
+        if active_uilist_scene_collection is not None:
+           active_collection_name = active_uilist_scene_collection.name
+            
+        layout.label(text=f"Active: {active_collection_name}")
+        # layout.label(text=f"Active: {sn.collection.children[getattr(sn, ct.SCENE_COLLECTION_CHILD_INDEX)]})
+        row = layout.row()
+        row.template_list(MDHARD_UL_scene_part.__name__, "", sn.collection, "children", sn, ct.SCENE_COLLECTION_CHILD_INDEX)
+
+
+
         return
     
     
@@ -68,7 +83,41 @@ class MDHARD_PT_md_normal_transfer(bpy.types.Panel):
         row.operator(ot.MDHARD_OT_sync_dnt.bl_idname, text="Sync DNT", icon="FILE_REFRESH")    
 
         return
-    
+
+
+
+#-------------------------------------------------------------------------------
+# Part UIList
+#-------------------------------------------------------------------------------
+@register_wrap
+class MDHARD_UL_scene_part(bpy.types.UIList):
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        if self.layout_type in {'DEFAULT', 'COMPACT'}:
+            # layout.label(text=item.name)
+            part_col = item # scene.collection.children ()
+            layout.prop(
+                part_col, 
+                'name', 
+                text="", 
+                icon="COLLECTION_COLOR_01" if getattr(part_col, ct.IS_MD_HARDSURF_PART_COLLECTION) else "OUTLINER_COLLECTION",  
+                emboss=False)
+            # split = layout.split(factor=0.5, align=False)
+            # split.prop(item, 'name', text="", emboss=False)
+            # row = split.row(align = True)
+            # row.emboss = 'NONE_OR_STATUS'
+
+            # row.prop(item, 'lock_shape', text="", emboss=False, icon='DECORATE_LOCKED' if item.lock_shape else 'DECORATE_UNLOCKED')
+
+        elif self.layout_type == 'GRID':
+            layout.alignment = 'CENTER'
+            layout.label(text="")
+
+
+
+
+#-------------------------------------------------------------------------------
+# Menu
+#-------------------------------------------------------------------------------
 
 @register_wrap
 class MDHARD_MT_md_hard_surface(bpy.types.Menu):
@@ -91,6 +140,9 @@ class MDHARD_MT_md_hard_surface(bpy.types.Menu):
             pass
 
 
+#-------------------------------------------------------------------------------
+# Sub Menu
+#-------------------------------------------------------------------------------
 @register_wrap
 class MDHARD_MT_face_strength_submenu(bpy.types.Menu):
     bl_label = "Face Strength Menu"
@@ -168,6 +220,8 @@ class MDHARD_MT_part_collection_submenu(bpy.types.Menu):
             if context.area.type == 'VIEW_3D':
                 layout.operator(ot.MDHARD_OT_md_show_only_this_part.bl_idname, text="S Show Only This Part")
 
+            if context.area.type == 'OUTLINER':
+                layout.operator(ot.MDHARD_OT_md_unlink_part.bl_idname, text="U Unlink This Part Collection")
                 # if context.object.type == 'MESH':
                     
         except AttributeError:

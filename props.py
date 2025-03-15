@@ -41,6 +41,24 @@ register_prop(
 
 
 
+register_prop(
+        bpy.types.Scene,
+        ct.SCENE_COLLECTION_CHILD_INDEX,
+        bpy.props.IntProperty(name=ct.SCENE_COLLECTION_CHILD_INDEX, default=-1, update=ut.update_scene_ui_list_active_part_collection)
+        )
+
+
+register_prop(
+        bpy.types.Scene,
+        ct.ACTIVE_PART_COLLECTION,
+        bpy.props.PointerProperty(
+            type=bpy.types.Collection, 
+            description="Readonly active part collection", 
+            ))
+
+
+
+
 # def msgbus_callback(*arg):
 #     # in console will be print selected_objects 
 #     print(bpy.context.selected_objects)

@@ -8,6 +8,11 @@ IS_MD_FACE_STRENGTH_MATERIAL_OVERRIDE = 'is_md_face_strength_material_override'
 IS_DNT_NORMAL_OBJECT = 'is_dnt_normal_object'
 OPEN_PART_COLLECTION_PLACEHOLDER = 'open_part_collection_place_holder' # this is needed because property pointer cannot be added to operator its self. Used in show only part operator.
 
+# UIList custom property name
+SCENE_COLLECTION_CHILD_INDEX = 'scene_collection_child_index'
+ACTIVE_PART_COLLECTION = "active_part_collection" # read only property to keep track of active part collection.
+
+
 # modifier name
 DNT_NORMAL_TRANSFER_NAME = "DNT_NORMAL"
 DNT_BEVEL_NAME = "DNT_BEVEL"

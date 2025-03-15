@@ -340,6 +340,37 @@ class MDHARD_OT_md_show_only_this_part(bpy.types.Operator):
         
 
 
+@register_wrap
+class MDHARD_OT_md_unlink_part(bpy.types.Operator):
+    """Unlink Part collection from current scene marking fake user.
+    """
+    bl_idname = "md_hard.md_unlink_part"
+    bl_label = "Unlink Part Collection"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(self, context:bpy.types.Context):
+        # window = bpy.context.area
+        return bpy.context.area.type == 'OUTLINER' 
+
+        
+    def execute(self, context):
+        # ut.unlink_part_collection()
+        bpy.ops.outliner.item_activate('INVOKE_DEFAULT', deselect_all=True)
+        self.report({"INFO"}, f"unlink part was called")
+
+
+        return {"FINISHED"}
+
+    
+
+    # def draw(self, context):
+    #     wm = context.window_manager
+    #     layout = self.layout
+
+    #     layout.prop(wm, ct.OPEN_PART_COLLECTION_PLACEHOLDER, text="Part Collection")
+
+
 
 @register_wrap
 class MDHARD_OT_md_remove_unused_dnt_normal_objects(bpy.types.Operator):

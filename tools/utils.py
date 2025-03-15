@@ -765,6 +765,17 @@ def show_part_collection(part_collection:bpy.types.Collection):
     return
 
 
+#-------------------------------------------------------------------------------
+# Unlink Part Collection
+#-------------------------------------------------------------------------------
+def unlink_part_collection(part_collection:bpy.types.Collection):
+    """Unlink given part collection from current scene.
+    Unlink but before do this operation, ensure collection has fake user from loss of data.
+    """
+    print("unlink_part_collection was called")
+    pass
+
+
 def get_scene_which_has_this_part_collection(part_collection:bpy.types.Collection, fallback:bpy.types.Scene=None)->bpy.types.Scene:
     """Get scene which has given part collections in it. If None, returns fallback scene
     Known issue is, if there are more than two scene which have given part_collection, you cannot determin which scene to jump.
@@ -803,6 +814,40 @@ def _isolate_part_collection_in_scene(part_collection:bpy.types.Collection, scen
         
     
     bpy.ops.object.hide_collection(collection_index=index)
+
+
+#-------------------------------------------------------------------------------
+# Organize Part
+#-------------------------------------------------------------------------------
+# pinter property cannot take getter/setter
+def update_scene_ui_list_active_part_collection(self, context):
+    """Callback for update active scene collection.
+    """
+    scene = bpy.context.scene
+    active_index = getattr(self, ct.SCENE_COLLECTION_CHILD_INDEX)
+    try:
+        active_col = scene.collection.children[active_index]
+    except Exception as e:
+        print(f"No valid collection found in getter_scene_ui_list_active_collection: {e}")
+        return None
+    
+    if getattr(active_col, ct.IS_MD_HARDSURF_PART_COLLECTION) == False:
+        active_col = None
+
+    else:
+        setattr(scene, ct.ACTIVE_PART_COLLECTION, active_col)
+        bpy.ops.object.hide_collection(collection_index=active_index+1) # collection_index is stargint from 1.
+
+    return
+
+# def get_scene_active_part_collection(scene:bpy.types.Scene)->bpy.types.Collection:
+#     """Get Active Part Collection in Given Scene.
+#     """
+#     active_part_collection = getattr(scene, ct.ACTIVE_PART_COLLECTION)
+#     return
+# def setter_scene_ui_list_active_collection(self, value):
+#     """scene active part collection is read only. You can only set active collection through UI List"""
+#     return
 
 
 #-------------------------------------------------------------------------------
