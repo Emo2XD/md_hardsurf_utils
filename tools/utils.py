@@ -1023,18 +1023,50 @@ def part_children_visibility_toggle(part_collection:bpy.types.Collection, child_
 def isolate_collection_under_scene(collection:bpy.types.Collection, extend:bool=False):
     """Isolate collection visibility under current scene.
     """
-    scene_col = bpy.context.scene.collection
+    # scene_col = bpy.context.scene.collection
     try:
-        index = scene_col.children_recursive.index(collection)
+        # index = scene_col.children_recursive.index(collection)
+        index = get_index_for_hide_collection_ops(bpy.context.scene, collection)
     except ValueError:
         print("Given collection is not children of this scene collection (recursively checked).")
         return
 
 
-    bpy.ops.object.hide_collection(collection_index=index+1, extend=extend)
+    bpy.ops.object.hide_collection(collection_index=index, extend=extend)
     return
 
+
+def get_index_for_hide_collection_ops(scene:bpy.types.Scene, target_collection:bpy.types.Collection):
+    """Return index of collection for bpy.ops.object.hide_collection.
+    Return Index is already added one for used in oeprator.
+    """
+    scene_col = scene.collection
+    index = _find_index_of_collection_in_scene(collection_list=list(scene_col.children), target_col=target_collection, index=0)
+    return index
+
+
+def _find_index_of_collection_in_scene(collection_list:List[bpy.types.Collection], target_col:bpy.types.Collection, index:int):
+    """Recursively search index of given collection in collection list. Count is done according to the bpy.ops.hide_collection collection_index.
+    """
+    if collection_list == []: # if collection is empty, then no more collections to search. Not found.
+        return None
     
+    next_collection_list = []
+    for c in collection_list:
+        index += 1
+        if c == target_col:
+            return index
+        next_collection_list += list(c.children)
+
+    else:
+        index = _find_index_of_collection_in_scene(next_collection_list, target_col, index)
+        return index
+            
+        
+    
+            
+        
+
 
 
 # def get_scene_active_part_collection(scene:bpy.types.Scene)->bpy.types.Collection:
