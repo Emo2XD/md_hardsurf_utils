@@ -782,6 +782,49 @@ class PartManager:
         reserved_collection = cls.get_mk_reserved_collection_from_part(part_collection=part_collection, prefix=prefix, create=create)
         return reserved_collection
             
+
+    @classmethod
+    def fix_part_visibility(cls, part_collection:bpy.types.Collection):
+        """fix part render and viewport visibility of given part collection.
+        """
+        cols_under_part_dict = cls.get_collection_dict(part_collection)
+
+        final_collection = cols_under_part_dict.get(ct.FINAL_COLLECTION, None)
+        dep_collection = cols_under_part_dict.get(ct.DEP_COLLECTION, None)
+        design_collection = cols_under_part_dict.get(ct.DESIGN_COLLECTION, None)
+        normal_collection = cols_under_part_dict.get(ct.NORMAL_COLLECTION, None)
+        dnt_collection = cols_under_part_dict.get(ct.DNT_COLLECTION, None)
+
+
+        cls._set_hide_state(col=final_collection,  render=False, viewport=False)
+        cls._set_hide_state(col=dep_collection,    render=False, viewport=False)
+        # cls._set_visibility(col=design_collection, render=False, viewport=True)
+        # cls._set_visibility(col=normal_collection, render=False, viewport=True)
+        # cls._set_visibility(col=dnt_collection,    render=True, viewport=True)
+
+
+    @classmethod
+    def _set_hide_state(cls, col:bpy.types.Collection, render:bool=None, viewport:bool=None):
+        """Set render and viewport visiblity of given collection. Checks collection validity.
+        It also set visibility under all nested object and collection.
+        """
+        if col is not None:
+            if render is not None:
+                col.hide_render = render
+                for c in col.children_recursive:
+                    c.hide_render = render
+                for o in col.all_objects:
+                    o.hide_render = render
+            
+            if viewport is not None:
+                col.hide_viewport = viewport
+                for c in col.children_recursive:
+                    c.hide_viewport = render
+                for o in col.all_objects:
+                    o.hide_viewport = render
+
+        
+    
     
 
 #-------------------------------------------------------------------------------
@@ -1014,5 +1057,21 @@ def shade_smooth_anywhere():
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.shade_smooth()
     bpy.ops.object.mode_set(mode=orig_mode)
+
+    return
+
+
+#-------------------------------------------------------------------------------
+# Fix Part Render and Viewport Visibilities
+#-------------------------------------------------------------------------------
+def fix_part_render_and_viewport_visibilities():
+    """Fix Part Render and Viewport Visibilities
+    This function fixes hide_render and hide_viewport property on collections
+    under every part collections.
+    """
+    parts_collections = [c for c in bpy.data.collections if getattr(c, ct.IS_MD_HARDSURF_PART_COLLECTION)]
+    
+    for part_col in parts_collections:
+        PartManager.fix_part_visibility(part_col)
 
     return
