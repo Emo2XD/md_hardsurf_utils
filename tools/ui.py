@@ -31,13 +31,21 @@ class MDHARD_PT_md_hard(bpy.types.Panel):
         layout.prop(bpy.context.scene, ct.IS_MD_FACE_STRENGTH_MATERIAL_OVERRIDE, text="Face Strength Override", icon="MATERIAL", expand=True)
 
         layout.separator()
-        active_uilist_part_collection = getattr(sn, ct.ACTIVE_PART_COLLECTION)
+        active_uilist_collection = getattr(sn, ct.ACTIVE_UILIST_COLLECTION)
         active_collection_name = ''
-        if active_uilist_part_collection is not None:
-           active_collection_name = active_uilist_part_collection.name
+        if active_uilist_collection is not None:
+           active_collection_name = active_uilist_collection.name
             
         # UIList
-        layout.label(text=f"Active: {active_collection_name}")
+        row = layout.row()
+        row.label(text=f"Active: {active_collection_name}")
+        if active_uilist_collection is not None:
+            row.prop(active_uilist_collection, ct.IS_MD_HARDSURF_SUB_PART_COLLECTION, text="Sub Part")
+            if getattr(active_uilist_collection, ct.IS_MD_HARDSURF_PART_COLLECTION) == False:
+                row.enabled = False
+                
+
+        
         row = layout.row()
         row.template_list(MDHARD_UL_scene_part.__name__, "", sn.collection, "children", sn, ct.SCENE_COLLECTION_CHILD_INDEX)
         col = row.column(align=True)

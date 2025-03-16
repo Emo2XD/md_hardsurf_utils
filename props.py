@@ -69,6 +69,16 @@ register_prop(
         bpy.types.Collection,
         ct.TEMP_VISIBILITY, bpy.props.BoolProperty(name=ct.TEMP_VISIBILITY, default = True, description="Store Visibility (eye icon in the outliner)")
         )
+
+register_prop(
+        bpy.types.Collection,
+        ct.IS_MD_HARDSURF_SUB_PART_COLLECTION, bpy.props.BoolProperty(
+            name=ct.IS_MD_HARDSURF_SUB_PART_COLLECTION, 
+            default=False, 
+            description="Subpart. True when part is not complete part and no need to mark as asset.",
+            update=ut.update_subpart_asset_status
+            )
+        )
 # register_prop(
 #         bpy.types.Collection,
 #         ct.DEP_COLLECTION, bpy.props.BoolProperty(name=ct.DEP_COLLECTION, default = False, description="Store Visibility of collection under part collection")

@@ -610,19 +610,37 @@ def setup_reserved_part_collection(part_collection:bpy.types.Collection):
     Args:
         part_collection: Under this collection, final, design, normal collections will be created.
     """
-    part_collection.use_fake_user = True # ensure keep even if part is not linked to any scene.
-
     final_collection      = PartManager.get_mk_reserved_collection_from_part(part_collection, ct.FINAL_COLLECTION, create=True)
     dependency_collection = PartManager.get_mk_reserved_collection_from_part(part_collection, ct.DEP_COLLECTION, create=True)
     design_collection     = PartManager.get_mk_reserved_collection_from_part(part_collection, ct.DESIGN_COLLECTION, create=True)
     normal_collection     = PartManager.get_mk_reserved_collection_from_part(part_collection, ct.NORMAL_COLLECTION, create=True)
 
+    if getattr(part_collection, ct.IS_MD_HARDSURF_SUB_PART_COLLECTION) == True:
+        final_collection.asset_clear()
+    else:
+        final_collection.asset_mark()
 
+    part_collection.use_fake_user = True # ensure keep even if part is not linked to any scene.
 
     final_collection.color_tag = 'COLOR_05'
     normal_collection.hide_render = True
     design_collection.hide_render = True
     dependency_collection.color_tag = 'COLOR_06'
+    return
+
+def update_subpart_asset_status(self, context):
+    """callback function for subpart bool update.
+    If True, then clear asset, if False, then mark asset.
+    """
+    if getattr(self, ct.IS_MD_HARDSURF_PART_COLLECTION, None) is not None:
+        final_collection = PartManager.get_mk_reserved_collection_from_part(self, ct.FINAL_COLLECTION, create=False)
+        if final_collection is None:
+          return
+    
+    if getattr(self, ct.IS_MD_HARDSURF_SUB_PART_COLLECTION) == True:
+        final_collection.asset_clear()
+    else:
+        final_collection.asset_mark()
     return
 
 
