@@ -5,7 +5,6 @@ from . import constants as ct
 from pprint import pprint
 
 
-
 @register_wrap
 class MDHARD_OT_sync_dnt(bpy.types.Operator):
     """Setup Dual Normal Transfer (DNT)
@@ -435,6 +434,48 @@ class MDHARD_OT_move_scene_collection_ui_list(bpy.types.Operator):
     def execute(self, context):
         ut.move_active_collection_in_ui_list(context.scene, self.move_type)
         return {"FINISHED"}
+
+
+@register_wrap
+class MDHARD_OT_part_children_visibility_toggle(bpy.types.Operator):
+    """Toggle Visibility of Children Collection Under Part.
+    This acts as same with the outliner as possible.
+    """
+    bl_idname = "md_hard.part_children_visibility_toggle"
+    bl_label = "Toggle Visibility of Child Collection Under Part"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    collection_prefix: bpy.props.EnumProperty(
+            name='Prefix', 
+            items=[(prefix, prefix, '') for prefix in ut.PartManager.reserved_collection_prefix]) # type: ignore
+    extend:bpy.props.BoolProperty(
+        name='Extend',
+        description="If True, The visibility will be extended, else, isolate given collection starts with prefix",
+        default=False
+    ) # type: ignore
+
+    @classmethod
+    def poll(self, context):
+        return ut.poll_is_ui_list_active_collection_part(self, context)
+
+    def execute(self, context):
+        sn = context.scene
+        part_collection = getattr(sn, ct.ACTIVE_PART_COLLECTION)
+        print(f"part_children_visibility_toggle called: '{self.collection_prefix}'")
+        # if part_collection is not None:
+            # setattr(part_collection)
+            # visibility = getattr(part_collection, ct.RESERVED_PART_COLLECTION_VISIBILITY)
+        # visibility_dict = visibility.get_props()
+        # visibility.set_props({ct.DEP_COLLECTION:True})
+        # visibility_dict[ct.DEP_COLLECTION] = True
+        ut.part_children_visibility_toggle(part_collection, self.collection_prefix, extend=self.extend)
+        return {"FINISHED"}
+
+    
+
+
+
+
 
 
 @register_wrap

@@ -48,22 +48,52 @@ class MDHARD_PT_md_hard(bpy.types.Panel):
         row.operator(ot.MDHARD_OT_unlink_part_collection_to_scene.bl_idname, text="Unlink", icon='UNLINKED')
         
         layout.separator()
+
+        # label_row = layout.row(align=True)
+        # label_row.scale_y = 0.5
+        # label_row.label(text=" ", icon="COLLECTION_COLOR_05")
+        # label_row.label(text=" ", icon="COLLECTION_COLOR_06")
+        # label_row.label(text=" ", icon="OUTLINER_COLLECTION")
+        # label_row.label(text=" ", icon="OUTLINER_COLLECTION")
+
         row = layout.row(align=True)
         row.scale_y = 1.5
 
-
+        # col = layout.column(align=True)
         current_uilit_scene_collection = getattr(sn, ct.ACTIVE_UILIST_COLLECTION) # This scene property is both return part or non part collection.
         if current_uilit_scene_collection is not None:
-            visibilities = getattr(current_uilit_scene_collection, ct.RESERVED_PART_COLLECTION_VISIBILITY)
-            row.prop(visibilities, 'final', text="F-", icon="COLLECTION_COLOR_05")
-            row.prop(visibilities, 'dependency', text="DEP-", icon="COLLECTION_COLOR_06")
-            row.prop(visibilities, 'design', text="D-", icon="OUTLINER_COLLECTION")
-            row.prop(visibilities, 'normal', text="NORMAL-", icon="OUTLINER_COLLECTION")
+            # row = col.row(align=True)
+            # row.label(text="F-", icon="COLLECTION_COLOR_05")
+            # row.operator(ot.MDHARD_OT_part_children_visibility_toggle.bl_idname, text="", icon="HIDE_OFF", emboss=False).collection_prefix = ct.FINAL_COLLECTION
+            
+            # row = col.row(align=True)
+            # row.label(text="DEP-", icon="COLLECTION_COLOR_06")
+            # row.operator(ot.MDHARD_OT_part_children_visibility_toggle.bl_idname, text="", icon="HIDE_OFF", emboss=False).collection_prefix = ct.DEP_COLLECTION
+
+            # row = col.row(align=True)
+            # row.label(text="D-", icon="OUTLINER_COLLECTION")
+            # row.operator(ot.MDHARD_OT_part_children_visibility_toggle.bl_idname, text="", icon="HIDE_OFF", emboss=False).collection_prefix = ct.DESIGN_COLLECTION
+            
+            # row = col.row(align=True)
+            # row.label(text="NORMAL-", icon="OUTLINER_COLLECTION")
+            # row.operator(ot.MDHARD_OT_part_children_visibility_toggle.bl_idname, text="", icon="HIDE_OFF", emboss=False).collection_prefix = ct.NORMAL_COLLECTION
+
+            row.operator(ot.MDHARD_OT_part_children_visibility_toggle.bl_idname, text="F-", icon="HIDE_OFF").collection_prefix = ct.FINAL_COLLECTION
+            row.operator(ot.MDHARD_OT_part_children_visibility_toggle.bl_idname, text="DEP-", icon="HIDE_OFF").collection_prefix = ct.DEP_COLLECTION
+            row.operator(ot.MDHARD_OT_part_children_visibility_toggle.bl_idname, text="D-", icon="HIDE_OFF").collection_prefix = ct.DESIGN_COLLECTION
+            row.operator(ot.MDHARD_OT_part_children_visibility_toggle.bl_idname, text="NORMAL-", icon="HIDE_OFF").collection_prefix = ct.NORMAL_COLLECTION
+
+            # row.prop(current_uilit_scene_collection, ct.FINAL_COLLECTION, text="F-", icon="COLLECTION_COLOR_05")
+            # row.prop(current_uilit_scene_collection, ct.DEP_COLLECTION, text="DEP-", icon="COLLECTION_COLOR_06")
+            # row.prop(current_uilit_scene_collection, ct.DESIGN_COLLECTION, text="D-", icon="OUTLINER_COLLECTION")
+            # row.prop(current_uilit_scene_collection, ct.NORMAL_COLLECTION, text="NORMAL-", icon="OUTLINER_COLLECTION")
 
             if getattr(current_uilit_scene_collection, ct.IS_MD_HARDSURF_PART_COLLECTION):
                 row.enabled = True
+                # label_row.enabled = True
             else:
                 row.enabled = False
+                # label_row.enabled = False
 
         return
     

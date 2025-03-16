@@ -649,6 +649,15 @@ def rename_part_collection(part_collection:bpy.types.Collection, new_name:str)->
     print("rename part is called")
     return
 
+def poll_is_ui_list_active_collection_part(self, context:bpy.types.Context)->bool:
+    """Poll function for operator to check if the active collection in UIList is part collection.
+
+    """
+    part_collection = getattr(context.scene, ct.ACTIVE_PART_COLLECTION)
+    if part_collection is None:
+        return False
+    return getattr(part_collection, ct.IS_MD_HARDSURF_PART_COLLECTION)
+
 
 class PartManager:
     """Manages Part Collection"""
@@ -878,6 +887,52 @@ def move_active_collection_in_ui_list(sn:bpy.types.Scene, move_type:str='UP'):
 
     setattr(sn, ct.SCENE_COLLECTION_CHILD_INDEX, move_to)
     return
+
+
+def set_collection_visibility_property_under_part(part_collection:bpy.types.Collection, extend:bool=False):
+    """Set Collection Visibility Property Under Part.
+    This stores the state of collection visibility under part. When using 'hide collection' operator, resets the visibility.
+    Through this function, it stores the visibility state.
+    """
+    pass
+
+
+def part_children_visibility_toggle(part_collection:bpy.types.Collection, child_prefix:str, extend:bool=False):
+    """Toggle Visibility of given collection udner part collection.
+
+    Args:
+        part_collection: Visibility of Children under this collection will be modified
+        child_prefix: prefix is either F, D, DEP, NORMAL, etc. defined in PartManager. 
+        The collection starts with given prefix will be used as primary collection to toggle visibility
+
+    """
+    reserved_collection = PartManager.get_mk_reserved_collection_from_part(part_collection, child_prefix, create=False)
+
+    if reserved_collection is None:
+        print(f"This part collection does not have child collection starts with prefix {child_prefix}-")
+        return
+    
+    isolate_collection_under_scene(reserved_collection, extend)
+
+    return
+
+
+def isolate_collection_under_scene(collection:bpy.types.Collection, extend:bool=False):
+    """Isolate collection visibility under current scene.
+    """
+    scene_col = bpy.context.scene.collection
+    try:
+        index = scene_col.children_recursive.index(collection)
+    except ValueError:
+        print("Given collection is not children of this scene collection (recursively checked).")
+        return
+
+
+    bpy.ops.object.hide_collection(collection_index=index+1, extend=extend)
+    return
+
+    
+
 
 # def get_scene_active_part_collection(scene:bpy.types.Scene)->bpy.types.Collection:
 #     """Get Active Part Collection in Given Scene.

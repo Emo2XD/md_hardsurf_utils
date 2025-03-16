@@ -13,7 +13,9 @@ SCENE_COLLECTION_CHILD_INDEX = 'scene_collection_child_index'
 ACTIVE_PART_COLLECTION = "active_part_collection" # read only property to keep track of active part collection.
 ACTIVE_UILIST_COLLECTION = "active_uilist_collection"
 
-RESERVED_PART_COLLECTION_VISIBILITY = "reserved_part_collection_visibility"
+TEMP_VISIBILITY = 'temp_visibility' # use for tracking visibility since there is no attribute.
+
+# RESERVED_PART_COLLECTION_VISIBILITY = "reserved_part_collection_visibility"
 
 
 # modifier name

@@ -7,10 +7,10 @@ vim.keymap.set({'i','n'}, '<F5>', ':TermSend python %<CR>', { noremap = true})
 -- vim.keymap.set('n', '<C-p>', builtin.find_files, {})
 
 -- vim.keymap.set('n', '<C-p>', builtin.git_files, {})
-vim.o.guifont = "UbuntuMono Nerd Font Mono:h11"
-vim.cmd.colorscheme("dracula")
+vim.o.guifont = "UbuntuMono Nerd Font Mono:h10"
+-- vim.cmd.colorscheme("dracula")
 -- vim.cmd.colorscheme("onedark")
--- vim.cmd.colorscheme("catppuccin-mocha")
+vim.cmd.colorscheme("catppuccin-mocha")
 -- vim.cmd.colorscheme("catppuccin-macchiato")
 
 require('telescope').setup{

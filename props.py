@@ -65,21 +65,57 @@ register_prop(
             )) # this return active collection.
 
 
-@register_wrap
-class ReservedPartCollectionVisibility(bpy.types.PropertyGroup):
-    final: bpy.props.BoolProperty(name=ct.FINAL_COLLECTION, default=True) # type: ignore
-    dependency:bpy.props.BoolProperty(name=ct.DEP_COLLECTION, default=False) # type: ignore
-    design:bpy.props.BoolProperty(name=ct.DESIGN_COLLECTION, default=False) # type: ignore
-    normal:bpy.props.BoolProperty(name=ct.NORMAL_COLLECTION, default=False) # type: ignore
-
-
 register_prop(
         bpy.types.Collection,
-        ct.RESERVED_PART_COLLECTION_VISIBILITY,
-        bpy.props.PointerProperty(
-            type=ReservedPartCollectionVisibility, 
-            description="Store Visibility of reserved collection under Part collection", 
-            ))
+        ct.TEMP_VISIBILITY, bpy.props.BoolProperty(name=ct.TEMP_VISIBILITY, default = True, description="Store Visibility (eye icon in the outliner)")
+        )
+# register_prop(
+#         bpy.types.Collection,
+#         ct.DEP_COLLECTION, bpy.props.BoolProperty(name=ct.DEP_COLLECTION, default = False, description="Store Visibility of collection under part collection")
+#         )
+# register_prop(
+#         bpy.types.Collection,
+#         ct.DESIGN_COLLECTION, bpy.props.BoolProperty(name=ct.DESIGN_COLLECTION, default = False, description="Store Visibility of collection under part collection")
+#         )
+# register_prop(
+#         bpy.types.Collection,
+#         ct.NORMAL_COLLECTION, bpy.props.BoolProperty(name=ct.NORMAL_COLLECTION, default = False, description="Store Visibility of collection under part collection")
+#         )
+# @register_wrap
+# class ReservedPartCollectionVisibility(bpy.types.PropertyGroup):
+#     final: bpy.props.BoolProperty(name=ct.FINAL_COLLECTION, default=True) # type: ignore
+#     dependency:bpy.props.BoolProperty(name=ct.DEP_COLLECTION, default=False) # type: ignore
+#     design:bpy.props.BoolProperty(name=ct.DESIGN_COLLECTION, default=False) # type: ignore
+#     normal:bpy.props.BoolProperty(name=ct.NORMAL_COLLECTION, default=False) # type: ignore
+
+#     # TODO: init method not work so you have to construct dictionary here.
+#     def get_props(self):
+#         """get current visibility"""
+#         visibility_dict = {
+#         ct.FINAL_COLLECTION : self.final, 
+#         ct.DEP_COLLECTION : self.dependency, 
+#         ct.DESIGN_COLLECTION : self.design, 
+#         ct.NORMAL_COLLECTION : self.normal
+#         }
+#         return visibility_dict
+    
+#     def set_props(self, prop_dict:dict):
+#         visibility_dict = self.get_props()
+#         for key, value in prop_dict.items():
+#             visibility_dict[key] = value
+#         return
+
+
+# register_prop(
+#         bpy.types.Collection,
+#         ct.RESERVED_PART_COLLECTION_VISIBILITY,
+#         bpy.props.PointerProperty(
+#             type=ReservedPartCollectionVisibility, 
+#             description="Store Visibility of reserved collection under Part collection", 
+#             ))
+
+
+
 
 # def msgbus_callback(*arg):
 #     # in console will be print selected_objects 
