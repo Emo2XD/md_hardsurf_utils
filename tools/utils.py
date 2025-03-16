@@ -124,12 +124,15 @@ def get_selected_edge_indices_bmesh(obj:bpy.types.Object):
 
 def poll_is_obj_in_part_collection(self, obj):
     """Poll function to filter object, only show when active object exist."""
-    active_obj = bpy.context.active_object
-    if active_obj is None:
+    active_part_col = getattr(bpy.context.scene, ct.ACTIVE_PART_COLLECTION)
+    # active_obj = bpy.context.active_object
+    # if active_obj is None:
+        # return False
+    if active_part_col is None:
         return False
     
     # normal_collection = get_mk_reserved_collection_under_part(obj=active_obj, prefix=ct.NORMAL_COLLECTION, create=False)
-    normal_collection = PartManager.get_mk_reserved_collection_from_obj(obj=active_obj, prefix=ct.NORMAL_COLLECTION, create=False)
+    normal_collection = PartManager.get_mk_reserved_collection_from_part(part_collection=active_part_col, prefix=ct.NORMAL_COLLECTION, create=False)
     if normal_collection == None:
         return False
     else:
@@ -183,7 +186,8 @@ def separate_as_normal_source_object(name:str, assign_as_src:bool=True, shade_sm
         print("No vertex is selected.")
         return 1
     
-    part_collection = get_parent_part_collection(obj=active_obj)
+    # part_collection = get_parent_part_collection(obj=active_obj)
+    part_collection = getattr(bpy.context.scene, ct.ACTIVE_PART_COLLECTION)
 
     # Separate
     object_set_before = set(bpy.context.selected_objects)
@@ -199,7 +203,7 @@ def separate_as_normal_source_object(name:str, assign_as_src:bool=True, shade_sm
         setattr(part_collection, ct.NORMAL_TRANSFER_SRC_OBJ_PER_COLLECTION, separated_objects[0])
 
     # normal_collection = get_mk_reserved_collection_under_part(active_obj, ct.NORMAL_COLLECTION)
-    normal_collection = PartManager.get_mk_reserved_collection_from_obj(active_obj, ct.NORMAL_COLLECTION)
+    normal_collection = PartManager.get_mk_reserved_collection_from_part(part_collection, ct.NORMAL_COLLECTION)
     for obj in separated_objects:
         obj.name = name
         clean_up_dnt_modifiers(obj)

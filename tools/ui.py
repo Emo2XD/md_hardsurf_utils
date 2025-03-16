@@ -113,16 +113,17 @@ class MDHARD_PT_md_normal_transfer(bpy.types.Panel):
 
     def draw(self, context):
         active_obj = context.active_object
-        if active_obj is not None:
-            part_collection = ut.get_parent_part_collection(active_obj, fallback=None)
-        else:
-            part_collection = None
+        part_collection = getattr(bpy.context.scene, ct.ACTIVE_PART_COLLECTION)
+        # if active_obj is not None:
+        #     part_collection = ut.get_parent_part_collection(active_obj, fallback=None)
+        # else:
+        #     part_collection = None
 
         layout = self.layout
         col = layout.column(heading="Normal Transfer")
 
         if part_collection is not None:
-            col.label(text=f"Active Object in: {part_collection.name}", icon="COLLECTION_COLOR_01")
+            # col.label(text=f"Active Object in: {part_collection.name}", icon="COLLECTION_COLOR_01")
             col.prop(part_collection, ct.NORMAL_TRANSFER_SRC_OBJ_PER_COLLECTION, text="Source")
             row = col.row(align=True)
             row.scale_y = 1.7

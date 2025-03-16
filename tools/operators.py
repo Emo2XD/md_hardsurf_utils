@@ -83,7 +83,8 @@ class MDHARD_OT_normal_transfer(bpy.types.Operator):
     def execute(self, context):
 
         target_obj = context.active_object
-        part_collection = ut.get_parent_part_collection(obj=target_obj, fallback=None)
+        # part_collection = ut.get_parent_part_collection(obj=target_obj, fallback=None)
+        part_collection = getattr(bpy.context.scene, ct.ACTIVE_PART_COLLECTION)
         if part_collection is None:
             self.report({"WARNING"}, f"Please Setup Valid Part Collection.")
             return {"CANCELLED"}
@@ -127,7 +128,8 @@ class MDHARD_OT_separate_normal_source(bpy.types.Operator):
     def execute(self, context):
 
         target_obj = context.active_object
-        part_collection = ut.get_parent_part_collection(obj=target_obj, fallback=None)
+        # part_collection = ut.get_parent_part_collection(obj=target_obj, fallback=None)
+        part_collection = getattr(bpy.context.scene, ct.ACTIVE_PART_COLLECTION)
         if part_collection is None:
             self.report({"WARNING"}, f"Please Setup Valid Part Collection.")
             return {"CANCELLED"}
