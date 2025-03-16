@@ -1000,7 +1000,13 @@ def set_collection_visibility_property_under_part(part_collection:bpy.types.Coll
         for c in part_collection.children:
             setattr(c, ct.TEMP_VISIBILITY, False)
 
-    setattr(child_collection, ct.TEMP_VISIBILITY, True)
+        setattr(child_collection, ct.TEMP_VISIBILITY, True)
+    
+    else:
+        # toggle when extend == True.
+        setattr(child_collection, ct.TEMP_VISIBILITY, not getattr(child_collection, ct.TEMP_VISIBILITY))
+
+
     return
 
 

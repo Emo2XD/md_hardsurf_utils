@@ -459,6 +459,15 @@ class MDHARD_OT_part_children_visibility_toggle(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         return ut.poll_is_ui_list_active_collection_part(self, context)
+    
+    def invoke(self, context, event):
+        shift_pressed = event.shift
+        if shift_pressed:
+            self.extend = True
+        else:
+           self.extend = False
+        return self.execute(context)
+
 
     def execute(self, context):
         sn = context.scene
