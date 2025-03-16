@@ -936,12 +936,16 @@ def restore_child_collection_visibility_under_part(part_collection:bpy.types.Col
     visibilities = PartManager.get_collection_visibility_dict(part_collection)
     part_child_collection_dict = PartManager.get_collection_dict(part_collection)
 
-    extend = False # if only one collection is visibile then extend = False. But if there are more than two collection visible, then extend.
+    
+    if len(part_collection.children) > 0: # hide all before restoration.
+        # by toggling on and off, you can hide everything in the part collection.
+        isolate_collection_under_scene(part_collection.children[0], extend=False)
+        isolate_collection_under_scene(part_collection.children[0], extend=True)
 
+    # starting from zero visibility is easy.
     for key, col in part_child_collection_dict.items():
         if visibilities.get(key, False):
-            isolate_collection_under_scene(col, extend)
-            extend = True # for next time, visibility will be extended.
+            isolate_collection_under_scene(col, extend=True)
 
     return
 
