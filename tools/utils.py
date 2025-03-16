@@ -848,13 +848,20 @@ def go_to_part_collection(part_collection:bpy.types.Collection):
 #-------------------------------------------------------------------------------
 # Unlink Part Collection
 #-------------------------------------------------------------------------------
-def unlink_part_collection(part_collection:bpy.types.Collection):
-    """Unlink given part collection from current scene.
+def unlink_ui_list_collection(ui_list_collection:bpy.types.Collection):
+    """Unlink given ui_list collection from current scene.
     Unlink but before do this operation, ensure collection has fake user from loss of data.
     """
-    print("unlink_part_collection was called")
-    pass
+    sn = bpy.context.scene
+    sn_col_children = sn.collection.children
+    active_index = getattr(sn, ct.SCENE_COLLECTION_CHILD_INDEX)
 
+    ui_list_collection.use_fake_user = True
+    sn_col_children.unlink(ui_list_collection)
+    
+    new_index = max(min(len(sn_col_children)-1, active_index), 0) # try active index stay the same. but les than length and more than zero.
+    setattr(sn, ct.SCENE_COLLECTION_CHILD_INDEX, new_index)
+    return
 
 def get_scene_which_has_this_part_collection(part_collection:bpy.types.Collection, fallback:bpy.types.Scene=None)->bpy.types.Scene:
     """Get scene which has given part collections in it. If None, returns fallback scene
@@ -906,12 +913,13 @@ def update_scene_ui_list_active_part_collection(self, context):
     """
     scene = bpy.context.scene
     active_index = getattr(self, ct.SCENE_COLLECTION_CHILD_INDEX)
-    active_col = get_ui_list_active_collection_from_index(scene=scene, active_index=active_index)
+    active_col = get_ui_list_active_collection_from_index(scene=scene, active_index=active_index) # might be none, if there is no collection in scene.
 
     setattr(scene, ct.ACTIVE_UILIST_COLLECTION, active_col) # This Alwarys returns active collection in the UIList.
 
-    if getattr(active_col, ct.IS_MD_HARDSURF_PART_COLLECTION) == False:
-        active_col = None
+    if active_col is not None:
+        if getattr(active_col, ct.IS_MD_HARDSURF_PART_COLLECTION) == False:
+            active_col = None
 
     
     setattr(scene, ct.ACTIVE_PART_COLLECTION, active_col) # update readonly property. This returns None when collection is not Part
@@ -954,6 +962,9 @@ def get_ui_list_active_collection_from_index(scene:bpy.types.Scene, active_index
     """
     try:
         active_col = scene.collection.children[active_index]
+    except IndexError: # when collection length is zero. You don't have to update active collection.
+        print(f"in get_ui_list_active_collection_from_index: There is no collection in scene.collection. Return None.")
+        return None
     except Exception as e:
         print(f"No valid collection found in getter_scene_ui_list_active_collection: {e}")
         return None

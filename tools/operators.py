@@ -393,14 +393,17 @@ class MDHARD_OT_unlink_part_collection_to_scene(bpy.types.Operator):
     bl_label = "Unlink Part Collection to Scene"
     bl_options = {'REGISTER', 'UNDO'}
 
-    # @classmethod
-    # def poll(self, context:bpy.types.Context):
-    #     # window = bpy.context.area
-    #     return bpy.context.area.type == 'OUTLINER' 
+    @classmethod
+    def poll(self, context:bpy.types.Context):
+        # window = bpy.context.area
+        return getattr(context.scene, ct.ACTIVE_UILIST_COLLECTION) is not None
+
 
         
     def execute(self, context):
-        self.report({"INFO"}, f"Unlink part was called")
+        ui_list_collection = getattr(context.scene, ct.ACTIVE_UILIST_COLLECTION)
+        ut.unlink_ui_list_collection(ui_list_collection)
+        self.report({"INFO"}, f"Unlink part was called, you can still find collection in blend file outliner")
         return {"FINISHED"}
     
 
