@@ -690,6 +690,32 @@ class PartManager:
                     reserved_collections.append(value)
         
         return reserved_collections
+    
+    @classmethod
+    def get_collection_dict(cls, part_collection:bpy.types.Collection):
+        """Returns collection dictionary. Basically same with get_collections but it returns dictionary.
+        you can access by using key.
+        """
+        #TODO: implement funciton.
+        collection_dict = {}
+        return collection_dict
+    
+    @classmethod
+    def get_collection_visibility_dict(cls, part_collection:bpy.types.Collection):
+        """Returns dictionary of visibility. You can retrieve visibility of collections under given part.
+        This function only consider reserved collection. Prefix can be used as key.
+        
+        typically you use with dict.get(key, default) to avoid key error.
+        """
+        collection_visibility_dict = {}
+        child_collections = part_collection.children
+        for prefix in cls.reserved_collection_prefix:
+            for key, col in child_collections.items():
+                if key.startswith(f"{prefix}-"):
+                    collection_visibility_dict[prefix] = getattr(col, ct.TEMP_VISIBILITY)
+    
+
+        return collection_visibility_dict
 
 
     @classmethod
@@ -889,12 +915,17 @@ def move_active_collection_in_ui_list(sn:bpy.types.Scene, move_type:str='UP'):
     return
 
 
-def set_collection_visibility_property_under_part(part_collection:bpy.types.Collection, extend:bool=False):
+def set_collection_visibility_property_under_part(part_collection:bpy.types.Collection, child_collection:bpy.types.Collection, extend:bool=False):
     """Set Collection Visibility Property Under Part.
     This stores the state of collection visibility under part. When using 'hide collection' operator, resets the visibility.
     Through this function, it stores the visibility state.
     """
-    pass
+    if extend == False:
+        for c in part_collection.children:
+            setattr(c, ct.TEMP_VISIBILITY, False)
+
+    setattr(child_collection, ct.TEMP_VISIBILITY, True)
+    return
 
 
 def part_children_visibility_toggle(part_collection:bpy.types.Collection, child_prefix:str, extend:bool=False):
@@ -913,7 +944,7 @@ def part_children_visibility_toggle(part_collection:bpy.types.Collection, child_
         return
     
     isolate_collection_under_scene(reserved_collection, extend)
-
+    set_collection_visibility_property_under_part(part_collection, reserved_collection, extend)
     return
 
 
