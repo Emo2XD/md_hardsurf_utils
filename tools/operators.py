@@ -475,21 +475,8 @@ class MDHARD_OT_part_children_visibility_toggle(bpy.types.Operator):
     def execute(self, context):
         sn = context.scene
         part_collection = getattr(sn, ct.ACTIVE_PART_COLLECTION)
-        print(f"part_children_visibility_toggle called: '{self.collection_prefix}'")
-        # if part_collection is not None:
-            # setattr(part_collection)
-            # visibility = getattr(part_collection, ct.RESERVED_PART_COLLECTION_VISIBILITY)
-        # visibility_dict = visibility.get_props()
-        # visibility.set_props({ct.DEP_COLLECTION:True})
-        # visibility_dict[ct.DEP_COLLECTION] = True
         ut.part_children_visibility_toggle(part_collection, self.collection_prefix, extend=self.extend)
         return {"FINISHED"}
-
-    
-
-
-
-
 
 
 @register_wrap

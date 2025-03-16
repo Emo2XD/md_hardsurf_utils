@@ -51,34 +51,11 @@ class MDHARD_PT_md_hard(bpy.types.Panel):
         
         layout.separator()
 
-        # label_row = layout.row(align=True)
-        # label_row.scale_y = 0.5
-        # label_row.label(text=" ", icon="COLLECTION_COLOR_05")
-        # label_row.label(text=" ", icon="COLLECTION_COLOR_06")
-        # label_row.label(text=" ", icon="OUTLINER_COLLECTION")
-        # label_row.label(text=" ", icon="OUTLINER_COLLECTION")
-
         row = layout.row(align=True)
         row.scale_y = 1.5
 
-        # col = layout.column(align=True)
         current_uilist_scene_collection = getattr(sn, ct.ACTIVE_UILIST_COLLECTION) # This scene property is both return part or non part collection.
         if current_uilist_scene_collection is not None:
-            # row = col.row(align=True)
-            # row.label(text="F-", icon="COLLECTION_COLOR_05")
-            # row.operator(ot.MDHARD_OT_part_children_visibility_toggle.bl_idname, text="", icon="HIDE_OFF", emboss=False).collection_prefix = ct.FINAL_COLLECTION
-            
-            # row = col.row(align=True)
-            # row.label(text="DEP-", icon="COLLECTION_COLOR_06")
-            # row.operator(ot.MDHARD_OT_part_children_visibility_toggle.bl_idname, text="", icon="HIDE_OFF", emboss=False).collection_prefix = ct.DEP_COLLECTION
-
-            # row = col.row(align=True)
-            # row.label(text="D-", icon="OUTLINER_COLLECTION")
-            # row.operator(ot.MDHARD_OT_part_children_visibility_toggle.bl_idname, text="", icon="HIDE_OFF", emboss=False).collection_prefix = ct.DESIGN_COLLECTION
-            
-            # row = col.row(align=True)
-            # row.label(text="NORMAL-", icon="OUTLINER_COLLECTION")
-            # row.operator(ot.MDHARD_OT_part_children_visibility_toggle.bl_idname, text="", icon="HIDE_OFF", emboss=False).collection_prefix = ct.NORMAL_COLLECTION
             visibilities = ut.PartManager.get_collection_visibility_dict(part_collection=current_uilist_scene_collection)
             icon_set = lambda prefix: "HIDE_OFF" if visibilities.get(prefix, False) else "HIDE_ON"
             row.operator(ot.MDHARD_OT_part_children_visibility_toggle.bl_idname, text="F-", icon=icon_set(ct.FINAL_COLLECTION)).collection_prefix = ct.FINAL_COLLECTION
@@ -86,17 +63,10 @@ class MDHARD_PT_md_hard(bpy.types.Panel):
             row.operator(ot.MDHARD_OT_part_children_visibility_toggle.bl_idname, text="D-", icon=icon_set(ct.DESIGN_COLLECTION)).collection_prefix = ct.DESIGN_COLLECTION
             row.operator(ot.MDHARD_OT_part_children_visibility_toggle.bl_idname, text="NORMAL-", icon=icon_set(ct.NORMAL_COLLECTION)).collection_prefix = ct.NORMAL_COLLECTION
 
-            # row.prop(current_uilit_scene_collection, ct.FINAL_COLLECTION, text="F-", icon="COLLECTION_COLOR_05")
-            # row.prop(current_uilit_scene_collection, ct.DEP_COLLECTION, text="DEP-", icon="COLLECTION_COLOR_06")
-            # row.prop(current_uilit_scene_collection, ct.DESIGN_COLLECTION, text="D-", icon="OUTLINER_COLLECTION")
-            # row.prop(current_uilit_scene_collection, ct.NORMAL_COLLECTION, text="NORMAL-", icon="OUTLINER_COLLECTION")
-
             if getattr(current_uilist_scene_collection, ct.IS_MD_HARDSURF_PART_COLLECTION):
                 row.enabled = True
-                # label_row.enabled = True
             else:
                 row.enabled = False
-                # label_row.enabled = False
 
         return
     
@@ -114,16 +84,11 @@ class MDHARD_PT_md_normal_transfer(bpy.types.Panel):
     def draw(self, context):
         active_obj = context.active_object
         part_collection = getattr(bpy.context.scene, ct.ACTIVE_PART_COLLECTION)
-        # if active_obj is not None:
-        #     part_collection = ut.get_parent_part_collection(active_obj, fallback=None)
-        # else:
-        #     part_collection = None
 
         layout = self.layout
         col = layout.column(heading="Normal Transfer")
 
         if part_collection is not None:
-            # col.label(text=f"Active Object in: {part_collection.name}", icon="COLLECTION_COLOR_01")
             col.prop(part_collection, ct.NORMAL_TRANSFER_SRC_OBJ_PER_COLLECTION, text="Source")
             row = col.row(align=True)
             row.scale_y = 1.7
@@ -151,14 +116,7 @@ class MDHARD_PT_md_normal_transfer(bpy.types.Panel):
 class MDHARD_UL_scene_part(bpy.types.UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            # layout.label(text=item.name)
             part_col = item # scene.collection.children ()
-            # layout.prop(
-            #     part_col, 
-            #     'name', 
-            #     text="", 
-            #     icon="COLLECTION_COLOR_01" if getattr(part_col, ct.IS_MD_HARDSURF_PART_COLLECTION) else "OUTLINER_COLLECTION",  
-            #     emboss=False)
             layout.label(
                 text=part_col.name,
                 icon="COLLECTION_COLOR_01" if getattr(part_col, ct.IS_MD_HARDSURF_PART_COLLECTION) else "OUTLINER_COLLECTION")
