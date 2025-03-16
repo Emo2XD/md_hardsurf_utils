@@ -846,6 +846,19 @@ def go_to_part_collection(part_collection:bpy.types.Collection):
 
 
 #-------------------------------------------------------------------------------
+# Link Part Collection
+#-------------------------------------------------------------------------------
+def link_ui_list_collection(part_collection:bpy.types.Collection):
+    """Link given ui_list collection from current scene.
+    Difference between go_go_part is that, This function stays the current scene no matter
+    other scene already contains the same part.
+    """
+    scene = bpy.context.scene
+    set_this_part_active_in_scene(part_collection, scene)
+    return
+
+
+#-------------------------------------------------------------------------------
 # Unlink Part Collection
 #-------------------------------------------------------------------------------
 def unlink_ui_list_collection(ui_list_collection:bpy.types.Collection):

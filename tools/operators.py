@@ -365,10 +365,6 @@ class MDHARD_OT_link_part_colleciton_to_scene(bpy.types.Operator):
     bl_label = "Link Part Collection to Scene"
     bl_options = {'REGISTER', 'UNDO'}
 
-    # @classmethod
-    # def poll(self, context:bpy.types.Context):
-    #     # window = bpy.context.area
-    #     return bpy.context.area.type == 'OUTLINER' 
 
     def invoke(self, context, event):
         wm = context.window_manager
@@ -376,12 +372,23 @@ class MDHARD_OT_link_part_colleciton_to_scene(bpy.types.Operator):
         return wm.invoke_props_dialog(self)
         
     def execute(self, context):
-        # ut.unlink_part_collection()
-        
-        self.report({"INFO"}, f"Link part was called")
+        wm = context.window_manager
+        part_col = getattr(wm, ct.OPEN_PART_COLLECTION_PLACEHOLDER)
+        if part_col is not None:
+            ut.link_ui_list_collection(part_col)
+        else:
+            self.report({"WARNING"}, f"Part Collection is not selected.")
+            return {"CANCELLED"}
 
+        self.report({"INFO"}, f"Part Collection Linked to this scene")
+        return {"FINISHED"}
+    
+    def draw(self, context):
+        wm = context.window_manager
+        layout = self.layout
 
-        return {"FINISHED"}      
+        layout.prop(wm, ct.OPEN_PART_COLLECTION_PLACEHOLDER, text="Part Collection")
+
 
 
 @register_wrap
