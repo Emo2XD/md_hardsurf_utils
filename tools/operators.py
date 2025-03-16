@@ -163,10 +163,10 @@ class MDHARD_OT_setup_part_collection(bpy.types.Operator):
 
     def draw(self, context):
         layout = self.layout
-        layout.use_property_split = True
-        
-        col = layout.column()
-        col.prop(self, "part_name")
+        row = layout.row()
+        row.activate_init = True
+        row.label(icon='COLLECTION_COLOR_01')
+        row.prop(self, "part_name", text="")
 
 
 @register_wrap
@@ -201,7 +201,7 @@ class MDHARD_OT_rename_part_collection(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     new_part_name: bpy.props.StringProperty(
-        name="New Part Name",
+        name="Name",
         description="New part name, if the given name is empty or same, the name will not be changed.") # type: ignore
 
     @classmethod
@@ -231,6 +231,13 @@ class MDHARD_OT_rename_part_collection(bpy.types.Operator):
 
         self.report({"INFO"}, f"Part collection renamed")
         return {"FINISHED"}
+    
+    def draw(self, context):
+        layout = self.layout
+        row = layout.row()
+        row.activate_init = True
+        row.label(icon='COLLECTION_COLOR_01')
+        row.prop(self, "new_part_name", text="")
     
 
 
@@ -352,8 +359,9 @@ class MDHARD_OT_go_to_part(bpy.types.Operator):
     def draw(self, context):
         wm = context.window_manager
         layout = self.layout
-
-        layout.prop(wm, ct.OPEN_PART_COLLECTION_PLACEHOLDER, text="Part Collection")
+        row = layout.row()
+        row.activate_init = True
+        row.prop(wm, ct.OPEN_PART_COLLECTION_PLACEHOLDER, text="")
 
 
 @register_wrap
@@ -386,8 +394,9 @@ class MDHARD_OT_link_part_colleciton_to_scene(bpy.types.Operator):
     def draw(self, context):
         wm = context.window_manager
         layout = self.layout
-
-        layout.prop(wm, ct.OPEN_PART_COLLECTION_PLACEHOLDER, text="Part Collection")
+        row = layout.row()
+        row.activate_init = True
+        row.prop(wm, ct.OPEN_PART_COLLECTION_PLACEHOLDER, text="")
 
 
 
