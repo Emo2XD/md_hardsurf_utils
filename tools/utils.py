@@ -696,15 +696,19 @@ class PartManager:
         """Returns collection dictionary. Basically same with get_collections but it returns dictionary.
         you can access by using key.
         """
-        #TODO: implement funciton.
         collection_dict = {}
+        child_collections = part_collection.children
+        for prefix in cls.reserved_collection_prefix:
+            for key, col in child_collections.items():
+                if key.startswith(f"{prefix}-"):
+                    collection_dict[prefix] = col
         return collection_dict
     
     @classmethod
     def get_collection_visibility_dict(cls, part_collection:bpy.types.Collection):
         """Returns dictionary of visibility. You can retrieve visibility of collections under given part.
         This function only consider reserved collection. Prefix can be used as key.
-        
+
         typically you use with dict.get(key, default) to avoid key error.
         """
         collection_visibility_dict = {}
@@ -857,17 +861,42 @@ def update_scene_ui_list_active_part_collection(self, context):
     active_index = getattr(self, ct.SCENE_COLLECTION_CHILD_INDEX)
     active_col = get_ui_list_active_collection_from_index(scene=scene, active_index=active_index)
 
-    setattr(scene, ct.ACTIVE_UILIST_COLLECTION, active_col)
+    setattr(scene, ct.ACTIVE_UILIST_COLLECTION, active_col) # This Alwarys returns active collection in the UIList.
 
     if getattr(active_col, ct.IS_MD_HARDSURF_PART_COLLECTION) == False:
         active_col = None
 
     
-    setattr(scene, ct.ACTIVE_PART_COLLECTION, active_col)
+    setattr(scene, ct.ACTIVE_PART_COLLECTION, active_col) # update readonly property. This returns None when collection is not Part
     bpy.ops.object.hide_collection(collection_index=active_index+1) # collection_index is stargint from 1.
+
+    if active_col is not None: # only apply this code to valid part collection
+        restore_child_collection_visibility_under_part(active_col) # you need to restore visibility, because, hide_collection automatically enable visibility of all child collection.
 
     return
 
+def restore_child_collection_visibility_under_part(part_collection:bpy.types.Collection):
+    """Restore child collection visibility under Part.
+    After the use of bpy.ops.object.hide_collection, All of the child collection visibilities
+    will be automatically updated as True. With this function, you can restore original visibility after the hide_correction
+    This function works only for Part Collection.
+
+    TODO:
+        make this work other than part collection. This function uses custom visibility property on collection.
+        this property is managed only through toggle part child collection visibility toggle operator. Thus visibility property on non-part collection
+        won't be updated so its not possible to restore visibility.
+    """
+    visibilities = PartManager.get_collection_visibility_dict(part_collection)
+    part_child_collection_dict = PartManager.get_collection_dict(part_collection)
+
+    extend = False # if only one collection is visibile then extend = False. But if there are more than two collection visible, then extend.
+
+    for key, col in part_child_collection_dict.items():
+        if visibilities.get(key, False):
+            isolate_collection_under_scene(col, extend)
+            extend = True # for next time, visibility will be extended.
+
+    return
 
 def get_ui_list_active_collection_from_index(scene:bpy.types.Scene, active_index:int):
     """Get Scene UIList active collection safely. index out of range is treated.
