@@ -3,7 +3,7 @@ from ..setup_tools.register import register_wrap
 from . import utils as ut
 from . import constants as ct
 from pprint import pprint
-
+from . import navigation as nav
 
 @register_wrap
 class MDHARD_OT_sync_dnt(bpy.types.Operator):
@@ -573,6 +573,34 @@ class MDHARD_OT_fix_all_part_render_viewport_visibilities(bpy.types.Operator):
         ut.fix_part_render_and_viewport_visibilities()
         self.report({"INFO"}, f"Fix Render and Viewport Visibility of All Part collections called.")
         return {"FINISHED"}
+
+
+
+#-------------------------------------------------------------------------------
+# Navigations
+#-------------------------------------------------------------------------------
+
+@register_wrap
+class MDHARD_OT_go_to_source_collection(bpy.types.Operator):
+    """Go To source of this collection instance.
+    It can be used both internal / external collection.
+    """
+    bl_idname = "md_hard.go_to_source_collection"
+    bl_label = "Go To Source Collection"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        active_obj = context.active_object
+        return active_obj is not None and (active_obj.instance_collection is not None)
+
+    def execute(self, context):
+        ins_obj = context.active_object
+        nav.Navigation.go_to_source_collection(ins_obj)
+        self.report({"INFO"}, f"Go To Source Collection Called")
+        return {"FINISHED"}
+
+
 
 
 @register_wrap

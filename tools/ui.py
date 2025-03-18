@@ -247,6 +247,7 @@ class MDHARD_MT_part_collection_submenu(bpy.types.Menu):
         try:
             if context.area.type == 'VIEW_3D':
                 layout.operator(ot.MDHARD_OT_go_to_part.bl_idname, text="G Go To This Part")
+                layout.operator(ot.MDHARD_OT_go_to_source_collection.bl_idname, text="S Go To Source", icon="OUTLINER_COLLECTION")
 
             # if context.area.type == 'OUTLINER':
             #     layout.operator(ot.MDHARD_OT_md_unlink_part.bl_idname, text="U Unlink This Part Collection")

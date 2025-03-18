@@ -856,7 +856,7 @@ def go_to_part_collection(part_collection:bpy.types.Collection):
     """Show given_part_collection. Jump to scene. If not found, then link to current scene.
     It is similar consept with opening file in new tab.
     """
-    scene = get_scene_which_has_this_part_collection(part_collection=part_collection, fallback=bpy.context.scene)
+    scene = get_scene_which_has_this_collection(collection=part_collection, fallback=bpy.context.scene)
     bpy.context.window.scene = scene
     set_this_part_active_in_scene(part_collection, scene)
 
@@ -894,20 +894,20 @@ def unlink_ui_list_collection(ui_list_collection:bpy.types.Collection):
     setattr(sn, ct.SCENE_COLLECTION_CHILD_INDEX, new_index)
     return
 
-def get_scene_which_has_this_part_collection(part_collection:bpy.types.Collection, fallback:bpy.types.Scene=None)->bpy.types.Scene:
-    """Get scene which has given part collections in it. If None, returns fallback scene
+def get_scene_which_has_this_collection(collection:bpy.types.Collection, fallback:bpy.types.Scene=None)->bpy.types.Scene:
+    """Get scene which has given collections in it. If None, returns fallback scene
     Known issue is, if there are more than two scene which have given part_collection, you cannot determin which scene to jump.
 
     Args:
-        part_collection: Search Scene which has this part collection.
+        collection: Search Scene which has this part collection.
         fallback: If there is no scene which has given part collection, then return this fallback
     """
     # search is starting from this scene
-    if part_collection in bpy.context.scene.collection.children[:]:
+    if collection in bpy.context.scene.collection.children[:]:
         return bpy.context.scene
 
     for s in bpy.data.scenes:
-        if part_collection in s.collection.children[:]:
+        if collection in s.collection.children[:]:
             return s
     
     return fallback
