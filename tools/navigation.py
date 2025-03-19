@@ -24,7 +24,7 @@ class Navigation:
         
         if not bpy.data.is_saved:
             print("Save before do this operation.")
-            return
+            return 1
 
         if src_col.library is not None:
             filepath = bpy.path.abspath(src_col.library.filepath)

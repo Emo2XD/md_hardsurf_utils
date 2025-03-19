@@ -596,7 +596,11 @@ class MDHARD_OT_go_to_source_collection(bpy.types.Operator):
 
     def execute(self, context):
         ins_obj = context.active_object
-        nav.Navigation.go_to_source_collection(ins_obj)
+        result = nav.Navigation.go_to_source_collection(ins_obj)
+        if result == 1:
+            self.report({"WARNING"}, f"Save Before using this operation")
+
+            return {"CANCELLED"}
         self.report({"INFO"}, f"Go To Source Collection Called")
         return {"FINISHED"}
 
