@@ -894,21 +894,35 @@ def unlink_ui_list_collection(ui_list_collection:bpy.types.Collection):
     setattr(sn, ct.SCENE_COLLECTION_CHILD_INDEX, new_index)
     return
 
-def get_scene_which_has_this_collection(collection:bpy.types.Collection, fallback:bpy.types.Scene=None)->bpy.types.Scene:
+def get_scene_which_has_this_collection(collection:bpy.types.Collection, children_recursive:bool=False, fallback:bpy.types.Scene=None)->bpy.types.Scene:
     """Get scene which has given collections in it. If None, returns fallback scene
     Known issue is, if there are more than two scene which have given part_collection, you cannot determin which scene to jump.
 
     Args:
         collection: Search Scene which has this part collection.
+        children_recursive: If True, search all collections even nested collections.
         fallback: If there is no scene which has given part collection, then return this fallback
     """
     # search is starting from this scene
-    if collection in bpy.context.scene.collection.children[:]:
-        return bpy.context.scene
+    if children_recursive == True:
+        if collection in bpy.context.scene.collection.children_recursive[:]:
+            return bpy.context.scene
 
-    for s in bpy.data.scenes:
-        if collection in s.collection.children[:]:
-            return s
+        for s in bpy.data.scenes:
+            if collection in s.collection.children_recursive[:]:
+                return s
+        else:
+            print(f"no collection found in scenes (check children_recursive). Fallback to default {fallback}")
+    else:
+        if collection in bpy.context.scene.collection.children[:]:
+            return bpy.context.scene
+
+        for s in bpy.data.scenes:
+            if collection in s.collection.children[:]:
+                return s
+        else:
+            print(f"no collection found in scenes (only top level children). Fallback to default {fallback}")
+
     
     return fallback
         

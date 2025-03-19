@@ -34,14 +34,17 @@ class Navigation:
             src_col = bpy.data.collections[src_col_name, None] # ensure pick local one. if there are multiple collection with the same name.
         
 
-        scene = ut.get_scene_which_has_this_collection(src_col, fallback=bpy.context.scene)
-
 
 
         # TODO: you have to nest context override for newly opened file.  There may unecessary codes.
         # cleanup.
         window = bpy.context.window_manager.windows[0]
         with bpy.context.temp_override(window=window):
+            scene = ut.get_scene_which_has_this_collection(collection=src_col, children_recursive=True, fallback=bpy.context.scene)
+            bpy.context.window.scene = scene
+                # print(f"currently in scene '{scene.name}' in '{bpy.path.relpath(bpy.data.filepath)}'")
+            # for s in bpy.data.scenes:
+            #         print(f"scene_name = {s.name}") # OK. src_col is bad
             area_type = 'VIEW_3D'
             areas  = [area for area in bpy.context.window.screen.areas if area.type == area_type]
             override = {
@@ -57,13 +60,16 @@ class Navigation:
 
 
             with bpy.context.temp_override(**context_override):
-                bpy.context.window.scene = scene
+                
+                
 
                 parent_part_col = None
-                for c in [c for c in bpy.data.collections if getattr(c, ct.IS_MD_HARDSURF_PART_COLLECTION)]:
-                    if src_col in list(c.children):
-                        parent_part_col = c
-
+                for p_col in [c for c in bpy.data.collections if getattr(c, ct.IS_MD_HARDSURF_PART_COLLECTION)]:
+                    if src_col in p_col.children[:]: # need [:] because CollectionProperty needs to be accessed by string.
+                        parent_part_col = p_col
+                        break
+                
+                
 
                 if parent_part_col is not None: # for Part
                     ut.set_this_part_active_in_scene(parent_part_col, scene)
