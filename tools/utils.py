@@ -1135,7 +1135,23 @@ def _find_index_of_collection_in_scene(collection_list:List[bpy.types.Collection
         
     
             
-        
+def get_view_3d_context()->bpy.types.Context:
+    """Get view 3d context for context.temp_override.
+    With this, you can get View 3D context to run bpy.ops.object.foo()
+    """
+    area_type = 'VIEW_3D'
+    areas  = [area for area in bpy.context.window.screen.areas if area.type == area_type]
+    override = {
+        'screen': bpy.context.window.screen,
+        'area': areas[0],
+        'region': [region for region in areas[0].regions if region.type == 'WINDOW'][0],
+    }
+
+    context_override = bpy.context.copy()
+    for key, value in override.items():
+        context_override[key] = value
+    
+    return context_override
 
 
 

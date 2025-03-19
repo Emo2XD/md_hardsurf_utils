@@ -42,33 +42,15 @@ class Navigation:
         with bpy.context.temp_override(window=window):
             scene = ut.get_scene_which_has_this_collection(collection=src_col, children_recursive=True, fallback=bpy.context.scene)
             bpy.context.window.scene = scene
-                # print(f"currently in scene '{scene.name}' in '{bpy.path.relpath(bpy.data.filepath)}'")
-            # for s in bpy.data.scenes:
-            #         print(f"scene_name = {s.name}") # OK. src_col is bad
-            area_type = 'VIEW_3D'
-            areas  = [area for area in bpy.context.window.screen.areas if area.type == area_type]
-            override = {
-                'screen': bpy.context.window.screen,
-                'area': areas[0],
-                'region': [region for region in areas[0].regions if region.type == 'WINDOW'][0],
-            }
 
-            context_override = bpy.context.copy()
-            for key, value in override.items():
-                context_override[key] = value
+            view_3d_context = ut.get_view_3d_context()
 
-
-
-            with bpy.context.temp_override(**context_override):
-                
-                
-
+            with bpy.context.temp_override(**view_3d_context):
                 parent_part_col = None
                 for p_col in [c for c in bpy.data.collections if getattr(c, ct.IS_MD_HARDSURF_PART_COLLECTION)]:
                     if src_col in p_col.children[:]: # need [:] because CollectionProperty needs to be accessed by string.
                         parent_part_col = p_col
                         break
-                
                 
 
                 if parent_part_col is not None: # for Part
@@ -79,6 +61,9 @@ class Navigation:
                     ut.isolate_collection_under_scene(src_col, extend=False)
 
         return
+    
+
+    
             
 
 
