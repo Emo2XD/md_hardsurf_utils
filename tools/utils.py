@@ -845,7 +845,34 @@ class PartManager:
                 for o in col.all_objects:
                     o.hide_viewport = render
 
-        
+    
+
+
+def get_scene_child_collection_contains_this_collection(scene:bpy.types.Scene, collection:bpy.types.Collection)->bpy.types.Collection:
+    """Get direct scene child collection which contains given colleciton.
+    Args:
+        scene: from this scene.collection.children, given collection will be searched
+        collection: Find which scene.collection contains this collection. If this collection is the direct child of scene collection, then return this.
+
+    Returns:
+        scene_col: This is the collection which contains given collection. None for not found.
+    """
+
+    # if given colection is the direct children of the scene.
+    if collection in scene.collection.children[:]:
+        return collection
+    
+    for c in scene.collection.children:
+        if collection in c.children_recursive[:]:
+            return c
+    else:
+        return None
+    
+
+
+
+
+
     
     
 
@@ -942,6 +969,8 @@ def set_this_part_active_in_scene(part_collection:bpy.types.Collection, scene:bp
     try:
         index = scene_col.children[:].index(part_collection)
     except ValueError:
+        if not create:
+            return
         scene_col.children.link(part_collection)
         index = len(scene_col.children) - 1
         
