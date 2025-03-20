@@ -248,6 +248,8 @@ class MDHARD_MT_part_collection_submenu(bpy.types.Menu):
             if context.area.type == 'VIEW_3D':
                 layout.operator(ot.MDHARD_OT_go_to_part.bl_idname, text="G Go To This Part")
                 layout.operator(ot.MDHARD_OT_go_to_source_collection.bl_idname, text="S Go To Source", icon="OUTLINER_COLLECTION")
+                layout.operator(ot.MDHARD_OT_navigate_forward.bl_idname, text="F Navigate Forward", icon="LOOP_FORWARDS")
+                layout.operator(ot.MDHARD_OT_navigate_back.bl_idname, text="B Navigate Backward", icon="LOOP_BACK") # TODO create better keymap for nav back/forward
 
             # if context.area.type == 'OUTLINER':
             #     layout.operator(ot.MDHARD_OT_md_unlink_part.bl_idname, text="U Unlink This Part Collection")
