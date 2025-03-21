@@ -298,7 +298,7 @@ class MDHARD_OT_set_dnt_bevel_modifier_width(bpy.types.Operator):
         else:
             self.modifier_width = dnt_bevel_mod.width # use as initial value, this is updated during "Adjust last operator."
             self.orig_width = dnt_bevel_mod.width # this is constant through out "Adunst last operator".
-        return wm.invoke_props_dialog(self)
+        return wm.invoke_props_popup(self, event)
         
 
     def execute(self, context):
