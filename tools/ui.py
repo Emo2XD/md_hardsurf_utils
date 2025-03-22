@@ -144,6 +144,63 @@ class MDHARD_UL_scene_part(bpy.types.UIList):
 
 
 
+#-------------------------------------------------------------------------------
+# Harpoon
+#-------------------------------------------------------------------------------
+@register_wrap
+class MDHARD_UL_Harpoon(bpy.types.UIList):
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        if self.layout_type in {'DEFAULT', 'COMPACT'}:
+            harpoon_element = item # scene.collection.children ()
+            layout.prop(harpoon_element, 'name', emboss=False, icon='FILE_BLEND')
+                
+                # icon="COLLECTION_COLOR_01" if getattr(part_col, ct.IS_MD_HARDSURF_PART_COLLECTION) else "OUTLINER_COLLECTION")
+
+            # split = layout.split(factor=0.5, align=False)
+            # split.prop(item, 'name', text="", emboss=False)
+            # row = split.row(align = True)
+            # row.emboss = 'NONE_OR_STATUS'
+
+            # row.prop(item, 'lock_shape', text="", emboss=False, icon='DECORATE_LOCKED' if item.lock_shape else 'DECORATE_UNLOCKED')
+
+        elif self.layout_type == 'GRID':
+            layout.alignment = 'CENTER'
+            layout.label(text="")
+
+@register_wrap
+class MDHARD_PT_harpoon(bpy.types.Panel):
+    """Panel for normal transfer
+    """
+    bl_idname = "MDHARD_PT_harpoon" 
+    bl_label = "Harpoon"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = "MD Hard" # tab name
+
+    def draw(self, context):
+        wm = context.window_manager
+        layout = self.layout
+        row = layout.row()
+        row.template_list(MDHARD_UL_Harpoon.__name__, "", wm, ct.MD_HARPOON_UILIST_COLLECTION, wm, ct.MD_HARPOON_INDEX)
+        col = row.column(align=True)
+        col.operator(ot.MDHARD_OT_harpoon_move_ui_list.bl_idname, text="", icon='TRIA_UP').move_type = 'UP'
+        col.operator(ot.MDHARD_OT_harpoon_move_ui_list.bl_idname, text="", icon='TRIA_DOWN').move_type = 'DOWN'
+        col.separator()
+        col.operator(ot.MDHARD_OT_harpoon_add_slot.bl_idname, text="", icon='ADD')
+        col.operator(ot.MDHARD_OT_harpoon_remove_slot.bl_idname, text="", icon='REMOVE')
+
+        row = layout.row()
+        row.operator_context = 'EXEC_DEFAULT'
+        row.operator(ot.MDHARD_OT_harpoon_add_slot.bl_idname, 
+                     text="Add This File", 
+                     icon='FILE_BLEND').filepath = bpy.data.filepath
+        if bpy.data.is_saved:
+            row.enabled = True
+        else:
+            row.enabled = False
+
+            
+        
 
 #-------------------------------------------------------------------------------
 # Menu

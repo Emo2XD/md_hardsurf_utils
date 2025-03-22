@@ -188,7 +188,7 @@ def harpoon_go_to_file_slot(index:int=0):
     pass
 
 def harpoon_add_file_slot(filepath:str=''):
-    print(f"Harpoon Add File Slot")
+    print(f"Harpoon Add File Slot: {filepath}")
     pass
 
 def harpoon_remove_file_slot(index:int=0):

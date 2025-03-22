@@ -89,6 +89,24 @@ register_prop(
             )
         )
 
+
+register_prop(
+        bpy.types.WindowManager,
+        ct.MD_HARPOON_INDEX,
+        bpy.props.IntProperty(name=ct.MD_HARPOON_INDEX, default=-1)
+        )
+
+@register_wrap
+class MDHarpoonCollection(bpy.types.PropertyGroup):
+    name:bpy.props.StringProperty(name='name', default='') #type: ignore
+    filepath:bpy.props.StringProperty(name='filepath', subtype='FILE_PATH') #type: ignore
+
+register_prop(
+        bpy.types.WindowManager,
+        ct.MD_HARPOON_UILIST_COLLECTION,
+        bpy.props.CollectionProperty(type=MDHarpoonCollection)
+        )
+
 # register_prop(
 #         bpy.types.Collection,
 #         ct.DEP_COLLECTION, bpy.props.BoolProperty(name=ct.DEP_COLLECTION, default = False, description="Store Visibility of collection under part collection")
