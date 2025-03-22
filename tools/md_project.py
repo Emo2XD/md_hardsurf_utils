@@ -241,6 +241,32 @@ def harpoon_remove_file_slot():
     return
 
 
+def harpoon_move_file_slot(move_type:str='UP'):
+    """Move Harpoon File Slot
+    """
+    wm = bpy.context.window_manager
+    uilist = getattr(wm, ct.MD_HARPOON_UILIST_COLLECTION)
+    active_slot_index = getattr(wm, ct.MD_HARPOON_INDEX)
+    uilist_len = len(uilist)
+    
+
+    move_from = active_slot_index
+    if move_type == 'UP':
+        move_to = (active_slot_index - 1) % uilist_len
+        
+    elif move_type == 'DOWN':
+        move_to = (active_slot_index + 1) % uilist_len
+    else:
+        print(f"WARNING: move_type must be 'UP' or 'DOWN', but {move_type} was given")
+        return
+
+    uilist.move(move_from, move_to)
+
+    setattr(wm, ct.MD_HARPOON_INDEX, move_to)
+    return
+
+
+
 def write_harpoon_dict(harpoon_dict):
     """Write Harpoon Dictionary to 
     """
