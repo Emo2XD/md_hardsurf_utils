@@ -26,7 +26,7 @@ def open_project(proj_root_dir:str):
     setup_project_folder(proj_root_dir=proj_root_dir, exists_ok=True)
     setup_md_proj_asset()
     set_current_project_to_wm()
-    
+    load_harpoon()
     print(f"Opened MD Project:'{proj_root_dir}'")
     return
 
@@ -34,10 +34,10 @@ def open_project(proj_root_dir:str):
 
 def close_project():
     """Close MD Project Asset Folder."""
+    save_harpoon() # save first
     set_cwd(cwd=None)
     unload_md_proj_asset()
     set_current_project_to_wm()
-
     print(f"Closed MD Project")
     return
 
@@ -53,7 +53,10 @@ def close_project():
 
 
 def get_cwd()->str:
-    """Get CWD from .md_home"""
+    """Get CWD from .md_home
+    Returns:
+        absolute path in string form. or None.
+    """
     d = read_home_info_dict()
     return d.get(ct.MD_PROJECT_CWD, None)
 
@@ -209,6 +212,7 @@ def harpoon_add_file_slot(filepath:str=''):
         slot.name = str(Path(filepath).relative_to(Path(get_cwd())))
         
     setattr(wm, ct.MD_HARPOON_INDEX, len(uilist)-1)
+    save_harpoon()
     return
 
 def harpoon_assign_to_slot(filepath:str=''):
@@ -223,7 +227,8 @@ def harpoon_assign_to_slot(filepath:str=''):
     else:
         slot.filepath = filepath
         slot.name = str(Path(filepath).relative_to(Path(get_cwd())))
-        
+    
+    save_harpoon()
     return 
 
 
@@ -238,6 +243,7 @@ def harpoon_remove_file_slot():
     uilist.remove(active_slot_index)
     new_index = max(min(len(uilist)-1, active_slot_index), 0)
     setattr(wm, ct.MD_HARPOON_INDEX, new_index)
+    save_harpoon()
     return
 
 
@@ -263,14 +269,82 @@ def harpoon_move_file_slot(move_type:str='UP'):
     uilist.move(move_from, move_to)
 
     setattr(wm, ct.MD_HARPOON_INDEX, move_to)
+    save_harpoon()
     return
 
 
+def load_harpoon():
+    """Load Harpoon Info from .md_project/md_harpoon_info.json
+    Usually used in launch or opening of project.
+    """
+    harpoon_dict = read_harpoon_dict()
+    harpoon_dict_to_wm(harpoon_dict)
+    
 
-def write_harpoon_dict(harpoon_dict):
+def save_harpoon():
+    """Save Harpoon Info to .md_project/md_harpoon_info.json
+    usually used in change of harpoon uilist.
+    """
+    harpoon_dict = harpoon_wm_to_dict()
+    write_harpoon_dict(harpoon_dict)
+
+
+
+def harpoon_wm_to_dict()->dict:
+    """Convert Harpoon Window Manager property into dictionary.
+    """
+    wm:bpy.types.WindowManager = bpy.context.window_manager
+    harpoon_uilist:bpy.types.CollectionProperty = getattr(wm, ct.MD_HARPOON_UILIST_COLLECTION)
+    harpoon_index:int = getattr(wm, ct.MD_HARPOON_INDEX)
+
+    harpoon_dict = {}
+    harpoon_dict[ct.MD_HARPOON_UILIST_COLLECTION] = [(i.name, i.filepath) for i in harpoon_uilist]
+    harpoon_dict[ct.MD_HARPOON_INDEX] = harpoon_index
+
+    return harpoon_dict
+
+
+def harpoon_dict_to_wm(harpoon_dict:dict):
+    """Convert Harpoon Dictionary into Window manager property
+    """
+    wm = bpy.context.window_manager
+    setattr(wm, ct.MD_HARPOON_INDEX, harpoon_dict[ct.MD_HARPOON_INDEX])
+
+    uilist:bpy.types.CollectionProperty = getattr(wm, ct.MD_HARPOON_UILIST_COLLECTION)
+
+    # ensure uilist is empty
+    for _ in range(len(uilist)):
+        uilist.remove(0) # you have to remove index zero. Remove is similar to pop. UIList will be updated.
+
+    for name, filepath in harpoon_dict[ct.MD_HARPOON_UILIST_COLLECTION]:
+        slot = uilist.add()
+        slot.name = name
+        slot.filepath = filepath
+    
+    return
+
+
+def write_harpoon_dict(harpoon_dict:dict):
     """Write Harpoon Dictionary to 
     """
-    pass
+    md_proj_p = Path(get_cwd())/ct.MD_PROJECT_INFO_FOLDER_NAME
+    md_proj_p.mkdir(exist_ok=True) #ensure save location is there.
+    harpoon_info_p = md_proj_p/ct.MD_HARPOON_INFO_JSON
+    with open(str(harpoon_info_p), 'w') as f:
+        json.dump(harpoon_dict, f, indent=4)
+
 
 def read_harpoon_dict()->dict:
-    pass
+    md_proj_p = Path(get_cwd())/ct.MD_PROJECT_INFO_FOLDER_NAME
+    harpoon_info_p = md_proj_p/ct.MD_HARPOON_INFO_JSON
+    harpoon_dict = {}
+    if harpoon_info_p.exists():
+        with open(str(harpoon_info_p), 'r') as f:
+            harpoon_dict = json.load(f)
+
+    else:
+        # default setup
+        harpoon_dict[ct.MD_HARPOON_INDEX] = 0
+        harpoon_dict[ct.MD_HARPOON_UILIST_COLLECTION] = []
+
+    return harpoon_dict
