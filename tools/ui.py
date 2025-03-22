@@ -152,7 +152,7 @@ class MDHARD_UL_Harpoon(bpy.types.UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
             harpoon_element = item # scene.collection.children ()
-            layout.prop(harpoon_element, 'name', emboss=False, icon='FILE_BLEND')
+            layout.prop(harpoon_element, 'name', text="", emboss=False, icon='FILE_BLEND')
                 
                 # icon="COLLECTION_COLOR_01" if getattr(part_col, ct.IS_MD_HARDSURF_PART_COLLECTION) else "OUTLINER_COLLECTION")
 

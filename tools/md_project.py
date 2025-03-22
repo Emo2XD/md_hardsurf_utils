@@ -54,18 +54,18 @@ def close_project():
 
 def get_cwd()->str:
     """Get CWD from .md_home"""
-    d = get_home_info_dict()
+    d = read_home_info_dict()
     return d.get(ct.MD_PROJECT_CWD, None)
 
 
 def set_cwd(cwd:str):
     """Write CWD to ~/.md_home/md_home_info.json"""
-    d = get_home_info_dict()
+    d = read_home_info_dict()
     d[ct.MD_PROJECT_CWD] = cwd
     write_home_info_dict(d)
 
 
-def get_home_info_dict()->dict:
+def read_home_info_dict()->dict:
     """Get MD Home Info Dictionary. If None generate default.
     Dictionary key:
         'md_project_cwd': Current working directory. if not set, None.
@@ -189,8 +189,43 @@ def harpoon_go_to_file_slot(index:int=0):
 
 def harpoon_add_file_slot(filepath:str=''):
     print(f"Harpoon Add File Slot: {filepath}")
+    wm = bpy.context.window_manager
+    uilist:bpy.types.CollectionProperty = getattr(wm, ct.MD_HARPOON_UILIST_COLLECTION)
+
+    existing_file_paths = [Path(bpy.path.abspath(e.filepath)) for e in uilist]
+
+    # don't create new slot if given file name has harpoon slot.
+    if (filepath != '') and (Path(bpy.path.abspath(filepath)) in existing_file_paths):
+        print(f"'{filepath}' already assigned")
+        return
+    
+    slot = uilist.add()
+
+    if filepath == '': # always create empty slot.
+        slot.filepath = ''
+        slot.name = 'Empty'
+    else:
+        slot.filepath = filepath
+        slot.name = str(Path(filepath).relative_to(Path(get_cwd())))
+        
+    setattr(wm, ct.MD_HARPOON_INDEX, len(uilist)-1)
+    return
+
+def harpoon_remove_file_slot():
+    print(f"Harpoon Remove File Slot")
+    wm = bpy.context.window_manager
+    uilist = getattr(wm, ct.MD_HARPOON_UILIST_COLLECTION)
+    active_slot_index = getattr(wm, ct.MD_HARPOON_INDEX)
+    uilist.remove(active_slot_index)
+    new_index = max(min(len(uilist)-1, active_slot_index), 0)
+    setattr(wm, ct.MD_HARPOON_INDEX, new_index)
+    return
+
+
+def write_harpoon_dict(harpoon_dict):
+    """Write Harpoon Dictionary to 
+    """
     pass
 
-def harpoon_remove_file_slot(index:int=0):
-    print(f"Harpoon Remove File Slot")
+def read_harpoon_dict()->dict:
     pass

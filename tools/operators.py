@@ -806,14 +806,14 @@ class MDHARD_OT_harpoon_remove_slot(bpy.types.Operator):
     bl_idname = "md_hard.harpoon_remove_slot"
     bl_label = "MD Harpoon Remove Slot"
 
-    index: bpy.props.IntProperty(name='harpoon_index', default=0, min=0) # type: ignore
+    # index: bpy.props.IntProperty(name='harpoon_index', default=0, min=0) # type: ignore
 
     # @classmethod
     # def poll(cls, context):
     #     return bpy.data.is_saved
 
     def execute(self, context):
-        mdp.harpoon_remove_file_slot(self.index)
+        mdp.harpoon_remove_file_slot()
         
         # result = 
         # if result == 1:
