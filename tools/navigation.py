@@ -39,6 +39,7 @@ class Navigation:
 
     @classmethod
     def _update_current_nav_element(cls):
+        """Update current scene and active index of nav element"""
         current = cls.nav_history[cls.nav_current_index]
         current.filepath = bpy.data.filepath
         current.scene = bpy.context.scene.name
@@ -47,6 +48,7 @@ class Navigation:
 
     @classmethod
     def nav_forward(cls):
+        """Navigate forward to next navigation point in history. Do nothing when out of history range."""
         cls._update_current_nav_element()
         next_index, next_nav_element = cls._get_nav_element_clamped(index=cls.nav_current_index + 1)
         cls.go_to_history_point(next_nav_element)
@@ -97,9 +99,6 @@ class Navigation:
             view_3d_context = ut.get_view_3d_context()
             with bpy.context.temp_override(**view_3d_context):
                 setattr(bpy.context.scene, ct.SCENE_COLLECTION_CHILD_INDEX, nav_element.active_index)
-
-
-        
 
 
     @classmethod
@@ -163,16 +162,3 @@ class Navigation:
                 #     ut.isolate_collection_under_scene(src_col, extend=False)
 
         return
-    
-
-
-
-            
-        
-
-
-        
-
-
-
-        

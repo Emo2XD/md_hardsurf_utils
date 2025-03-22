@@ -3,6 +3,7 @@ if "bpy" not in locals():
     from . import constants 
     from . import utils
     from . import navigation
+    from . import md_project
     from . import operators
     from . import ui
 
@@ -11,5 +12,6 @@ else:
     importlib.reload(constants)
     importlib.reload(utils)
     importlib.reload(navigation)
+    importlib.reload(md_project)
     importlib.reload(operators)
     importlib.reload(ui)

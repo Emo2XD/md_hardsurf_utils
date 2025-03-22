@@ -1,9 +1,11 @@
 import bpy
+from pathlib import Path
 from ..setup_tools.register import register_wrap
 from . import utils as ut
 from . import constants as ct
 from pprint import pprint
 from . import navigation as nav
+from . import md_project as mdp
 
 @register_wrap
 class MDHARD_OT_sync_dnt(bpy.types.Operator):
@@ -653,6 +655,119 @@ class MDHARD_OT_navigate_back(bpy.types.Operator):
         return {"FINISHED"}
 
 
+@register_wrap
+class MDHARD_OT_open_project(bpy.types.Operator):
+    """Open Project
+    This is similar concept to 'Open Folder' in VSCode or setting working directory
+    in text editor
+
+    The Concept and specification:
+        -Only one asset folder is opened as local asset folder
+        -You can load multiple asset library.
+        -When you want to open/close local asset folder, you have to explicitly call open or close (like VSCode).
+        -When open local asset folder, it will be loaded as standard asset library.
+        -If Addon loads the asset folder, then this is the local asset folder and will be unloaded on close folder.
+        -If Blender loads the asset folder, then this will stay as asset when close local asset folder.
+        -closing/opening blender instance won't close/open local asset folder.
+    """
+    bl_idname = "md_hard.open_project"
+    bl_label = "MD Open Project"
+
+    folder_path: bpy.props.StringProperty(
+        name='folder_path', 
+        default=str(Path.home()),
+        subtype='DIR_PATH') #type: ignore
+    # @classmethod
+    # def poll(cls, context):
+    #     return bpy.data.is_saved
+    def invoke(self, context, event):
+        wm = context.window_manager
+        return wm.invoke_props_dialog(self)
+
+    def execute(self, context):
+        # result = 
+        # if result == 1:
+            # self.report({"WARNING"}, f"Save on disk before using this operation")
+        mdp.open_project(proj_root_dir=self.folder_path)
+            # return {"CANCELLED"}
+        # self.report({"INFO"}, f"Open Local Asset Folder")
+        return {"FINISHED"}
+    
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(self, 'folder_path')
+    
+
+@register_wrap
+class MDHARD_OT_close_project(bpy.types.Operator):
+    """Close Local Asset Folder
+    This is similar concept to 'Close Folder' in VSCode
+    """
+    bl_idname = "md_hard.close_project"
+    bl_label = "MD Close Project"
+
+    # @classmethod
+    # def poll(cls, context):
+    #     return bpy.data.is_saved
+
+    def execute(self, context):
+        # result = 
+        # if result == 1:
+            # self.report({"WARNING"}, f"Save on disk before using this operation")
+        mdp.close_project()
+
+            # return {"CANCELLED"}
+        self.report({"INFO"}, f"Open Recent Local Asset Folder")
+        return {"FINISHED"}
+    
+
+
+
+@register_wrap
+class MDHARD_OT_rescent_local_asset_folder(bpy.types.Operator):
+    """Open Recent Local Asset Folder
+    This is similar concept to 'Open Recent Folder' in VSCode or setting working directory
+    in text editor
+    """
+    bl_idname = "md_hard.recent_local_asset_folder"
+    bl_label = "MD Recent Local Asset Folder"
+
+    @classmethod
+    def poll(cls, context):
+        return bpy.data.is_saved
+
+    def execute(self, context):
+        # result = 
+        # if result == 1:
+            # self.report({"WARNING"}, f"Save on disk before using this operation")
+
+            # return {"CANCELLED"}
+        self.report({"INFO"}, f"Open Recent Local Asset Folder")
+        return {"FINISHED"}
+    
+
+@register_wrap
+class MDHARD_OT_harpoon(bpy.types.Operator):
+    """Harpoon.
+    This is similar concept to Neovim Harpoon. The file hopper.
+    """
+    bl_idname = "md_hard.harpoon"
+    bl_label = "MD Harpoon"
+
+    index: bpy.props.IntProperty(name='harpoon_index', default=0) # type: ignore
+
+    @classmethod
+    def poll(cls, context):
+        return bpy.data.is_saved
+
+    def execute(self, context):
+        # result = 
+        # if result == 1:
+            # self.report({"WARNING"}, f"Save on disk before using this operation")
+
+            # return {"CANCELLED"}
+        self.report({"INFO"}, f"Harpoon")
+        return {"FINISHED"}
 
 
 

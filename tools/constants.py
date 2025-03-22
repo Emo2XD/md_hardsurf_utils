@@ -39,3 +39,11 @@ FACE_STRENGTH_MATERIAL_BLEND_PATH = f"{BLEND_PATH}/face_strength_material.blend"
 # face strength material override
 FACE_STRENGTH_MAT_NAME = f"__MD_FaceStrength" # Node tree name, material name, node name uses the same.
 FACE_STRENGTH_TEMP_OUTPUT_NODE = f"__MD_TempOutput" # material output node name.
+
+
+# MD Project System Constants
+MD_HOME_FOLDER_NAME = '.md_files' # default: ~/.md_files/
+MD_PROJECT_INFO_FOLDER_NAME = '.md_project' # stored in CWD root directory, ./.md_project/
+MD_PROJECT_ASSET_PREFIX = '_MD_PROJ' # used as asset name._MD_PROJ-{asset_folder_name}
+MD_HOME_INFO_JSON = 'md_home_info.json' # stored as  ~/.md_files/md_home_info.json
+MD_PROJECT_CWD = 'md_project_cwd' # dictionary key in md_home_info.json

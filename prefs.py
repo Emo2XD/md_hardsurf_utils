@@ -3,6 +3,7 @@ TODO: Define preferences for this addon
 """
 import bpy
 from .setup_tools.register import register_wrap
+from pathlib import Path
 
 
 @register_wrap
@@ -30,6 +31,13 @@ class MDHARD_Preferences(bpy.types.AddonPreferences):
         ]
         
     ) #type: ignore
+
+    md_home_dir: bpy.props.StringProperty(
+        name="MD Hard Files Path",
+        description="Store information of this addon.",
+        default=str(Path.home()),
+        subtype="DIR_PATH"
+    ) #type: ignore
  
     def draw(self, context):
         layout = self.layout
@@ -37,7 +45,8 @@ class MDHARD_Preferences(bpy.types.AddonPreferences):
         layout.label(text="DNT Default Settings", icon='MOD_BEVEL')
         layout.prop(self, 'default_bevel_width', text="Width")
         layout.prop(self, 'default_bevel_width_type', text="Type")
-
+        layout.prop(self, 'md_home_dir', text="Addon Info Path", icon='FILE_FOLDER')
+        
 
 
 def get_preferences():
