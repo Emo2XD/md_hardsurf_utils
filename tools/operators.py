@@ -888,7 +888,7 @@ class MDHARD_OT_harpoon_move_ui_list(bpy.types.Operator):
     #     return bpy.data.is_saved
 
     def execute(self, context):
-        self.report({"INFO"}, f"MD Harpoon: harpoon_move_ui_list")
+        mdp.harpoon_move_file_slot(self.move_type)
         return {"FINISHED"}
 
 
