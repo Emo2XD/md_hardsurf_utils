@@ -169,6 +169,7 @@ def set_current_project_on_startup(dummy):
         load_post needs one paramter to work so dummy is needed
     """
     set_current_project_to_wm()
+    load_harpoon()
 
 def register_set_current_project_on_startup():
     bpy.app.handlers.load_post.append(set_current_project_on_startup)
