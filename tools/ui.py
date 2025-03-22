@@ -17,6 +17,8 @@ class MDHARD_PT_md_hard(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
+        current_project = getattr(context.window_manager, ct.MD_PROJECT_CWD)
+        layout.label(text=f"Project: {current_project}" if current_project!='' else "Project: Not Opened", icon='FILE_FOLDER')
         sn = context.scene
         row = layout.row(align=True)
         row.scale_y = 1.7

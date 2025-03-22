@@ -79,6 +79,16 @@ register_prop(
             update=ut.update_subpart_asset_status
             )
         )
+
+register_prop(
+        bpy.types.WindowManager,
+        ct.MD_PROJECT_CWD, bpy.props.StringProperty(
+            name=ct.MD_PROJECT_CWD, 
+            default='', 
+            description="Keep Track of currently opened project."
+            )
+        )
+
 # register_prop(
 #         bpy.types.Collection,
 #         ct.DEP_COLLECTION, bpy.props.BoolProperty(name=ct.DEP_COLLECTION, default = False, description="Store Visibility of collection under part collection")

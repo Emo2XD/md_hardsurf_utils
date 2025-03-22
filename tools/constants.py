@@ -46,4 +46,4 @@ MD_HOME_FOLDER_NAME = '.md_files' # default: ~/.md_files/
 MD_PROJECT_INFO_FOLDER_NAME = '.md_project' # stored in CWD root directory, ./.md_project/
 MD_PROJECT_ASSET_PREFIX = '_MD_PROJ' # used as asset name._MD_PROJ-{asset_folder_name}
 MD_HOME_INFO_JSON = 'md_home_info.json' # stored as  ~/.md_files/md_home_info.json
-MD_PROJECT_CWD = 'md_project_cwd' # dictionary key in md_home_info.json
+MD_PROJECT_CWD = 'md_project_cwd' # dictionary key in md_home_info.json and window manager property.

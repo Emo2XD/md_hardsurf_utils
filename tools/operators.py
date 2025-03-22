@@ -689,6 +689,7 @@ class MDHARD_OT_open_project(bpy.types.Operator):
         # if result == 1:
             # self.report({"WARNING"}, f"Save on disk before using this operation")
         mdp.open_project(proj_root_dir=self.folder_path)
+        self.report({"INFO"}, f"Opened Project Folder")
             # return {"CANCELLED"}
         # self.report({"INFO"}, f"Open Local Asset Folder")
         return {"FINISHED"}
@@ -711,13 +712,8 @@ class MDHARD_OT_close_project(bpy.types.Operator):
     #     return bpy.data.is_saved
 
     def execute(self, context):
-        # result = 
-        # if result == 1:
-            # self.report({"WARNING"}, f"Save on disk before using this operation")
         mdp.close_project()
-
-            # return {"CANCELLED"}
-        self.report({"INFO"}, f"Open Recent Local Asset Folder")
+        self.report({"INFO"}, f"Closed Project Folder")
         return {"FINISHED"}
     
 

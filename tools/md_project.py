@@ -4,12 +4,14 @@ This Gives Blender the concept of  'Current Working Directory'
 
 
 import bpy
+from bpy.app.handlers import persistent
 from pathlib import Path
 from typing import List
 from ..myblendrc_utils import utils as myu
 from . import constants as ct
 from ..prefs import get_preferences
 import json
+from ..setup_tools.register import register_other
 
 
 def open_project(proj_root_dir:str):
@@ -21,9 +23,9 @@ def open_project(proj_root_dir:str):
     """
     # setup_md_home_folder() # ensure having one.
     set_cwd(cwd=proj_root_dir)
-
     setup_project_folder(proj_root_dir=proj_root_dir, exists_ok=True)
     setup_md_proj_asset()
+    set_current_project_to_wm()
     
     print(f"Opened MD Project:'{proj_root_dir}'")
     return
@@ -34,6 +36,8 @@ def close_project():
     """Close MD Project Asset Folder."""
     set_cwd(cwd=None)
     unload_md_proj_asset()
+    set_current_project_to_wm()
+
     print(f"Closed MD Project")
     return
 
@@ -150,6 +154,35 @@ def _add_asset_path():
 def _remove_asset_path():
     pass
 
+def set_current_project_to_wm():
+    """Set Current Project name to window manager property.
+    This is used to visualize the name in the UI. If Project is not opened, then
+    project name will be empty ''.
+    """
+    cwd = get_cwd()
+    if cwd is not None:
+        project_name = Path(cwd).name
+    else:
+        project_name = ''
+    setattr(bpy.context.window_manager, ct.MD_PROJECT_CWD, project_name)
 
 
+@persistent
+def set_current_project_on_startup(dummy):
+    """Set Current Project On Startup of Blender
+    Args:
+        load_post needs one paramter to work so dummy is needed
+    """
+    set_current_project_to_wm()
+
+def register_set_current_project_on_startup():
+    bpy.app.handlers.load_post.append(set_current_project_on_startup)
+
+def unregister_set_current_project_on_startup():
+    if set_current_project_on_startup in bpy.app.handlers.load_post:
+        bpy.app.handlers.load_post.remove(set_current_project_on_startup)
+
+register_other(
+    register_func=register_set_current_project_on_startup, 
+    unregister_func=unregister_set_current_project_on_startup)
 
