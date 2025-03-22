@@ -673,30 +673,20 @@ class MDHARD_OT_open_project(bpy.types.Operator):
     bl_idname = "md_hard.open_project"
     bl_label = "MD Open Project"
 
-    folder_path: bpy.props.StringProperty(
-        name='folder_path', 
+    directory: bpy.props.StringProperty( # must be the name of 'directory'. This is required by wm.fileselect_add()
+        name='directory', 
         default=str(Path.home()),
         subtype='DIR_PATH') #type: ignore
-    # @classmethod
-    # def poll(cls, context):
-    #     return bpy.data.is_saved
+    
     def invoke(self, context, event):
         wm = context.window_manager
-        return wm.invoke_props_dialog(self)
+        wm.fileselect_add(self)
+        return {'RUNNING_MODAL'}
 
     def execute(self, context):
-        # result = 
-        # if result == 1:
-            # self.report({"WARNING"}, f"Save on disk before using this operation")
-        mdp.open_project(proj_root_dir=self.folder_path)
+        mdp.open_project(proj_root_dir=self.directory)
         self.report({"INFO"}, f"Opened Project Folder")
-            # return {"CANCELLED"}
-        # self.report({"INFO"}, f"Open Local Asset Folder")
         return {"FINISHED"}
-    
-    def draw(self, context):
-        layout = self.layout
-        layout.prop(self, 'folder_path')
     
 
 @register_wrap
@@ -743,26 +733,89 @@ class MDHARD_OT_rescent_local_asset_folder(bpy.types.Operator):
     
 
 @register_wrap
-class MDHARD_OT_harpoon(bpy.types.Operator):
+class MDHARD_OT_harpoon_go_to_file_slot(bpy.types.Operator):
     """Harpoon.
     This is similar concept to Neovim Harpoon. The file hopper.
     """
-    bl_idname = "md_hard.harpoon"
-    bl_label = "MD Harpoon"
+    bl_idname = "md_hard.harpoon_go_to_file_slot"
+    bl_label = "MD Harpoon Go To File Slot"
 
-    index: bpy.props.IntProperty(name='harpoon_index', default=0) # type: ignore
+    index: bpy.props.IntProperty(name='harpoon_index', default=0, min=0) # type: ignore
 
     @classmethod
     def poll(cls, context):
         return bpy.data.is_saved
 
     def execute(self, context):
+        mdp.harpoon_go_to_file_slot(self.index)
         # result = 
         # if result == 1:
             # self.report({"WARNING"}, f"Save on disk before using this operation")
 
             # return {"CANCELLED"}
-        self.report({"INFO"}, f"Harpoon")
+        self.report({"INFO"}, f"MD Harpoon: Go To slot {self.index}")
+        return {"FINISHED"}
+
+
+
+@register_wrap
+class MDHARD_OT_harpoon_add_slot(bpy.types.Operator):
+    """Harpoon.
+    """
+    bl_idname = "md_hard.harpoon_add_slot"
+    bl_label = "MD Harpoon Add Slot"
+
+    filepath: bpy.props.StringProperty(name='harpoon_filepath', default=str(Path.home()), subtype='FILE_PATH') # type: ignore
+
+    @classmethod
+    def poll(cls, context):
+        return bpy.data.is_saved
+    
+    def invoke(self, context, event):
+        cwd = mdp.get_cwd()
+        if cwd is not None:
+            self.filepath = cwd
+        wm = context.window_manager
+        
+        return wm.invoke_props_dialog(self)
+
+    def execute(self, context):
+        mdp.harpoon_add_file_slot(self.filepath)
+
+        # result = 
+        # if result == 1:
+            # self.report({"WARNING"}, f"Save on disk before using this operation")
+
+            # return {"CANCELLED"}
+        self.report({"INFO"}, f"MD Harpoon: add_slot")
+        return {"FINISHED"}
+
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(self, 'filepath')
+
+@register_wrap
+class MDHARD_OT_harpoon_remove_slot(bpy.types.Operator):
+    """Harpoon.
+    """
+    bl_idname = "md_hard.harpoon_remove_slot"
+    bl_label = "MD Harpoon Remove Slot"
+
+    index: bpy.props.IntProperty(name='harpoon_index', default=0, min=0) # type: ignore
+
+    @classmethod
+    def poll(cls, context):
+        return bpy.data.is_saved
+
+    def execute(self, context):
+        mdp.harpoon_remove_file_slot(self.index)
+        
+        # result = 
+        # if result == 1:
+            # self.report({"WARNING"}, f"Save on disk before using this operation")
+
+            # return {"CANCELLED"}
+        self.report({"INFO"}, f"MD Harpoon: remove_slot")
         return {"FINISHED"}
 
 

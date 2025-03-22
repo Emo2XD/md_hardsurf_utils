@@ -94,9 +94,9 @@ def write_home_info_dict(home_info_dict:dict):
         json.dump(home_info_dict, f)
 
 
-
 def get_md_home_folder_path()->str:
     return str(Path(get_preferences().md_home_dir)/ct.MD_HOME_FOLDER_NAME)
+
 
 def setup_project_folder(proj_root_dir:str, exists_ok:bool=True):
     """mkdir .md_project folder
@@ -116,7 +116,6 @@ def setup_md_proj_asset():
     # ensure only one asset library per one path,
     # If specified proj_root_directory is already an asset, then skip new asset creation.
     # by nesting with Path and abspath, it ensures that each path is sharing the same format.
-    # existing_asset_lib_path = [Path(bpy.path.abspath(al.path)) for al in asset_libs]
     cwd = get_cwd()
 
     for al in asset_libs:
@@ -124,7 +123,6 @@ def setup_md_proj_asset():
             proj_lib = al
             break
     else:
-    # if Path(bpy.path.abspath(cwd)) not in existing_asset_lib_path:
         proj_lib = asset_libs.new(
             name=f"{ct.MD_PROJECT_ASSET_PREFIX}-{Path(cwd).name}", # somehow bpy.path.basename not work.
             directory=cwd
@@ -147,12 +145,6 @@ def unload_md_proj_asset():
     
     return
 
-
-def _add_asset_path():
-    pass
-
-def _remove_asset_path():
-    pass
 
 def set_current_project_to_wm():
     """Set Current Project name to window manager property.
@@ -186,3 +178,19 @@ register_other(
     register_func=register_set_current_project_on_startup, 
     unregister_func=unregister_set_current_project_on_startup)
 
+
+
+#-------------------------------------------------------------------------------
+# Harpoon
+#-------------------------------------------------------------------------------
+def harpoon_go_to_file_slot(index:int=0):
+    print(f"Harpoon Go To")
+    pass
+
+def harpoon_add_file_slot(filepath:str=''):
+    print(f"Harpoon Add File Slot")
+    pass
+
+def harpoon_remove_file_slot(index:int=0):
+    print(f"Harpoon Remove File Slot")
+    pass
