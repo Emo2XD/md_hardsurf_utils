@@ -20,7 +20,7 @@ class NavElement:
 class Navigation:
     nav_history:List[NavElement] = [NavElement()]
     nav_current_index:int = 0
-    MAX_HISTORY:int = 8 # TODO: create preference UI, maybe 100 is good. For test purpose, currently use 8.
+    MAX_HISTORY:int = 8
 
     @classmethod
     def _add_nav_history(cls):
@@ -34,6 +34,12 @@ class Navigation:
             del cls.nav_history[cls.nav_current_index+1:]
 
         cls.nav_history.append(NavElement())
+        
+        # If length of history is exceeding max count, then remove it from front.
+        cls.MAX_HISTORY = get_preferences().max_nav_history
+        del cls.nav_history[:max(len(cls.nav_history)-cls.MAX_HISTORY, 0)]
+
+
         cls.nav_current_index = len(cls.nav_history) - 1 # last index of nav_history
         return
 

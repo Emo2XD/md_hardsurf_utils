@@ -38,6 +38,13 @@ class MDHARD_Preferences(bpy.types.AddonPreferences):
         default=str(Path.home()),
         subtype="DIR_PATH"
     ) #type: ignore
+
+    max_nav_history: bpy.props.IntProperty(
+        name='Max Navigation History',
+        description='Maximum history count for navigation forward / back.',
+        default=100,
+        min=2
+    ) #type: ignore
  
     def draw(self, context):
         layout = self.layout
@@ -46,6 +53,7 @@ class MDHARD_Preferences(bpy.types.AddonPreferences):
         layout.prop(self, 'default_bevel_width', text="Width")
         layout.prop(self, 'default_bevel_width_type', text="Type")
         layout.prop(self, 'md_home_dir', text="Addon Info Path", icon='FILE_FOLDER')
+        layout.prop(self, 'max_nav_history', text="Max Navigation History")
         
 
 
