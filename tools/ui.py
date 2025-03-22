@@ -179,7 +179,13 @@ class MDHARD_PT_harpoon(bpy.types.Panel):
 
     def draw(self, context):
         wm = context.window_manager
+
         layout = self.layout
+        if getattr(wm, ct.MD_PROJECT_CWD) == '':
+            layout.enabled = False
+        else:
+            layout.enabled = True
+
         row = layout.row()
         row.template_list(MDHARD_UL_Harpoon.__name__, "", wm, ct.MD_HARPOON_UILIST_COLLECTION, wm, ct.MD_HARPOON_INDEX)
         col = row.column(align=True)
@@ -190,14 +196,9 @@ class MDHARD_PT_harpoon(bpy.types.Panel):
         col.operator(ot.MDHARD_OT_harpoon_remove_slot.bl_idname, text="", icon='REMOVE')
 
         row = layout.row()
-        row.operator_context = 'EXEC_DEFAULT'
-        row.operator(ot.MDHARD_OT_harpoon_add_slot.bl_idname, 
-                     text="Add This File", 
-                     icon='FILE_BLEND').filepath = bpy.data.filepath
-        if bpy.data.is_saved:
-            row.enabled = True
-        else:
-            row.enabled = False
+        row.operator(ot.MDHARD_OT_harpoon_assign_to_slot.bl_idname, 
+                     text="Assign To Slot", 
+                     icon='FILE_BLEND')
 
             
         

@@ -211,7 +211,26 @@ def harpoon_add_file_slot(filepath:str=''):
     setattr(wm, ct.MD_HARPOON_INDEX, len(uilist)-1)
     return
 
+def harpoon_assign_to_slot(filepath:str=''):
+    wm = bpy.context.window_manager
+    uilist:bpy.types.CollectionProperty = getattr(wm, ct.MD_HARPOON_UILIST_COLLECTION)
+    active_index = getattr(wm, ct.MD_HARPOON_INDEX)
+    slot = uilist[active_index]
+
+    if filepath == '': # always create empty slot.
+        slot.filepath = ''
+        slot.name = 'Empty'
+    else:
+        slot.filepath = filepath
+        slot.name = str(Path(filepath).relative_to(Path(get_cwd())))
+        
+    return 
+
+
+
 def harpoon_remove_file_slot():
+    """Remove Harpoon File Slot
+    """
     print(f"Harpoon Remove File Slot")
     wm = bpy.context.window_manager
     uilist = getattr(wm, ct.MD_HARPOON_UILIST_COLLECTION)

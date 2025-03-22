@@ -761,6 +761,9 @@ class MDHARD_OT_harpoon_go_to_file_slot(bpy.types.Operator):
 @register_wrap
 class MDHARD_OT_harpoon_add_slot(bpy.types.Operator):
     """Harpoon.
+    -LMB: Add this file. 
+    -Shift LMB: Add Empty, 
+    -Ctrl LMB: Search in file browser
     """
     bl_idname = "md_hard.harpoon_add_slot"
     bl_label = "MD Harpoon Add Slot"
@@ -776,52 +779,99 @@ class MDHARD_OT_harpoon_add_slot(bpy.types.Operator):
     #     return bpy.data.is_saved
     
     def invoke(self, context, event):
-        cwd = mdp.get_cwd()
-        if cwd is not None:
-            self.filepath = cwd
-        wm = context.window_manager
-        wm.fileselect_add(self)
-        return {'RUNNING_MODAL'}
+        if event.shift and not event.ctrl:
+            self.filepath=''
+            return self.execute(context)
+        elif event.ctrl and not event.shift:
+            cwd = mdp.get_cwd()
+            if cwd is not None:
+                self.filepath = cwd
+            wm = context.window_manager
+            wm.fileselect_add(self)
+            return {'RUNNING_MODAL'}
+        else:
+            self.filepath = bpy.data.filepath
+            return self.execute(context)
         # return wm.invoke_props_dialog(self)
 
     def execute(self, context):
         mdp.harpoon_add_file_slot(self.filepath)
-
-        # result = 
-        # if result == 1:
-            # self.report({"WARNING"}, f"Save on disk before using this operation")
-
-            # return {"CANCELLED"}
         self.report({"INFO"}, f"MD Harpoon: add_slot {self.filepath}")
         return {"FINISHED"}
 
-    # def draw(self, context):
-    #     layout = self.layout
-    #     layout.prop(self, 'filepath')
 
 @register_wrap
 class MDHARD_OT_harpoon_remove_slot(bpy.types.Operator):
     """Harpoon.
+    -LMB: Remove slot, 
+    
     """
     bl_idname = "md_hard.harpoon_remove_slot"
     bl_label = "MD Harpoon Remove Slot"
 
-    # index: bpy.props.IntProperty(name='harpoon_index', default=0, min=0) # type: ignore
+    # keep_slot: bpy.props.BoolProperty(
+    #     name='keep_slot',
+    #     default=False,
+    #     description="If True, Only remove name and filename, keep slot.")#type: ignore
+    
 
-    # @classmethod
-    # def poll(cls, context):
-    #     return bpy.data.is_saved
+    # def invoke(self, context, event):
+    #     if event.shift:
+    #         self.keep_slot = True
+    #     else:
+    #         self.keep_slot = False
+
+    #     return self.execute(context)
+
 
     def execute(self, context):
         mdp.harpoon_remove_file_slot()
-        
-        # result = 
-        # if result == 1:
-            # self.report({"WARNING"}, f"Save on disk before using this operation")
-
-            # return {"CANCELLED"}
         self.report({"INFO"}, f"MD Harpoon: remove_slot")
         return {"FINISHED"}
+
+
+@register_wrap
+class MDHARD_OT_harpoon_assign_to_slot(bpy.types.Operator):
+    """Harpoon.
+    -LMB: Assign This File to Slot.
+    -Ctrl LMB: Invoke File Browser
+    -Shift LMB: Clear name and filepath.
+    """
+    bl_idname = "md_hard.harpoon_assign_to_slot"
+    bl_label = "MD Harpoon Assign To Slot"
+
+    filepath: bpy.props.StringProperty(name='filepath', default=str(Path.home()), subtype='FILE_PATH') # type: ignore
+    filter_glob: bpy.props.StringProperty(
+        default="*.blend",
+        options={'HIDDEN'},
+        )#type: ignore
+    
+    @classmethod
+    def poll(cls, context):
+        wm = context.window_manager
+        return len(getattr(wm, ct.MD_HARPOON_UILIST_COLLECTION)) > 0
+
+    def invoke(self, context, event):
+        if event.shift and not event.ctrl:
+            self.filepath = ''
+            return self.execute(context)
+        elif event.ctrl and not event.shift:
+            cwd = mdp.get_cwd()
+            if cwd is not None:
+                self.filepath = cwd
+            wm = context.window_manager
+            wm.fileselect_add(self)
+            return {'RUNNING_MODAL'}
+        else:
+            self.filepath = bpy.data.filepath
+            return self.execute(context)
+
+
+    def execute(self, context):
+        mdp.harpoon_assign_to_slot(self.filepath)
+        self.report({"INFO"}, f"MD Harpoon: assign to slot")
+        return {"FINISHED"}
+
 
 
 @register_wrap
