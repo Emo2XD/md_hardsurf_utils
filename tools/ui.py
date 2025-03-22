@@ -149,11 +149,21 @@ class MDHARD_UL_scene_part(bpy.types.UIList):
 #-------------------------------------------------------------------------------
 @register_wrap
 class MDHARD_UL_Harpoon(bpy.types.UIList):
-    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+    def draw_item(self, context, layout:bpy.types.UILayout, data, item, icon, active_data, active_propname, index):
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
             harpoon_element = item # scene.collection.children ()
-            layout.prop(harpoon_element, 'name', text="", emboss=False, icon='FILE_BLEND')
-                
+            row = layout.row()
+            if harpoon_element.filepath == '':
+                row.enabled = False
+            else:
+                row.enabled = True
+            
+            split = row.split(factor=0.9)
+            split.prop(harpoon_element, 'name', text="", emboss=False)
+            split.operator(ot.MDHARD_OT_harpoon_go_to_file_slot.bl_idname, text='', icon='FILE_BLEND', emboss=False).index = index
+
+            
+            
                 # icon="COLLECTION_COLOR_01" if getattr(part_col, ct.IS_MD_HARDSURF_PART_COLLECTION) else "OUTLINER_COLLECTION")
 
             # split = layout.split(factor=0.5, align=False)

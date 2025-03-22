@@ -184,7 +184,7 @@ register_other(
 # Harpoon
 #-------------------------------------------------------------------------------
 def harpoon_go_to_file_slot(index:int=0):
-    print(f"Harpoon Go To")
+    print(f"Harpoon Go To slot {index}")
     pass
 
 def harpoon_add_file_slot(filepath:str=''):

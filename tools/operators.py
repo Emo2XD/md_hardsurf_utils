@@ -809,21 +809,6 @@ class MDHARD_OT_harpoon_remove_slot(bpy.types.Operator):
     bl_idname = "md_hard.harpoon_remove_slot"
     bl_label = "MD Harpoon Remove Slot"
 
-    # keep_slot: bpy.props.BoolProperty(
-    #     name='keep_slot',
-    #     default=False,
-    #     description="If True, Only remove name and filename, keep slot.")#type: ignore
-    
-
-    # def invoke(self, context, event):
-    #     if event.shift:
-    #         self.keep_slot = True
-    #     else:
-    #         self.keep_slot = False
-
-    #     return self.execute(context)
-
-
     def execute(self, context):
         mdp.harpoon_remove_file_slot()
         self.report({"INFO"}, f"MD Harpoon: remove_slot")
