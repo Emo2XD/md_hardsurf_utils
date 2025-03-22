@@ -188,8 +188,33 @@ register_other(
 # Harpoon
 #-------------------------------------------------------------------------------
 def harpoon_go_to_file_slot(index:int=0):
-    print(f"Harpoon Go To slot {index}")
-    pass
+    wm = bpy.context.window_manager
+    uilist = getattr(wm, ct.MD_HARPOON_UILIST_COLLECTION)
+    setattr(wm, ct.MD_HARPOON_INDEX, index)
+    save_harpoon()
+    slot = None
+    try:
+        slot = uilist[index]
+    except Exception as e:
+        print(f"harpoon_go_to_file_slot: {e}")
+        print(f"index: {index} not found in uilist")
+        return
+
+    if slot.filepath == bpy.data.filepath:
+        print(f"harpoon tries to go to the same file path: abort")
+        return
+    elif slot.filepath == '':
+        print(f"harpoon File path is empty: abort")
+        return
+    
+    bpy.ops.wm.save_mainfile()
+    try:
+        bpy.ops.wm.open_mainfile(filepath=slot.filepath)
+    except Exception as e:
+        print(f"harpoon failed open file '{slot.filepath}': {e}")
+        return 1
+    return
+
 
 def harpoon_add_file_slot(filepath:str=''):
     print(f"Harpoon Add File Slot: {filepath}")
