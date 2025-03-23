@@ -26,6 +26,8 @@ def open_project(proj_root_dir:str):
     set_cwd(cwd=proj_root_dir)
     setup_project_folder(proj_root_dir=proj_root_dir, exists_ok=True)
     setup_md_proj_asset()
+    bpy.ops.wm.save_userpref()
+
     set_current_project_to_wm()
     load_harpoon()
     print(f"Opened MD Project:'{proj_root_dir}'")
@@ -38,6 +40,8 @@ def close_project():
     save_harpoon() # save first
     set_cwd(cwd=None)
     unload_md_proj_asset()
+    bpy.ops.wm.save_userpref()
+
     set_current_project_to_wm()
     print(f"Closed MD Project")
     return
@@ -113,14 +117,17 @@ def setup_project_folder(proj_root_dir:str, exists_ok:bool=True):
 
 
 def setup_md_proj_asset():
-    # ensure close every other md project asset
-    asset_libs = bpy.context.preferences.filepaths.asset_libraries
-    unload_md_proj_asset() # remove currently opened project.
     
     # ensure only one asset library per one path,
     # If specified proj_root_directory is already an asset, then skip new asset creation.
     # by nesting with Path and abspath, it ensures that each path is sharing the same format.
     cwd = get_cwd()
+    if cwd is None:
+        print("Project is not Opened: abort setup_md_proj_asset")
+        return
+    # ensure close every other md project asset
+    asset_libs = bpy.context.preferences.filepaths.asset_libraries
+    unload_md_proj_asset() # remove currently opened project.
 
     for al in asset_libs:
         if Path(bpy.path.abspath(al.path)) == Path(bpy.path.abspath(cwd)):
