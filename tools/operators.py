@@ -321,7 +321,9 @@ class MDHARD_OT_shade_smooth_anywhere(bpy.types.Operator):
         return context.active_object is not None
         
     def execute(self, context):
-        ut.shade_smooth_anywhere()
+        result = ut.shade_smooth_anywhere()
+        if result == 1:
+            self.report({"WARNING"}, f"Cannot shade smooth. See system colsole for more detail.")
         return {"FINISHED"}
 
 

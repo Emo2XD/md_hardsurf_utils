@@ -360,7 +360,11 @@ def harpoon_dict_to_wm(harpoon_dict:dict):
 def write_harpoon_dict(harpoon_dict:dict):
     """Write Harpoon Dictionary to 
     """
-    md_proj_p = Path(get_cwd())/ct.MD_PROJECT_INFO_FOLDER_NAME
+    cwd = get_cwd()
+    if cwd is None: # if project is not opened do nothing.
+        return
+
+    md_proj_p = Path(cwd)/ct.MD_PROJECT_INFO_FOLDER_NAME
     md_proj_p.mkdir(exist_ok=True) #ensure save location is there.
     harpoon_info_p = md_proj_p/ct.MD_HARPOON_INFO_JSON
     with open(str(harpoon_info_p), 'w') as f:
@@ -368,17 +372,21 @@ def write_harpoon_dict(harpoon_dict:dict):
 
 
 def read_harpoon_dict()->dict:
-    md_proj_p = Path(get_cwd())/ct.MD_PROJECT_INFO_FOLDER_NAME
+    harpoon_dict = {
+        ct.MD_HARPOON_INDEX: 0,
+        ct.MD_HARPOON_UILIST_COLLECTION: []
+    } # default
+
+    cwd = get_cwd()
+    if cwd is None:
+        return harpoon_dict # return ndefault
+    
+    md_proj_p = Path(cwd)/ct.MD_PROJECT_INFO_FOLDER_NAME
     harpoon_info_p = md_proj_p/ct.MD_HARPOON_INFO_JSON
-    harpoon_dict = {}
     if harpoon_info_p.exists():
         with open(str(harpoon_info_p), 'r') as f:
             harpoon_dict = json.load(f)
 
-    else:
-        # default setup
-        harpoon_dict[ct.MD_HARPOON_INDEX] = 0
-        harpoon_dict[ct.MD_HARPOON_UILIST_COLLECTION] = []
 
     return harpoon_dict
 

@@ -1200,12 +1200,18 @@ def get_view_3d_context()->bpy.types.Context:
 def shade_smooth_anywhere():
     """Shade smooth anywhere"""
     orig_mode = bpy.context.active_object.mode
+    result = 0
 
     bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.shade_smooth()
+    try:
+        bpy.ops.object.shade_smooth()
+    except Exception as e:
+        print(f"Error on shade_smooth_anywhere. {e}")
+        result = 1
+        
     bpy.ops.object.mode_set(mode=orig_mode)
 
-    return
+    return result
 
 
 #-------------------------------------------------------------------------------
