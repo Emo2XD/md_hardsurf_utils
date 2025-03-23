@@ -745,7 +745,11 @@ class MDHARD_OT_harpoon_go_to_file_slot(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         wm = context.window_manager
-        return bpy.data.is_saved and getattr(wm, ct.MD_PROJECT_CWD) != ''
+        # return ((
+        #     bpy.data.is_saved or
+        #     (not bpy.data.is_dirty and not bpy.data.is_saved))
+        #     and getattr(wm, ct.MD_PROJECT_CWD) != '')
+        return getattr(wm, ct.MD_PROJECT_CWD) != ''
 
     def execute(self, context):
         result = mdp.harpoon_go_to_file_slot(self.index)
@@ -753,6 +757,10 @@ class MDHARD_OT_harpoon_go_to_file_slot(bpy.types.Operator):
         if result == 1:
             self.report({"WARNING"}, f"Harpoon Failed to open slot {self.index}")
             return {"CANCELLED"}
+        elif result == 2:
+            self.report({"WARNING"}, f"Harpoon: Save before operation")
+            return {"CANCELLED"}
+
         
         self.report({"INFO"}, f"MD Harpoon: Go To slot {self.index}")
         return {"FINISHED"}

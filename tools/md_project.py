@@ -207,7 +207,14 @@ def harpoon_go_to_file_slot(index:int=0):
         print(f"harpoon File path is empty: abort")
         return
     
-    bpy.ops.wm.save_mainfile()
+    if bpy.data.is_saved:
+        bpy.ops.wm.save_mainfile()
+    elif not bpy.data.is_saved and not bpy.data.is_dirty:
+        pass
+    else:
+        print(f"harpoon: current file not saved in Disk abort")
+        return 2
+    
     try:
         bpy.ops.wm.open_mainfile(filepath=slot.filepath)
     except Exception as e:
