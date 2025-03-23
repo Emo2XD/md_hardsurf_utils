@@ -626,8 +626,7 @@ class MDHARD_OT_navigate_forward(bpy.types.Operator):
     def execute(self, context):
         result = nav.Navigation.nav_forward()
         if result == 1:
-            self.report({"WARNING"}, f"Save on disk before using this operation")
-
+            self.report({"WARNING"}, f"No More Forward Navigation History.")
             return {"CANCELLED"}
         self.report({"INFO"}, f"Navigation Forward")
         return {"FINISHED"}
@@ -650,8 +649,7 @@ class MDHARD_OT_navigate_back(bpy.types.Operator):
     def execute(self, context):
         result = nav.Navigation.nav_back()
         if result == 1:
-            self.report({"WARNING"}, f"Save on disk before using this operation")
-
+            self.report({"WARNING"}, f"No More Backward Navigation History.")
             return {"CANCELLED"}
         self.report({"INFO"}, f"Navigation Backward")
         return {"FINISHED"}

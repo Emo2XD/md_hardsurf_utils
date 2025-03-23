@@ -56,17 +56,25 @@ class Navigation:
     def nav_forward(cls):
         """Navigate forward to next navigation point in history. Do nothing when out of history range."""
         cls._update_current_nav_element()
-        next_index, next_nav_element = cls._get_nav_element_clamped(index=cls.nav_current_index + 1)
+        orig_index = cls.nav_current_index
+        next_index, next_nav_element = cls._get_nav_element_clamped(index=orig_index + 1)
         cls.go_to_history_point(next_nav_element)
         cls.nav_current_index = next_index
+
+        if orig_index == next_index: # navigation not taken.
+            return 1
 
     @classmethod
     def nav_back(cls):
         """Navigate back to previous navigation point in history. Do nothing when out of history range."""
         cls._update_current_nav_element()
-        prev_index, prev_nav_element = cls._get_nav_element_clamped(index=cls.nav_current_index - 1)
+        orig_index = cls.nav_current_index
+        prev_index, prev_nav_element = cls._get_nav_element_clamped(index=orig_index - 1)
         cls.go_to_history_point(prev_nav_element)
         cls.nav_current_index = prev_index
+
+        if orig_index == prev_index: # navigation not taken.
+            return 1
 
 
     @classmethod
