@@ -230,11 +230,12 @@ class MDHARD_MT_md_hard_surface(bpy.types.Menu):
                 layout.menu(MDHARD_MT_edge_bevel_weight_submenu.bl_idname, text="B Bevel Weight...", icon="MOD_BEVEL")
                 layout.menu(MDHARD_MT_toggle_submenu.bl_idname, text="T Toggle Vibility...")
                 layout.operator(ot.MDHARD_OT_shade_smooth_anywhere.bl_idname, text="S Shade Smooth Anywhere")
-            layout.menu(MDHARD_MT_part_collection_submenu.bl_idname, text="W Part Collection...")
+            layout.menu(MDHARD_MT_project_submenu.bl_idname, text="W Project...")
 
             col = layout.column()
             col.operator_context = 'INVOKE_DEFAULT'
             col.operator(ot.MDHARD_OT_open_file_in_project.bl_idname, text="P Open File in Project")
+            col.operator(ot.MDHARD_OT_link_part.bl_idname, text="A Link Part")
         except AttributeError:
             # Exception when you have not selected anything.
             # When you have not selected mesh, you cannot check the line
@@ -312,9 +313,9 @@ class MDHARD_MT_toggle_submenu(bpy.types.Menu):
 
 
 @register_wrap
-class MDHARD_MT_part_collection_submenu(bpy.types.Menu):
-    bl_label = "Hard Surface Part Collection Menu"
-    bl_idname = "MDHARD_MT_part_collection_submenu"
+class MDHARD_MT_project_submenu(bpy.types.Menu):
+    bl_label = "MD Project Submenu"
+    bl_idname = "MDHARD_MT_project_submenu"
 
     def draw(self, context):
         layout = self.layout
@@ -322,13 +323,15 @@ class MDHARD_MT_part_collection_submenu(bpy.types.Menu):
             if context.area.type == 'VIEW_3D':
                 layout.operator(ot.MDHARD_OT_go_to_part.bl_idname, text="G Go To This Part")
                 layout.operator(ot.MDHARD_OT_go_to_source_collection.bl_idname, text="S Go To Source", icon="OUTLINER_COLLECTION")
-                layout.operator(ot.MDHARD_OT_navigate_forward.bl_idname, text="F Navigate Forward", icon="LOOP_FORWARDS")
-                layout.operator(ot.MDHARD_OT_navigate_back.bl_idname, text="B Navigate Backward", icon="LOOP_BACK") # TODO create better keymap for nav back/forward
-                layout.operator(ot.MDHARD_OT_open_project.bl_idname, text="O Open Local Asset Folder")
-                layout.operator(ot.MDHARD_OT_close_project.bl_idname, text="C Close Local Asset Folder")
+                # layout.operator(ot.MDHARD_OT_navigate_forward.bl_idname, text="F Navigate Forward", icon="LOOP_FORWARDS")
+                # layout.operator(ot.MDHARD_OT_navigate_back.bl_idname, text="B Navigate Backward", icon="LOOP_BACK") # TODO create better keymap for nav back/forward
+                layout.operator(ot.MDHARD_OT_open_project.bl_idname, text="O Open Project")
+                layout.operator(ot.MDHARD_OT_close_project.bl_idname, text="C Close Project")
             # if context.area.type == 'OUTLINER':
             #     layout.operator(ot.MDHARD_OT_md_unlink_part.bl_idname, text="U Unlink This Part Collection")
             #     # if context.object.type == 'MESH':
-                    
+
+                
+            
         except AttributeError:
             pass
