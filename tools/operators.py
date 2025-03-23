@@ -699,9 +699,10 @@ class MDHARD_OT_close_project(bpy.types.Operator):
     bl_idname = "md_hard.close_project"
     bl_label = "MD Close Project"
 
-    # @classmethod
-    # def poll(cls, context):
-    #     return bpy.data.is_saved
+    @classmethod
+    def poll(cls, context):
+        wm = bpy.context.window_manager
+        return getattr(wm, ct.MD_PROJECT_CWD) != ''
 
     def execute(self, context):
         mdp.close_project()
@@ -747,10 +748,6 @@ class MDHARD_OT_harpoon_go_to_file_slot(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         wm = context.window_manager
-        # return ((
-        #     bpy.data.is_saved or
-        #     (not bpy.data.is_dirty and not bpy.data.is_saved))
-        #     and getattr(wm, ct.MD_PROJECT_CWD) != '')
         return getattr(wm, ct.MD_PROJECT_CWD) != ''
 
     def execute(self, context):
@@ -785,10 +782,6 @@ class MDHARD_OT_harpoon_add_slot(bpy.types.Operator):
         options={'HIDDEN'},
         )#type: ignore
 
-    # @classmethod
-    # def poll(cls, context):
-    #     return bpy.data.is_saved
-    
     def invoke(self, context, event):
         if event.shift and not event.ctrl:
             self.filepath=''
@@ -803,7 +796,6 @@ class MDHARD_OT_harpoon_add_slot(bpy.types.Operator):
         else:
             self.filepath = bpy.data.filepath
             return self.execute(context)
-        # return wm.invoke_props_dialog(self)
 
     def execute(self, context):
         mdp.harpoon_add_file_slot(self.filepath)
@@ -879,10 +871,6 @@ class MDHARD_OT_harpoon_move_ui_list(bpy.types.Operator):
 
     move_type: bpy.props.EnumProperty(name='Type', items=[('UP', 'UP', ''), ('DOWN', 'DOWN', '')]) # type: ignore
 
-    # @classmethod
-    # def poll(cls, context):
-    #     return bpy.data.is_saved
-
     def execute(self, context):
         mdp.harpoon_move_file_slot(self.move_type)
         return {"FINISHED"}
@@ -905,13 +893,7 @@ class MDHARD_OT_open_file_in_project(bpy.types.Operator):
     bl_label = "MD Open File in Project"
     bl_property = "filepath"
 
-    # filepath: bpy.props.StringProperty(name="filepath", subtype="FILE_PATH") # type: ignore
-    # is_save: bpy.props.BoolProperty(name='is_save', default=False) #type: ignore
     filepath: bpy.props.EnumProperty(name='File Path', items=mdp.search_file_in_project_callback) # type: ignore
-
-    # @classmethod
-    # def poll(cls, context):
-    #     return bpy.data.is_saved
 
     def invoke(self, context, event):
         wm = context.window_manager
@@ -921,21 +903,15 @@ class MDHARD_OT_open_file_in_project(bpy.types.Operator):
         
         if mdp.get_cwd() is None:
             self.report({"WARNING"}, f"MD Project not opened, fallback to default wm.open_mainfile()")
+            nav.Navigation.add_nav_history()
             return bpy.ops.wm.open_mainfile('INVOKE_DEFAULT')
         else:
             wm.invoke_search_popup(self)
             return {'FINISHED'}
-        #     #ask save
-        #     wm.invoke
-        # elif ((bpy.data.is_saved == False) and (bpy.data.is_dirty == False)): # startup scene
-        #     # no need for save
-        #     pass
-        # else:
-        
     
-
     def execute(self, context):
         print(f"filepath = '{self.filepath}'")
+        nav.Navigation.add_nav_history()
         try:
             bpy.ops.wm.open_mainfile(filepath=self.filepath)
             self.report({"INFO"}, f"Open file in project")

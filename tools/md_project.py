@@ -12,6 +12,7 @@ from . import constants as ct
 from ..prefs import get_preferences
 import json
 from ..setup_tools.register import register_other
+from .navigation import Navigation
 
 
 def open_project(proj_root_dir:str):
@@ -215,6 +216,7 @@ def harpoon_go_to_file_slot(index:int=0):
         print(f"harpoon: current file not saved in Disk abort")
         return 2
     
+    Navigation.add_nav_history()
     try:
         bpy.ops.wm.open_mainfile(filepath=slot.filepath)
     except Exception as e:

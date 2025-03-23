@@ -23,7 +23,7 @@ class Navigation:
     MAX_HISTORY:int = 8
 
     @classmethod
-    def _add_nav_history(cls):
+    def add_nav_history(cls):
         """Add new NavElement and set new element as current.
         All forwarding history will be removed.
         """
@@ -123,7 +123,7 @@ class Navigation:
             print("Save before do this operation.")
             return 1
 
-        cls._add_nav_history()
+        cls.add_nav_history()
 
         if src_col.library is not None:
             filepath = bpy.path.abspath(src_col.library.filepath)
