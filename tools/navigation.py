@@ -46,6 +46,10 @@ class Navigation:
     @classmethod
     def _update_current_nav_element(cls):
         """Update current scene and active index of nav element"""
+        # don't update if the file is invalid.
+        if not bpy.data.is_saved:
+            return
+        
         current = cls.nav_history[cls.nav_current_index]
         current.filepath = bpy.data.filepath
         current.scene = bpy.context.scene.name
