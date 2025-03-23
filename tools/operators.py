@@ -6,6 +6,7 @@ from . import constants as ct
 from pprint import pprint
 from . import navigation as nav
 from . import md_project as mdp
+from ..myblendrc_utils import utils as myu
 
 @register_wrap
 class MDHARD_OT_sync_dnt(bpy.types.Operator):
@@ -927,6 +928,39 @@ class MDHARD_OT_open_file_in_project(bpy.types.Operator):
     
     
 
+@register_wrap
+class MDHARD_OT_link_part(bpy.types.Operator):
+    """Link Part  'F-' Collection into current scene
+    """
+    bl_idname = "md_hard.link_part"
+    bl_label = "MD Link Part in Project"
+    bl_property = "part_path"
+
+    part_path: bpy.props.EnumProperty(
+        name='part_path', 
+        items=mdp.search_parts_in_project_callback, 
+        description='The format is abs/path/to/*.blend|data_id|name') # type: ignore
+    
+    @classmethod
+    def poll(cls, context):
+        return bpy.context.mode == 'OBJECT'
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        
+        if mdp.get_cwd() is None:
+            self.report({"WARNING"}, f"MD Project not opened, fallback to default wm.link()")
+            return bpy.ops.wm.link('INVOKE_DEFAULT')
+        else:
+            wm.invoke_search_popup(self)
+            return {'FINISHED'}
+    
+    def execute(self, context):
+        mdp.link_part(self.part_path)
+        print(f"'{self.part_path}' Linked")
+        return {"FINISHED"}
+    
+
 
 
 @register_wrap
@@ -957,9 +991,16 @@ class MDHARD_OT_test_x(bpy.types.Operator):
         # objs = get_mesh_object_in_collection(getattr(context.scene, ct.TARGET_COLLECTION), recursive=True)
         # pprint(objs)
         # pprint(get_unique_key_block_name_in_collection(getattr(context.scene, ct.TARGET_COLLECTION), recursive=True))
-        bpy.data.materials.new("new1")
-        print("material created")
-        self.report({"INFO"}, f"self: print x={self.x}: MD Hard surface utils 'test' X called")
+        # bpy.data.materials.new("new1")
+        # print("material created")
+        # self.report({"INFO"}, f"self: print x={self.x}: MD Hard surface utils 'test' X called")
+        # filepath = "C:\\Users\\takun\\OneDrive\\Arts\\Projects\\experiment\\hard_susrface_experiment\\md_hard_test\\A_go_to_collection\\src_lv2.blend"
+        # with bpy.data.libraries.load(filepath, link=True)  as (data_from, data_to):
+            
+        #     # data_to.collections = [name for name in data_from.collections if name.startswith("F-")]
+        #     # pprint([name for name in data_from.collections if name.startswith("F-")])
+        #     pprint([name for name in data_from.libraries])
+            
 
         return {"FINISHED"}
         # return {"CANCELLED"}

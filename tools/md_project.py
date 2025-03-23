@@ -415,3 +415,59 @@ def search_file_in_project_callback(self, context):
         enum_list.append((path, disp_name, ''))
 
     return enum_list
+
+
+# Parts Link
+def search_parts_in_project_callback(self, context):
+    """Callback function for search parts in project.
+    """
+    cwd = get_cwd()
+    enum_list = []
+    id_path_list, disp_path_list = myu.gen_blend_file_path_and_display_name_list(search_path=cwd, exclude_prefix='.')
+
+
+    for path, disp_name in zip( id_path_list, disp_path_list):
+        with bpy.data.libraries.load(path, link=True)  as (data_from, data_to):
+            collection_name_list = [name for name in data_from.collections if name.startswith("F-")]
+
+        for c_name in collection_name_list:
+            enum_list.append((
+                f"{path}|collections|{c_name}", 
+                f"{disp_name}:{c_name}",
+                  ''))
+
+    return enum_list
+
+
+def link_part(id_path:str):
+    """Link collection 'id_path' retrieved from search_parts_in_project_callback()
+    """
+    filepath, data_id, name = parse_link_id_path(id_path)
+    col_to_link = None
+
+    if Path(bpy.path.abspath(filepath)) == Path(bpy.path.abspath(bpy.data.filepath)):
+        col_to_link = bpy.data.collections.get(name)
+    else:
+        col_to_link = myu.load_from_lib_and_return(filepath=filepath, attr_name=data_id, name=name, link=True)
+    
+    if col_to_link is not None:
+        new_part_obj = bpy.data.objects.new(name=col_to_link.name, object_data=None)
+        bpy.context.collection.objects.link(new_part_obj)
+        new_part_obj.instance_collection = col_to_link
+        new_part_obj.empty_display_size  = 0.01
+        new_part_obj.instance_type = 'COLLECTION'
+
+        myu.select_only(new_part_obj)
+        # bpy.context.collection.children.link(col_to_link)
+
+    return
+    
+
+
+def parse_link_id_path(id_path:str):
+    """Parse id_path from search_parts_in_project_callback.
+    Example
+        'abs/path/to/*.blend|data_id|name'
+        -> ('abs/path/to/*.blend', 'data_id', 'name')
+    """
+    return tuple(id_path.split("|", 2))
