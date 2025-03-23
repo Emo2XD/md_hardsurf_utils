@@ -110,7 +110,11 @@ class Navigation:
     @classmethod
     def go_to_history_point(cls, nav_element:NavElement):
         if nav_element.filepath != bpy.data.filepath: # before jumping to other file.
-            bpy.ops.wm.save_mainfile()
+            if not bpy.data.is_saved and not bpy.data.is_dirty: # abort save if default file.
+                pass
+            else:
+                bpy.ops.wm.save_mainfile()
+
             try:
                 bpy.ops.wm.open_mainfile(filepath=nav_element.filepath)
             except Exception as e:

@@ -621,7 +621,7 @@ class MDHARD_OT_navigate_forward(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return bpy.data.is_saved
+        return bpy.data.is_saved or (not bpy.data.is_saved and not bpy.data.is_dirty)
 
     def execute(self, context):
         result = nav.Navigation.nav_forward()
@@ -647,7 +647,7 @@ class MDHARD_OT_navigate_back(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return bpy.data.is_saved
+        return bpy.data.is_saved or (not bpy.data.is_saved and not bpy.data.is_dirty)
 
     def execute(self, context):
         result = nav.Navigation.nav_back()
