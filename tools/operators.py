@@ -628,6 +628,9 @@ class MDHARD_OT_navigate_forward(bpy.types.Operator):
         if result == 1:
             self.report({"WARNING"}, f"No More Forward Navigation History.")
             return {"CANCELLED"}
+        elif result == 2:
+            self.report({"WARNING"}, f"History not found, removed. Abort Forward Navigation.")
+            return {"CANCELLED"}
         self.report({"INFO"}, f"Navigation Forward")
         return {"FINISHED"}
     
@@ -650,6 +653,9 @@ class MDHARD_OT_navigate_back(bpy.types.Operator):
         result = nav.Navigation.nav_back()
         if result == 1:
             self.report({"WARNING"}, f"No More Backward Navigation History.")
+            return {"CANCELLED"}
+        elif result == 2:
+            self.report({"WARNING"}, f"History not found, removed. Abort Backward Navigation.")
             return {"CANCELLED"}
         self.report({"INFO"}, f"Navigation Backward")
         return {"FINISHED"}

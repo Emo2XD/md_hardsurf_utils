@@ -58,7 +58,11 @@ class Navigation:
         cls._update_current_nav_element()
         orig_index = cls.nav_current_index
         next_index, next_nav_element = cls._get_nav_element_clamped(index=orig_index + 1)
-        cls.go_to_history_point(next_nav_element)
+        result = cls.go_to_history_point(next_nav_element)
+        if result == 1:
+            del cls.nav_history[next_index]
+            return 2 # you don't have to update current index because next element will be removed.
+        
         cls.nav_current_index = next_index
 
         if orig_index == next_index: # navigation not taken.
@@ -70,8 +74,13 @@ class Navigation:
         cls._update_current_nav_element()
         orig_index = cls.nav_current_index
         prev_index, prev_nav_element = cls._get_nav_element_clamped(index=orig_index - 1)
-        cls.go_to_history_point(prev_nav_element)
+        result = cls.go_to_history_point(prev_nav_element)
+
         cls.nav_current_index = prev_index
+
+        if result == 1: # on error. you have to update nav_current_index because element will be deleted
+            del cls.nav_history[prev_index]
+            return 2
 
         if orig_index == prev_index: # navigation not taken.
             return 1
@@ -96,9 +105,14 @@ class Navigation:
 
     @classmethod
     def go_to_history_point(cls, nav_element:NavElement):
-        if nav_element.filepath != bpy.data.filepath:
+        if nav_element.filepath != bpy.data.filepath: # before jumping to other file.
             bpy.ops.wm.save_mainfile()
-            bpy.ops.wm.open_mainfile(filepath=nav_element.filepath)
+            try:
+                bpy.ops.wm.open_mainfile(filepath=nav_element.filepath)
+            except Exception as e:
+                print(f"Cannot go_to_history_point, abort: {e}")
+                return 1
+
 
         nav_scene = bpy.data.scenes.get(nav_element.scene)
         if nav_scene is None:
