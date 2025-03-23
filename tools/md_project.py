@@ -381,3 +381,20 @@ def read_harpoon_dict()->dict:
         harpoon_dict[ct.MD_HARPOON_UILIST_COLLECTION] = []
 
     return harpoon_dict
+
+
+#-------------------------------------------------------------------------------
+# File Search
+#-------------------------------------------------------------------------------
+def search_file_in_project_callback(self, context):
+    """Callback function for project file search."""
+    # wm = context.window_manager
+    cwd = get_cwd()
+    # print(f"!!!!!!!!!!!!!!!!{cwd}")
+    enum_list = []
+    id_path_list, disp_path_list = myu.gen_blend_file_path_and_display_name_list(search_path=cwd, exclude_prefix='.')
+
+    for path, disp_name in zip( id_path_list, disp_path_list):
+        enum_list.append((path, disp_name, ''))
+
+    return enum_list

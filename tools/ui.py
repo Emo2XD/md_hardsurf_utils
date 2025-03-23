@@ -231,6 +231,10 @@ class MDHARD_MT_md_hard_surface(bpy.types.Menu):
                 layout.menu(MDHARD_MT_toggle_submenu.bl_idname, text="T Toggle Vibility...")
                 layout.operator(ot.MDHARD_OT_shade_smooth_anywhere.bl_idname, text="S Shade Smooth Anywhere")
             layout.menu(MDHARD_MT_part_collection_submenu.bl_idname, text="W Part Collection...")
+
+            col = layout.column()
+            col.operator_context = 'INVOKE_DEFAULT'
+            col.operator(ot.MDHARD_OT_open_file_in_project.bl_idname, text="P Open File in Project")
         except AttributeError:
             # Exception when you have not selected anything.
             # When you have not selected mesh, you cannot check the line

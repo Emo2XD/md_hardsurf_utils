@@ -884,6 +884,67 @@ class MDHARD_OT_harpoon_move_ui_list(bpy.types.Operator):
     def execute(self, context):
         mdp.harpoon_move_file_slot(self.move_type)
         return {"FINISHED"}
+    
+
+
+
+
+
+
+@register_wrap
+class MDHARD_OT_open_file_in_project(bpy.types.Operator):
+    """Open File in Project.
+    - If Project is Opened Popup search menu
+    - If Project is not Opened, Open with file browser
+    - If Current File is saved on disk, then automatically saved on opening new file.
+    - If Current File is not saved on disk, save popup will be shown before opening new file.
+    """
+    bl_idname = "md_hard.open_file_in_project"
+    bl_label = "MD Open File in Project"
+    bl_property = "filepath"
+
+    # filepath: bpy.props.StringProperty(name="filepath", subtype="FILE_PATH") # type: ignore
+    # is_save: bpy.props.BoolProperty(name='is_save', default=False) #type: ignore
+    filepath: bpy.props.EnumProperty(name='File Path', items=mdp.search_file_in_project_callback) # type: ignore
+
+    # @classmethod
+    # def poll(cls, context):
+    #     return bpy.data.is_saved
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        if (bpy.data.is_saved == False) and (bpy.data.is_dirty):
+            self.report({"WARNING"}, f"Save To Disk Before Opening File")
+            return {'CANCELLED'}
+        
+        if mdp.get_cwd() is None:
+            self.report({"WARNING"}, f"MD Project not opened, fallback to default wm.open_mainfile()")
+            return bpy.ops.wm.open_mainfile('INVOKE_DEFAULT')
+        else:
+            wm.invoke_search_popup(self)
+            return {'FINISHED'}
+        #     #ask save
+        #     wm.invoke
+        # elif ((bpy.data.is_saved == False) and (bpy.data.is_dirty == False)): # startup scene
+        #     # no need for save
+        #     pass
+        # else:
+        
+    
+
+    def execute(self, context):
+        print(f"filepath = '{self.filepath}'")
+        try:
+            bpy.ops.wm.open_mainfile(filepath=self.filepath)
+            self.report({"INFO"}, f"Open file in project")
+        except Exception as e:
+            print(f"Failed to open file '{self.filepath}': {e}")
+            self.report({"WARNING"}, "Failed to open file. See system console for more detail.")
+
+        return {"FINISHED"}
+    
+    
+
 
 
 @register_wrap
