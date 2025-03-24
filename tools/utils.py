@@ -1228,3 +1228,96 @@ def fix_part_render_and_viewport_visibilities():
         PartManager.fix_part_visibility(part_col)
 
     return
+
+
+def get_rename_data_list():
+    """Known data type
+    """
+    data_attr_name_list = [
+        # 'actions',
+        'armatures',
+        # 'brushes',
+        'cameras',
+        'collections',
+        'curves',
+        # 'fonts',
+        # 'grease_pencils_v3',
+        # 'lattices',
+        # 'libraries',
+        # 'lightprobes',
+        'lights',
+        # 'linestyles',
+        # 'masks',
+        'materials',
+        'meshes',
+        # 'metaballs',
+        # 'movieclips',
+        'node_groups',
+        'objects',
+        # 'paint_curves',
+        'palettes',
+        # 'particles',
+        # 'pointclouds',
+        'scenes',
+        # 'screens',
+        # 'shape_keys',
+        # 'sounds',
+        # 'speakers',
+        # 'texts',
+        # 'textures',
+        # 'volumes',
+        'workspaces',
+        'worlds'
+    ]
+    return data_attr_name_list
+
+
+def get_data_type_list():
+    """Get Data Type List for appending
+    """
+    return [
+        "Armature",
+        "Camera",
+        "Curve",
+        "Collection",
+        "Light",
+        "Material",
+        "Mesh",
+        "Object",
+        "ShaderNodeTree",
+        "Scene",
+        "WorkSpace",
+        "World",
+    ]
+
+def poll_only_local_data_id(self, data):
+    """Poll function for checking id is local.
+    """
+    return data.library is None
+
+def get_data_dir_callback(self, context):
+    """Get Data Enum Property
+    """
+    # following list is data atrribute name which is tested
+    data_types = get_data_type_list()
+
+    return [(d, d, "") for d in data_types]
+
+def get_data_list_callack(self, context):
+    """Callback for list all of get data for enum property
+    """
+    data_type = self.data_type
+    data_list = []
+    if data_type is not None:
+        data_list = [d.name for d in getattr(bpy.data, data_type)[:] if d.library is None] # Local Only.
+    return [(d, d, "") for d in data_list]
+
+
+def getter_rename_new_name_callback(self):
+    """Getter function for determin new name. It avoids Name Collision.
+    """
+    return self.get('old_name', self.bl_rna.properties['old_name'].default) # to avoid value not assigned error.
+
+def setter_rename_new_name_callback(self, value):
+    """Setter function for determin new name. It avoids name collision"""
+    pass

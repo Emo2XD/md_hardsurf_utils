@@ -107,6 +107,18 @@ register_prop(
         bpy.props.CollectionProperty(type=MDHarpoonCollection)
         )
 
+
+# placeholder for rename data.
+for d_type in ut.get_data_type_list():
+    register_prop(
+        bpy.types.WindowManager,
+        f"MD_{d_type}",
+        bpy.props.PointerProperty(
+            type=getattr(bpy.types, d_type),
+            poll = ut.poll_only_local_data_id
+        )
+    )
+
 # register_prop(
 #         bpy.types.Collection,
 #         ct.DEP_COLLECTION, bpy.props.BoolProperty(name=ct.DEP_COLLECTION, default = False, description="Store Visibility of collection under part collection")

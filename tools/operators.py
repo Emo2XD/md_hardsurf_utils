@@ -961,6 +961,55 @@ class MDHARD_OT_link_part(bpy.types.Operator):
         return {"FINISHED"}
     
 
+@register_wrap
+class MDHARD_OT_sync_project_rename_data(bpy.types.Operator):
+    """Rename Data and Sync Project reference
+    """
+    bl_idname = "md_hard.sync_project_rename_data"
+    bl_label = "MD Rename Data And Sync Project"
+    
+    # filepath: bpy.props.StringProperty(name='filepath', default=str(Path.home()), subtype='FILE_PATH') # type: ignore
+    # filter_glob: bpy.props.StringProperty(
+    #     default="*.blend",
+    #     options={'HIDDEN'},
+    #     )#type: ignore
+    data_type: bpy.props.EnumProperty(
+        name='Data',
+        description='Data type to rename.',
+        items=ut.get_data_dir_callback
+    ) # type: ignore
+
+    # old_name: bpy.props.EnumProperty(
+    #     name='Old Name',
+    #     description='This Data with this name will be Renamed',
+    #     items=ut.get_data_list_callack
+    #     ) # type: ignore
+    
+    new_name: bpy.props.StringProperty(
+        name='New Name',
+        description='This Name will be used for new data',
+        default=''
+        ) # type: ignore
+    
+    
+    @classmethod
+    def poll(cls, context):
+        return bpy.data.is_saved and (mdp.get_cwd() is not None)
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        return wm.invoke_props_dialog(self)
+
+    def execute(self, context):
+        print(f" Rename WIP:")
+        return {"FINISHED"}
+
+    def draw(self, context):
+        wm = context.window_manager
+        layout = self.layout
+        layout.prop(self, 'data_type')
+        layout.prop(wm, f"MD_{self.data_type}")
+        layout.prop(self, 'new_name')
 
 
 @register_wrap
