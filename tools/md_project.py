@@ -448,7 +448,7 @@ def link_part(id_path:str):
     if Path(bpy.path.abspath(filepath)) == Path(bpy.path.abspath(bpy.data.filepath)):
         col_to_link = bpy.data.collections.get(name)
     else:
-        col_to_link = myu.load_from_lib_and_return(filepath=filepath, attr_name=data_id, name=name, link=True)
+        col_to_link = myu.load_from_lib_and_return(filepath=filepath, attr_name=data_id, name=name, link=True, relative=True)
     
     if col_to_link is not None:
         new_part_obj = bpy.data.objects.new(name=col_to_link.name, object_data=None)
