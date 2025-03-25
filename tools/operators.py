@@ -962,10 +962,10 @@ class MDHARD_OT_link_part(bpy.types.Operator):
     
 
 @register_wrap
-class MDHARD_OT_sync_project_rename_data(bpy.types.Operator):
+class MDHARD_OT_rename_data_sync_project(bpy.types.Operator):
     """Rename Data and Sync Project reference
     """
-    bl_idname = "md_hard.sync_project_rename_data"
+    bl_idname = "md_hard.rename_data_sync_project"
     bl_label = "MD Rename Data And Sync Project"
     
     # filepath: bpy.props.StringProperty(name='filepath', default=str(Path.home()), subtype='FILE_PATH') # type: ignore
@@ -1010,6 +1010,77 @@ class MDHARD_OT_sync_project_rename_data(bpy.types.Operator):
         layout.prop(self, 'data_type')
         layout.prop(wm, f"MD_{self.data_type}")
         layout.prop(self, 'new_name')
+
+
+@register_wrap
+class MDHARD_OT_rename_file_sync_project(bpy.types.Operator):
+    """Rename File and Sync Project reference
+    """
+    bl_idname = "md_hard.rename_file_sync_project"
+    bl_label = "MD Rename File And Sync Project"
+    
+    filepath: bpy.props.StringProperty(name='filepath', default=str(Path.home()), subtype='FILE_PATH') # type: ignore
+    
+    
+    @classmethod
+    def poll(cls, context):
+        return bpy.data.is_saved and (mdp.get_cwd() is not None)
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        self.filepath = bpy.data.filepath
+        return wm.invoke_props_dialog(self)
+
+    def execute(self, context):
+        print(f"Rename File WIP:{Path(bpy.data.filepath).relative_to(Path(mdp.get_cwd()))}")
+        return {"FINISHED"}
+
+    def draw(self, context):
+        wm = context.window_manager
+        layout = self.layout
+        layout.label(text="Change File Name From:", icon="FILE_BLEND")
+        layout.label(text=f"{Path(bpy.data.filepath).relative_to(Path(mdp.get_cwd()).parent)}")
+        layout.label(text="To:", icon="FILE_BLEND")
+        layout.prop(self, 'filepath', text='')
+
+
+
+@register_wrap
+class MDHARD_OT_move_data_sync_project(bpy.types.Operator):
+    """Move Data and Sync Project
+    """
+    bl_idname = "md_hard.move_data_sync_project"
+    bl_label = "MD Move Data And Sync Project"
+    
+    data_type: bpy.props.EnumProperty(
+        name='Data',
+        description='Data type to rename.',
+        items=ut.get_data_dir_callback
+    ) # type: ignore
+
+    filepath: bpy.props.StringProperty(name='filepath', default=str(Path.home()), subtype='FILE_PATH') # type: ignore
+  
+    
+    @classmethod
+    def poll(cls, context):
+        return bpy.data.is_saved and (mdp.get_cwd() is not None)
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        self.filepath = bpy.data.filepath
+        return wm.invoke_props_dialog(self)
+
+    def execute(self, context):
+        print(f" Move Data WIP:")
+        return {"FINISHED"}
+
+    def draw(self, context):
+        wm = context.window_manager
+        layout = self.layout
+        layout.prop(self, 'data_type')
+        layout.prop(wm, f"MD_{self.data_type}")
+        layout.label(text="Move To: ")
+        layout.prop(self, 'filepath', text="")
 
 
 @register_wrap
