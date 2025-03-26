@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 from typing import List
 from ..myblendrc_utils import utils as myu
+from ..myblendrc_utils import common_constants as cct
 from . import constants as ct
 from ..prefs import get_preferences
 import numpy as np
@@ -1230,66 +1231,6 @@ def fix_part_render_and_viewport_visibilities():
     return
 
 
-def get_rename_data_list():
-    """Known data type
-    """
-    data_attr_name_list = [
-        # 'actions',
-        'armatures',
-        # 'brushes',
-        'cameras',
-        'collections',
-        'curves',
-        # 'fonts',
-        # 'grease_pencils_v3',
-        # 'lattices',
-        # 'libraries',
-        # 'lightprobes',
-        'lights',
-        # 'linestyles',
-        # 'masks',
-        'materials',
-        'meshes',
-        # 'metaballs',
-        # 'movieclips',
-        'node_groups',
-        'objects',
-        # 'paint_curves',
-        'palettes',
-        # 'particles',
-        # 'pointclouds',
-        'scenes',
-        # 'screens',
-        # 'shape_keys',
-        # 'sounds',
-        # 'speakers',
-        # 'texts',
-        # 'textures',
-        # 'volumes',
-        'workspaces',
-        'worlds'
-    ]
-    return data_attr_name_list
-
-
-def get_data_type_list():
-    """Get Data Type List for appending
-    """
-    return [
-        "Armature",
-        "Camera",
-        "Curve",
-        "Collection",
-        "Light",
-        "Material",
-        "Mesh",
-        "Object",
-        "ShaderNodeTree",
-        "Scene",
-        "WorkSpace",
-        "World",
-    ]
-
 def poll_only_local_data_id(self, data):
     """Poll function for checking id is local.
     """
@@ -1299,7 +1240,7 @@ def get_data_dir_callback(self, context):
     """Get Data Enum Property
     """
     # following list is data atrribute name which is tested
-    data_types = get_data_type_list()
+    data_types = cct.DataAttrNameDict.keys()
 
     return [(d, d, "") for d in data_types]
 
@@ -1321,3 +1262,19 @@ def getter_rename_new_name_callback(self):
 def setter_rename_new_name_callback(self, value):
     """Setter function for determin new name. It avoids name collision"""
     pass
+
+
+def getter_blend_filepath_callback(self):
+    return self.get('filepath', self.bl_rna.properties['filepath'].default)
+
+def setter_blend_filepath_callback(self, value:str):
+    
+    if value.endswith('.blend'):
+        filepath_with_ext = value
+    else:
+        if value.endswith('.'):
+            filepath_with_ext = f"{value}blend"
+        else:
+            filepath_with_ext = f"{value}.blend"
+
+    self['filepath'] = filepath_with_ext

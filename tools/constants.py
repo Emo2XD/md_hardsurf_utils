@@ -52,3 +52,7 @@ MD_PROJECT_CWD = 'md_project_cwd' # dictionary key in md_home_info.json and wind
 MD_HARPOON_INDEX = 'md_harpoon_index'
 MD_HARPOON_UILIST_COLLECTION = 'md_harpoon_ui_list_collection'
 MD_HARPOON_INFO_JSON = 'md_harpoon_info.json' # store to project_root/.md_project/md_harpoon_info.json
+
+
+# MD data placeholder prefix
+MD_PREFIX = 'MD'

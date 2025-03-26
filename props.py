@@ -2,7 +2,7 @@ import bpy
 from .setup_tools.register import register_prop, register_wrap, register_other
 from .tools import constants as ct
 from .tools import utils as ut
-
+from .myblendrc_utils.common_constants import DataAttrNameDict
 
 
 register_prop(
@@ -109,15 +109,24 @@ register_prop(
 
 
 # placeholder for rename data.
-for d_type in ut.get_data_type_list():
+for d_type in DataAttrNameDict.keys():
     register_prop(
         bpy.types.WindowManager,
-        f"MD_{d_type}",
+        f"{ct.MD_PREFIX}_{d_type}",
         bpy.props.PointerProperty(
             type=getattr(bpy.types, d_type),
             poll = ut.poll_only_local_data_id
         )
     )
+
+def get_md_data_id_placeholder(d_type:str):
+    """Return Data ID which is stored in window manager.
+    Args:
+       d_type: e.g. "Collection", "Object", etc. You can find by using dir(bpy.types) 
+    """
+    wm = bpy.context.window_manager
+    data_id = getattr(wm, f"{ct.MD_PREFIX}_{d_type}")
+    return data_id
 
 # register_prop(
 #         bpy.types.Collection,

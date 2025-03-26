@@ -7,6 +7,7 @@ from pprint import pprint
 from . import navigation as nav
 from . import md_project as mdp
 from ..myblendrc_utils import utils as myu
+from ..myblendrc_utils.common_constants import DataAttrNameDict
 
 @register_wrap
 class MDHARD_OT_sync_dnt(bpy.types.Operator):
@@ -1008,8 +1009,18 @@ class MDHARD_OT_rename_data_sync_project(bpy.types.Operator):
         wm = context.window_manager
         layout = self.layout
         layout.prop(self, 'data_type')
-        layout.prop(wm, f"MD_{self.data_type}")
-        layout.prop(self, 'new_name')
+        layout.prop(wm, f"{ct.MD_PREFIX}_{self.data_type}")
+        
+        row = layout.row()
+        if self.data_type is not None: # row.alert must be called before row.prop(...)
+            data_ids = getattr(bpy.data, DataAttrNameDict.get(self.data_type))
+            if data_ids.get(self.new_name, None) is not None: # When duplicate name found.
+                row.alert = True 
+            else: # When duplicate name does not found
+                row.alert = False
+        row.prop(self, 'new_name')
+            
+
 
 
 @register_wrap
@@ -1019,7 +1030,7 @@ class MDHARD_OT_rename_file_sync_project(bpy.types.Operator):
     bl_idname = "md_hard.rename_file_sync_project"
     bl_label = "MD Rename File And Sync Project"
     
-    filepath: bpy.props.StringProperty(name='filepath', default=str(Path.home()), subtype='FILE_PATH') # type: ignore
+    filepath: bpy.props.StringProperty(name='filepath', default=str(Path.home()), subtype='FILE_PATH', set=ut.setter_blend_filepath_callback, get=ut.getter_blend_filepath_callback) # type: ignore
     
     
     @classmethod
@@ -1041,7 +1052,13 @@ class MDHARD_OT_rename_file_sync_project(bpy.types.Operator):
         layout.label(text="Change File Name From:", icon="FILE_BLEND")
         layout.label(text=f"{Path(bpy.data.filepath).relative_to(Path(mdp.get_cwd()).parent)}")
         layout.label(text="To:", icon="FILE_BLEND")
-        layout.prop(self, 'filepath', text='')
+        row = layout.row()
+        if Path(bpy.path.abspath(self.filepath)).exists():
+            row.alert = True
+        else:
+            row.alert = False
+
+        row.prop(self, 'filepath', text='')
 
 
 
@@ -1058,7 +1075,7 @@ class MDHARD_OT_move_data_sync_project(bpy.types.Operator):
         items=ut.get_data_dir_callback
     ) # type: ignore
 
-    filepath: bpy.props.StringProperty(name='filepath', default=str(Path.home()), subtype='FILE_PATH') # type: ignore
+    filepath: bpy.props.StringProperty(name='filepath', default=str(Path.home()), subtype='FILE_PATH', get=ut.getter_blend_filepath_callback, set=ut.setter_blend_filepath_callback) # type: ignore
   
     
     @classmethod
@@ -1080,7 +1097,13 @@ class MDHARD_OT_move_data_sync_project(bpy.types.Operator):
         layout.prop(self, 'data_type')
         layout.prop(wm, f"MD_{self.data_type}")
         layout.label(text="Move To: ")
-        layout.prop(self, 'filepath', text="")
+        row = layout.row()
+        if Path(bpy.path.abspath(self.filepath)).exists(): # move destination exists
+            row.alert = False
+        else: # move destination not found
+            row.alert = True
+
+        row.prop(self, 'filepath', text="")
 
 
 @register_wrap
