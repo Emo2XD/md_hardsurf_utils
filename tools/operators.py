@@ -8,6 +8,7 @@ from . import navigation as nav
 from . import md_project as mdp
 from ..myblendrc_utils import utils as myu
 from ..myblendrc_utils.common_constants import DataAttrNameDict
+from ..props import get_md_data_id_placeholder
 
 @register_wrap
 class MDHARD_OT_sync_dnt(bpy.types.Operator):
@@ -1002,14 +1003,27 @@ class MDHARD_OT_rename_data_sync_project(bpy.types.Operator):
         return wm.invoke_props_dialog(self)
 
     def execute(self, context):
-        print(f" Rename WIP:")
+        data_id = get_md_data_id_placeholder(self.data_type)
+        result = mdp.rename_data_sync_project(dtype=self.data_type, data_id=data_id, new_name=self.new_name)
+        if result == 1:
+            self.report({'WARNING'}, f"Name not changed")
+            return {"CANCELLED"}
+        elif result == 2:
+            self.report({'WARNING'}, f"Name Collision. Abort.")
+            return {"CANCELLED"}
+        
+
+        
+
         return {"FINISHED"}
 
     def draw(self, context):
         wm = context.window_manager
         layout = self.layout
+        # layout.prop_search(context.scene, 'test', bpy.data, 'node_groups')
         layout.prop(self, 'data_type')
-        layout.prop(wm, f"{ct.MD_PREFIX}_{self.data_type}")
+        # UILayout.prop() not work for ShaderNodeTree but prop_search works.
+        layout.prop_search(wm, f"{ct.MD_PREFIX}_{self.data_type}", bpy.data, DataAttrNameDict.get(self.data_type))
         
         row = layout.row()
         if self.data_type is not None: # row.alert must be called before row.prop(...)
@@ -1095,10 +1109,12 @@ class MDHARD_OT_move_data_sync_project(bpy.types.Operator):
         wm = context.window_manager
         layout = self.layout
         layout.prop(self, 'data_type')
-        layout.prop(wm, f"MD_{self.data_type}")
+        # layout.prop(wm, f"MD_{self.data_type}")
+        layout.prop_search(wm, f"{ct.MD_PREFIX}_{self.data_type}", bpy.data, DataAttrNameDict.get(self.data_type))
+
         layout.label(text="Move To: ")
         row = layout.row()
-        if Path(bpy.path.abspath(self.filepath)).exists(): # move destination exists
+        if Path(bpy.path.abspath(self.filepath)).exists() and not myu.is_same_path(self.filepath, bpy.data.filepath): # move destination exists
             row.alert = False
         else: # move destination not found
             row.alert = True

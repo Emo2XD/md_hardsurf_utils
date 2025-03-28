@@ -13,7 +13,7 @@ from ..prefs import get_preferences
 import json
 from ..setup_tools.register import register_other
 from .navigation import Navigation
-
+from ..myblendrc_utils.common_constants import DataAttrNameDict, DataS
 
 def open_project(proj_root_dir:str):
     """Open MD Project Asset Folder
@@ -471,3 +471,36 @@ def parse_link_id_path(id_path:str):
         -> ('abs/path/to/*.blend', 'data_id', 'name')
     """
     return tuple(id_path.split("|", 2))
+
+
+
+#-------------------------------------------------------------------------------
+# Rename Move File and Data and Sync Project
+#-------------------------------------------------------------------------------
+def rename_data_sync_project(dtype:str, data_id:bpy.types.ID, new_name:str):
+    """Rename Data and Sync project
+    """
+    # data_ids = getattr(bpy.data, DataAttrNameDict.get(dtype))
+    data_ids = getattr(bpy.data, getattr(DataS, data_id.id_type).data_name)
+
+    if new_name == data_id.name:
+        print("rename_data_sync_project: given same name. Unchanged.")
+        return 1
+    elif data_ids.get(new_name, None) is not None: # When duplicate name found.
+        print("rename_data_sync_project: Name Collision. Unchanged.")
+        return 2
+    
+    
+    print(f" Rename WIP:")
+
+    pass
+
+def rename_file_sync_project(src_path:str, dst_path:str):
+    """Rename File and Sync Project
+    """
+    pass
+
+def move_data_sync_project():
+    pass
+    
+    

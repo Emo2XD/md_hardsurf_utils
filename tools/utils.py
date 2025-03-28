@@ -1230,7 +1230,9 @@ def fix_part_render_and_viewport_visibilities():
 
     return
 
-
+#-------------------------------------------------------------------------------
+# Rename Move File and Data and Sync Project
+#-------------------------------------------------------------------------------
 def poll_only_local_data_id(self, data):
     """Poll function for checking id is local.
     """
