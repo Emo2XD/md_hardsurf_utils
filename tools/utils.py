@@ -8,6 +8,7 @@ from ..myblendrc_utils import common_constants as cct
 from . import constants as ct
 from ..prefs import get_preferences
 import numpy as np
+from ..myblendrc_utils.common_constants import DataS
 
 
 #-------------------------------------------------------------------------------
@@ -1280,3 +1281,22 @@ def setter_blend_filepath_callback(self, value:str):
             filepath_with_ext = f"{value}.blend"
 
     self['filepath'] = filepath_with_ext
+
+
+def is_name_exists(id_type:str, new_name:str, only_local:bool=True)->bool:
+    """Check if the name is used in current file, given data type.
+
+    Args:
+        id_type: such that bpy.types.ID.id_type. E.g. 'CAMERA', 'COLLECTION', 'OBJECT' etc.
+        new_name: this name is checked if it is available.
+        only_local: If True, 'Check-scope' of the name existance is only local data.
+        This means, it allows the existance of  ['foo', ''] and ['foo', 'bar/lib.blend']...  in the same file.
+    """
+
+    data_ids = getattr(bpy.data, getattr(DataS, id_type).data_name)
+    new_data_id = data_ids.get(new_name, None)
+
+    if only_local:
+        return (new_data_id is not None) and (new_data_id.library is None) # only local
+    else:
+        return (new_data_id is not None) # include externally linked library

@@ -14,6 +14,7 @@ import json
 from ..setup_tools.register import register_other
 from .navigation import Navigation
 from ..myblendrc_utils.common_constants import DataAttrNameDict, DataS
+from . import utils as ut
 
 def open_project(proj_root_dir:str):
     """Open MD Project Asset Folder
@@ -477,23 +478,73 @@ def parse_link_id_path(id_path:str):
 #-------------------------------------------------------------------------------
 # Rename Move File and Data and Sync Project
 #-------------------------------------------------------------------------------
-def rename_data_sync_project(dtype:str, data_id:bpy.types.ID, new_name:str):
+def rename_data_sync_project(data_id:bpy.types.ID, new_name:str):
     """Rename Data and Sync project
     """
-    # data_ids = getattr(bpy.data, DataAttrNameDict.get(dtype))
-    data_ids = getattr(bpy.data, getattr(DataS, data_id.id_type).data_name)
+    # data_ids = getattr(bpy.data, DataAttrNameDict.get(dtype))n
+    id_type:str = data_id.id_type
 
     if new_name == data_id.name:
         print("rename_data_sync_project: given same name. Unchanged.")
         return 1
-    elif data_ids.get(new_name, None) is not None: # When duplicate name found.
+    elif ut.is_name_exists(id_type=id_type, new_name=new_name, only_local=True): # When duplicate name found.
         print("rename_data_sync_project: Name Collision. Unchanged.")
         return 2
     
-    
-    print(f" Rename WIP:")
+    all_fpaths = myu.find_blend_files(search_path=get_cwd(), exclude_prefix=None)
+    all_fpaths_exclude_current = [p for p in all_fpaths if not myu.is_same_path(p, bpy.data.filepath)]
 
-    pass
+    old_name = data_id.name
+    data_id.name = new_name
+    src_filepath = bpy.data.filepath
+    
+    bpy.ops.wm.save_mainfile()
+    for p in all_fpaths_exclude_current:
+        bpy.ops.wm.open_mainfile(filepath=p)
+        renamed_linked_data_and_remap(src_path=src_filepath, id_type=id_type, old_name=old_name, new_name=new_name)
+        bpy.ops.wm.save_as_mainfile()
+
+    bpy.ops.wm.open_mainfile(filepath=src_filepath)
+    return
+
+
+def renamed_linked_data_and_remap(src_path:str, id_type:str, old_name:str, new_name:str):
+    """Rename Linked Data in file.
+    """
+    if Path(bpy.path.abspath(src_path)) not in [Path(bpy.path.abspath(lib.filepath)) for lib in bpy.data.libraries[:]]:
+        print(f"'{bpy.data.filepath}' does not use library '{src_path}'")
+        return
+
+    data_s = getattr(DataS, id_type)
+    data_ids:List[bpy.types.ID] = getattr(bpy.data, data_s.data_name)
+
+    new_id = myu.load_from_lib_and_return(filepath=src_path, attr_name=data_s.data_name, name=new_name, link=True, relative=True)
+
+    old_id:bpy.types.ID = None
+
+    # get old data id
+    for id in data_ids:
+        if id.name != old_name:
+            continue
+        if id.library is None:
+            continue
+        if not myu.is_same_path(id.library.filepath, src_path):
+            continue
+        else:
+            old_id = id
+            break
+    else:
+        print(f"'{bpy.data.filepath}' does not use {data_s.type_name} '{old_name}'")
+        return
+
+    old_id.user_remap(new_id=new_id)
+    data_ids.remove(old_id)
+    return
+
+
+        
+                
+
 
 def rename_file_sync_project(src_path:str, dst_path:str):
     """Rename File and Sync Project

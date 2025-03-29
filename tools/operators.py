@@ -1004,7 +1004,11 @@ class MDHARD_OT_rename_data_sync_project(bpy.types.Operator):
 
     def execute(self, context):
         data_id = get_md_data_id_placeholder(self.data_type)
-        result = mdp.rename_data_sync_project(dtype=self.data_type, data_id=data_id, new_name=self.new_name)
+        if data_id is None or (self.new_name is None) or (self.new_name == ''): # if there are empty value, then abort
+            self.report({'WARNING'}, f"Specify properties.")
+            return {"CANCELLED"}
+        
+        result = mdp.rename_data_sync_project(data_id=data_id, new_name=self.new_name)
         if result == 1:
             self.report({'WARNING'}, f"Name not changed")
             return {"CANCELLED"}
@@ -1013,6 +1017,7 @@ class MDHARD_OT_rename_data_sync_project(bpy.types.Operator):
             return {"CANCELLED"}
         
 
+        self.report({'INFO'}, f"Rename and sync data.")
         
 
         return {"FINISHED"}
@@ -1027,8 +1032,8 @@ class MDHARD_OT_rename_data_sync_project(bpy.types.Operator):
         
         row = layout.row()
         if self.data_type is not None: # row.alert must be called before row.prop(...)
-            data_ids = getattr(bpy.data, DataAttrNameDict.get(self.data_type))
-            if data_ids.get(self.new_name, None) is not None: # When duplicate name found.
+            data_id:bpy.types.ID = get_md_data_id_placeholder(self.data_type)
+            if (data_id is not None) and ut.is_name_exists(id_type=data_id.id_type, new_name=self.new_name, only_local=True):
                 row.alert = True 
             else: # When duplicate name does not found
                 row.alert = False
