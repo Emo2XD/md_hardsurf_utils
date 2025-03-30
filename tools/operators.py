@@ -1063,7 +1063,13 @@ class MDHARD_OT_rename_file_sync_project(bpy.types.Operator):
 
     def execute(self, context):
         print(f"Rename File WIP:{Path(bpy.data.filepath).relative_to(Path(mdp.get_cwd()))}")
-        return {"FINISHED"}
+
+        result = mdp.rename_file_sync_project(src_path=bpy.data.filepath, dst_path=self.filepath)
+        if result == 1:
+            self.report({'WARNING'}, f"Filepath is invalid. See console for more details.")
+            return {'CANCELLED'}
+
+        return {'FINISHED'}
 
     def draw(self, context):
         wm = context.window_manager
@@ -1072,7 +1078,7 @@ class MDHARD_OT_rename_file_sync_project(bpy.types.Operator):
         layout.label(text=f"{Path(bpy.data.filepath).relative_to(Path(mdp.get_cwd()).parent)}")
         layout.label(text="To:", icon="FILE_BLEND")
         row = layout.row()
-        if Path(bpy.path.abspath(self.filepath)).exists():
+        if not mdp.is_dst_filepath_valid_for_rename(dst_filepath=self.filepath, ensure_inside_project=True, suppress_log=True):
             row.alert = True
         else:
             row.alert = False
@@ -1107,6 +1113,12 @@ class MDHARD_OT_move_data_sync_project(bpy.types.Operator):
         return wm.invoke_props_dialog(self)
 
     def execute(self, context):
+        wm = context.window_manager
+        data_id = get_md_data_id_placeholder(self.data_type)
+        if data_id is None or (self.filepath is None) or (self.filepath == ''): # if there are empty value, then abort
+            self.report({'WARNING'}, f"Specify properties.")
+            return {"CANCELLED"} 
+        result = mdp.move_data_sync_project(data_id=data_id, filepath=self.filepath)
         print(f" Move Data WIP:")
         return {"FINISHED"}
 
@@ -1119,7 +1131,8 @@ class MDHARD_OT_move_data_sync_project(bpy.types.Operator):
 
         layout.label(text="Move To: ")
         row = layout.row()
-        if Path(bpy.path.abspath(self.filepath)).exists() and not myu.is_same_path(self.filepath, bpy.data.filepath): # move destination exists
+        
+        if mdp.is_dst_filepath_valid_for_move(dst_filepath=self.filepath): # move destination exists
             row.alert = False
         else: # move destination not found
             row.alert = True

@@ -542,16 +542,87 @@ def renamed_linked_data_and_remap(src_path:str, id_type:str, old_name:str, new_n
     return
 
 
-        
-                
 
+def move_data_sync_project(data_id:bpy.types.ID, filepath:str):
+    if not is_dst_filepath_valid_for_move(filepath):
+        print(f"Given filepath is not valid for move. '{filepath}'")
+        return 1
+    
+    print("WIP: move_data_sync_project run.")
+    pass    
+                
+def move_linked_data_and_remap(src_path:str, id_type:str, old_name:str, new_name:str):
+    pass
 
 def rename_file_sync_project(src_path:str, dst_path:str):
     """Rename File and Sync Project
     """
-    pass
+    src_pathlib = Path(bpy.path.abspath(src_path)).resolve()
 
-def move_data_sync_project():
-    pass
+    if not is_dst_filepath_valid_for_rename(dst_filepath=dst_path):
+        return 1
+
+    bpy.ops.wm.save_mainfile() # Update .blend1. This will be a backup of src_pathlib.unlink().
+
+    all_fpaths = myu.find_blend_files(search_path=get_cwd(), exclude_prefix=None)
+    all_other_fpaths = [
+        p for p in all_fpaths 
+        if not (myu.is_same_path(p, src_path) or (myu.is_same_path(p, dst_path)))
+    ]
+
+    bpy.ops.wm.save_as_mainfile(filepath=dst_path)
     
+    for p in all_other_fpaths:
+        bpy.ops.wm.open_mainfile(filepath=p)
+        change_linked_library_filepath(old_p=src_path, new_p=dst_path)
+        bpy.ops.wm.save_as_mainfile()
+    
+    bpy.ops.wm.open_mainfile(filepath=dst_path)
+    src_pathlib.unlink()
+    return
+
+
+def change_linked_library_filepath(old_p:str, new_p:str):
+    """Change linked library filepath
+    """
+    for lib in bpy.data.libraries:
+        if myu.is_same_path(old_p, lib.filepath):
+            lib.filepath = bpy.path.relpath(new_p)
+            lib.name = bpy.path.basename(new_p)
+        else:
+            continue
+
+    return
+
+def is_dst_filepath_valid_for_rename(dst_filepath:str, ensure_inside_project:bool=True, suppress_log:bool=False)->bool:
+    """Check if dst_filepath is valid for rename.
+    Empty dst_filepath, 
+    """
+    dst_pathlib = Path(bpy.path.abspath(dst_filepath)).resolve()
+    if not dst_pathlib.parent.exists: # upper directory not found
+        if not suppress_log: print("upper directory not found")
+        return False
+    if dst_pathlib.exists(): # given filepath is already taken
+        if not suppress_log: print("given filepath is already taken")
+        return False
+    if dst_filepath == '' or dst_filepath is None: # invalid filepath
+        if not suppress_log: print("Enpty filepath is given")
+        return False
+    
+    if ensure_inside_project:
+        project_root = str(Path(get_cwd()).resolve())
+        if not str(dst_filepath).startswith(project_root):
+            if not suppress_log: print("Outside of project folder.")
+            return False
+        else:
+            return True
+    else:
+        return True
+
+def is_dst_filepath_valid_for_move(dst_filepath:str)->bool:
+    """Check if the destination filepath is valid for move.
+
+    If dst_filepath is not exist or same with current, then return False
+    """
+    return Path(bpy.path.abspath(dst_filepath)).exists() and not myu.is_same_path(dst_filepath, bpy.data.filepath)
     
