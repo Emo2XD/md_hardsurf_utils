@@ -659,7 +659,7 @@ def update_data_holder_collection(filepath:str, data_type:str, data_holder:bpy.t
         return data_names
 
     if myu.is_same_path(filepath, bpy.data.filepath):
-        data_names = [d.name for d in getattr(bpy.data, data_type)]
+        data_names = [d.name for d in getattr(bpy.data, data_type) if d.library is None] # only show local
     else:
         with bpy.data.libraries.load(filepath=filepath, link=True) as (data_from, data_to):
             data_names = [name for name in getattr(data_from, data_type)]
