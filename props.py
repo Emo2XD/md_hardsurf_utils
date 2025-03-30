@@ -128,6 +128,26 @@ def get_md_data_id_placeholder(d_type:str):
     data_id = getattr(wm, f"{ct.MD_PREFIX}_{d_type}")
     return data_id
 
+
+@register_wrap
+class MDRmapHolderGroup(bpy.types.PropertyGroup):
+    name:bpy.props.StringProperty(name='name', default='') #type: ignore
+
+
+register_prop(
+        bpy.types.WindowManager,
+        ct.MD_REMAP_HOLDER_FROM,
+        bpy.props.CollectionProperty(type=MDRmapHolderGroup)
+        )
+
+register_prop(
+        bpy.types.WindowManager,
+        ct.MD_REMAP_HOLDER_TO,
+        bpy.props.CollectionProperty(type=MDRmapHolderGroup)
+        )
+
+
+
 # register_prop(
 #         bpy.types.Collection,
 #         ct.DEP_COLLECTION, bpy.props.BoolProperty(name=ct.DEP_COLLECTION, default = False, description="Store Visibility of collection under part collection")

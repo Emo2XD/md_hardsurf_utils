@@ -1127,6 +1127,78 @@ class MDHARD_OT_move_data_sync_project(bpy.types.Operator):
 
 
 @register_wrap
+class MDHARD_OT_remap_data_sync_project(bpy.types.Operator):
+    """Remap Data and Sync Project
+    """
+    bl_idname = "md_hard.remap_data_sync_project"
+    bl_label = "MD Remap Data And Sync Project"
+    
+    data_type: bpy.props.EnumProperty(
+        name='Data',
+        description='Data type to remap.',
+        items=ut.get_data_dir_callback,
+        update=ut.update_data_holder_data_type
+    ) # type: ignore
+
+    map_from_filepath: bpy.props.StringProperty(name='map_from_filepath', default=str(Path.home()), subtype='FILE_PATH', update=ut.update_data_holder_from) # type: ignore
+    map_to_filepath: bpy.props.StringProperty(name='map_to_filepath', default=str(Path.home()), subtype='FILE_PATH', update=ut.update_data_holder_to) # type: ignore
+    map_from_data_name: bpy.props.StringProperty(name='map_from_data_name') # type:ignore
+    map_to_data_name: bpy.props.StringProperty(name='map_to_data_name') # type:ignore
+
+    exclude_f:bpy.props.BoolProperty(name='exclude_f') # type:ignore
+    exclude_t:bpy.props.BoolProperty(name='exclude_t') # type:ignore
+    
+
+    @classmethod
+    def poll(cls, context):
+        return bpy.data.is_saved and (mdp.get_cwd() is not None)
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+
+        if not str(self.map_from_filepath).startswith(mdp.get_cwd()):
+            self.map_from_filepath = bpy.data.filepath 
+        if not str(self.map_to_filepath).startswith(mdp.get_cwd()):
+            self.map_to_filepath = bpy.data.filepath
+            
+
+        return wm.invoke_props_dialog(self)
+
+    def execute(self, context):
+        # data_id = get_md_data_id_placeholder(self.data_type)
+        # if data_id is None or (self.filepath is None) or (self.filepath == ''): # if there are empty value, then abort
+        #     self.report({'WARNING'}, f"Specify properties.")
+        #     return {"CANCELLED"} 
+        # result = mdp.move_data_sync_project(data_id=data_id, filepath=self.filepath)
+        print(f"Remap Data WIP:")
+        return {"FINISHED"}
+
+    def draw(self, context):
+        wm = context.window_manager
+        layout = self.layout
+        layout.prop(self, 'data_type')
+        # layout.prop(wm, f"MD_{self.data_type}")
+        # layout.prop_search(wm, f"{ct.MD_PREFIX}_{self.data_type}", bpy.data, DataAttrNameDict.get(self.data_type))
+        layout.label(text="Remap From")
+        layout.prop(self, 'map_from_filepath', text='')
+        layout.prop_search(self, 'map_from_data_name', wm, ct.MD_REMAP_HOLDER_FROM, text='')
+
+        layout.label(text="To")
+        layout.prop(self, 'map_to_filepath', text='')
+        layout.prop_search(self, 'map_to_data_name', wm, ct.MD_REMAP_HOLDER_TO, text='')
+
+        # layout.label(text="Move To: ")
+        # row = layout.row()
+        
+        # if mdp.is_dst_filepath_valid_for_move(dst_filepath=self.filepath): # move destination exists
+        #     row.alert = False
+        # else: # move destination not found
+        #     row.alert = True
+
+        # row.prop(self, 'filepath', text="")
+
+
+@register_wrap
 class MDHARD_OT_test_x(bpy.types.Operator):
     """Test"""
     bl_idname = "md_hard.test_x"

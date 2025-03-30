@@ -56,3 +56,5 @@ MD_HARPOON_INFO_JSON = 'md_harpoon_info.json' # store to project_root/.md_projec
 
 # MD data placeholder prefix
 MD_PREFIX = 'MD'
+MD_REMAP_HOLDER_FROM = 'md_remap_holder_from'
+MD_REMAP_HOLDER_TO = 'md_remap_holder_to'
