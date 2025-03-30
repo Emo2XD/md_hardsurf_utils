@@ -1145,8 +1145,8 @@ class MDHARD_OT_remap_data_sync_project(bpy.types.Operator):
     map_from_data_name: bpy.props.StringProperty(name='map_from_data_name') # type:ignore
     map_to_data_name: bpy.props.StringProperty(name='map_to_data_name') # type:ignore
 
-    exclude_f:bpy.props.BoolProperty(name='exclude_f', default=True, description="If True, exclude library dependency update operation for 'map_from_filepath") # type:ignore
-    exclude_t:bpy.props.BoolProperty(name='exclude_t', default=True, description="If True, exclude library dependency update operation for 'map_to_filepath'") # type:ignore
+    exclude_f:bpy.props.BoolProperty(name='exclude_f', default=True, description="If False it replaces current user with 'map_to' data in 'map_from' blend file. THIS MAY CAUSE UNEXPECTED RESULTS, USE CAREFULLY. if you don't know, then True is good. If True, exclude library dependency update operation for 'map_from_filepath.") # type:ignore
+    exclude_t:bpy.props.BoolProperty(name='exclude_t', default=True, description="If False it replaces current user with 'map_to' data in 'map_to' blend file. If True, exclude library dependency update operation for 'map_to_filepath'") # type:ignore
     
 
     @classmethod

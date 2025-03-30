@@ -682,8 +682,8 @@ def remap_data_sync_project(
         map_to_filepath:str,
         map_from_data_name:str,
         map_to_data_name:str,
-        exclude_f:str,
-        exclude_t:str
+        exclude_f:bool,
+        exclude_t:bool
         ):
     """Remap Data Sync Project.
 
@@ -714,6 +714,12 @@ def remap_data_sync_project(
         if not (myu.is_same_path(p, map_from_filepath) or (myu.is_same_path(p, map_from_filepath)))
     ]
 
+    if not exclude_f:
+        all_other_fpaths.append(map_from_filepath)
+    if not exclude_t:
+        all_other_fpaths.append(map_to_filepath)
+
+
     for p in all_other_fpaths:
         bpy.ops.wm.open_mainfile(filepath=p)
         remap_data(
@@ -726,10 +732,6 @@ def remap_data_sync_project(
         bpy.ops.wm.save_as_mainfile()
 
 
-    if not exclude_f:
-        pass
-    if not exclude_t:
-        pass
 
     bpy.ops.wm.open_mainfile(filepath=current_filepath)
     return
@@ -743,7 +745,8 @@ def remap_data(
         map_to_data_name:str
         ):
     data_name:str = DataAttrNameDict.get(data_type)
-    if Path(bpy.path.abspath(map_from_filepath)) not in [Path(bpy.path.abspath(lib.filepath)).resolve() for lib in bpy.data.libraries[:]]:
+    # you have to exclude map_from_filepath because map_from_filepath itself uses corresponding data without library.
+    if Path(bpy.path.abspath(map_from_filepath)) not in [Path(bpy.path.abspath(lib.filepath)).resolve() for lib in bpy.data.libraries[:]] and not myu.is_same_path(bpy.data.filepath, map_from_filepath):
         print(f"'{bpy.data.filepath}' does not use library '{map_from_filepath}'")
         return
     
@@ -752,22 +755,43 @@ def remap_data(
     if map_from_data_name not in data_ids:
         print(f"'{map_from_data_name}' not in '{map_from_filepath}'")
         return
+    
+    # Find 'map_from_data' in file.
     data_with_same_name:List[bpy.types.ID] = [d for d in data_ids if d.name == map_from_data_name]
-    
     map_from_id:bpy.types.ID = None
-    for d in data_with_same_name:
-        if d.library is None:
-            continue
+    if not myu.is_same_path(bpy.data.filepath, map_from_filepath):
+        for d in data_with_same_name:
+            if d.library is None:
+                continue
 
-        if myu.is_same_path(d.library.filepath, map_from_filepath):
-            map_from_id = d
-            break
-    else:
-        print(f"'{map_from_data_name}' is not used in '{bpy.data.filepath}'.")
+            if myu.is_same_path(d.library.filepath, map_from_filepath):
+                map_from_id = d
+                break
+        else:
+            print(f"'{map_from_data_name}' is not used in '{bpy.data.filepath}'.")
+            return
+    else: # when bpy.data.filepath == map_from_filepath
+        for d in data_with_same_name:
+            if d.library is None:
+                map_from_id = d
+                break
+        else:
+            print(f"'{map_from_data_name}' is not used in '{bpy.data.filepath}'.")
+            return
     
+    # get map_to_id.
+    map_to_id:bpy.types.ID = None
+    if myu.is_same_path(map_to_filepath, bpy.data.filepath): # when trying to update dependency on 'map_to' blend file.
+        for d in data_ids:
+            if d.name == map_to_data_name and d.library is None: # local data with name 'map_to_data_name'
+                map_to_id = d
+                break
+    else:
+        map_to_id = myu.load_from_lib_and_return(filepath=map_to_filepath, attr_name=data_name, name=map_to_data_name, link=True, relative=True)
 
-    map_to_id:bpy.types.ID = myu.load_from_lib_and_return(filepath=map_to_filepath, attr_name=data_name, name=map_to_data_name, link=True, relative=True)
+    # remap.
     map_from_id.user_remap(new_id=map_to_id)
+    
 
     return
 
