@@ -839,3 +839,52 @@ def is_valid_argument_remap_data_sync_project(
         return False
     
     return True
+
+
+
+#-------------------------------------------------------------------------------
+# Rename part collection
+#-------------------------------------------------------------------------------
+def rename_part_collection(part_collection:bpy.types.Collection, new_name:str)->int:
+    """Rename currently selected part col
+    """
+    current_name = part_collection.name
+
+    # F-Part collection is designed to be shared among other files. It has to be synced inside project.
+    # so treat separately
+    f_collection = ut.PartManager.get_mk_reserved_collection_from_part(
+                        part_collection=part_collection,
+                        prefix=ct.FINAL_COLLECTION,
+                        create=False
+                        )
+    
+    # Check name existance. Avoid unintentional name change like foo.001.
+    local_col_name_list = [c.name for c in bpy.data.collections if c.library is None]
+    if f"{ct.FINAL_COLLECTION}-{new_name}" in local_col_name_list and (f_collection is not None):
+        print("Given name is already taken.")
+        return 1
+
+    if new_name == current_name:
+        print("Given name is same with the current one.")
+        return 1
+    elif not new_name:
+        print("Given name is empty")
+        return 1
+    elif new_name.isspace():
+        print("Given name only contains space")
+        return 1
+
+
+    part_collection.name = new_name
+    # use different algorithm for final collection.
+    reserved_collection = ut.PartManager.get_collections(part_collection=part_collection)
+    for col in reserved_collection:
+        if col.name.startswith(f"{ct.FINAL_COLLECTION}-"):
+            continue
+        col.name = f"{col.name.split('-', 1)[0]}-{new_name}"
+
+    if f_collection is not None:
+        rename_data_sync_project(data_id=f_collection, new_name=f"{ct.FINAL_COLLECTION}-{new_name}")
+
+    print("rename part is called")
+    return

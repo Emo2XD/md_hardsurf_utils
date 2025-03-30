@@ -225,7 +225,7 @@ class MDHARD_OT_rename_part_collection(bpy.types.Operator):
         scene = context.scene
         part_collection = getattr(scene, ct.ACTIVE_PART_COLLECTION)
         if part_collection is not None:
-            result = ut.rename_part_collection(part_collection, self.new_part_name)
+            result = mdp.rename_part_collection(part_collection, self.new_part_name)
 
             if result == 1:
                 self.report({"WARNING"}, f"Part collection name was not changed: See system console for more detail.")

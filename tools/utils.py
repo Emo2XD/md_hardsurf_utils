@@ -646,32 +646,7 @@ def update_subpart_asset_status(self, context):
     return
 
 
-#-------------------------------------------------------------------------------
-# Rename part collection
-#-------------------------------------------------------------------------------
-def rename_part_collection(part_collection:bpy.types.Collection, new_name:str)->int:
-    """Rename currently selected part col
-    """
-    current_name = part_collection.name
 
-    if new_name == current_name:
-        print("Given name is same with the current one.")
-        return 1
-    elif not new_name:
-        print("Given name is empty")
-        return 1
-    elif new_name.isspace():
-        print("Given name only contains space")
-        return 1
-
-    reserved_collection = PartManager.get_collections(part_collection=part_collection)
-
-    part_collection.name = new_name
-    for col in reserved_collection:
-        col.name = f"{col.name.split('-', 1)[0]}-{new_name}"
-
-    print("rename part is called")
-    return
 
 def poll_is_ui_list_active_collection_part(self, context:bpy.types.Context)->bool:
     """Poll function for operator to check if the active collection in UIList is part collection.
