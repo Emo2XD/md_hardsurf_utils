@@ -970,22 +970,12 @@ class MDHARD_OT_rename_data_sync_project(bpy.types.Operator):
     bl_idname = "md_hard.rename_data_sync_project"
     bl_label = "MD Rename Data And Sync Project"
     
-    # filepath: bpy.props.StringProperty(name='filepath', default=str(Path.home()), subtype='FILE_PATH') # type: ignore
-    # filter_glob: bpy.props.StringProperty(
-    #     default="*.blend",
-    #     options={'HIDDEN'},
-    #     )#type: ignore
     data_type: bpy.props.EnumProperty(
         name='Data',
         description='Data type to rename.',
         items=ut.get_data_dir_callback
     ) # type: ignore
 
-    # old_name: bpy.props.EnumProperty(
-    #     name='Old Name',
-    #     description='This Data with this name will be Renamed',
-    #     items=ut.get_data_list_callack
-    #     ) # type: ignore
     
     new_name: bpy.props.StringProperty(
         name='New Name',
@@ -1025,9 +1015,7 @@ class MDHARD_OT_rename_data_sync_project(bpy.types.Operator):
     def draw(self, context):
         wm = context.window_manager
         layout = self.layout
-        # layout.prop_search(context.scene, 'test', bpy.data, 'node_groups')
         layout.prop(self, 'data_type')
-        # UILayout.prop() not work for ShaderNodeTree but prop_search works.
         layout.prop_search(wm, f"{ct.MD_PREFIX}_{self.data_type}", bpy.data, DataAttrNameDict.get(self.data_type))
         
         row = layout.row()
@@ -1072,16 +1060,15 @@ class MDHARD_OT_rename_file_sync_project(bpy.types.Operator):
         return {'FINISHED'}
 
     def draw(self, context):
-        wm = context.window_manager
         layout = self.layout
         layout.label(text="Change File Name From:", icon="FILE_BLEND")
         layout.label(text=f"{Path(bpy.data.filepath).relative_to(Path(mdp.get_cwd()).parent)}")
         layout.label(text="To:", icon="FILE_BLEND")
         row = layout.row()
-        if not mdp.is_dst_filepath_valid_for_rename(dst_filepath=self.filepath, ensure_inside_project=True, suppress_log=True):
-            row.alert = True
-        else:
+        if mdp.is_dst_filepath_valid_for_rename(dst_filepath=self.filepath, ensure_inside_project=True, suppress_log=True):
             row.alert = False
+        else:
+            row.alert = True
 
         row.prop(self, 'filepath', text='')
 
@@ -1113,7 +1100,6 @@ class MDHARD_OT_move_data_sync_project(bpy.types.Operator):
         return wm.invoke_props_dialog(self)
 
     def execute(self, context):
-        wm = context.window_manager
         data_id = get_md_data_id_placeholder(self.data_type)
         if data_id is None or (self.filepath is None) or (self.filepath == ''): # if there are empty value, then abort
             self.report({'WARNING'}, f"Specify properties.")
