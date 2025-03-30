@@ -511,7 +511,7 @@ def rename_data_sync_project(data_id:bpy.types.ID, new_name:str):
 def renamed_linked_data_and_remap(src_path:str, id_type:str, old_name:str, new_name:str):
     """Rename Linked Data in file.
     """
-    if Path(bpy.path.abspath(src_path)) not in [Path(bpy.path.abspath(lib.filepath)) for lib in bpy.data.libraries[:]]:
+    if Path(bpy.path.abspath(src_path)) not in [Path(bpy.path.abspath(lib.filepath)).resolve() for lib in bpy.data.libraries[:]]:
         print(f"'{bpy.data.filepath}' does not use library '{src_path}'")
         return
 
@@ -626,3 +626,173 @@ def is_dst_filepath_valid_for_move(dst_filepath:str)->bool:
     """
     return Path(bpy.path.abspath(dst_filepath)).exists() and not myu.is_same_path(dst_filepath, bpy.data.filepath)
     
+
+def update_data_holder_to(self, context):
+    """callback for data_holder to"""
+    wm = context.window_manager
+    update_data_holder_collection(
+        filepath=self.map_to_filepath, 
+        data_type=DataAttrNameDict.get(self.data_type),
+        data_holder=getattr(wm, ct.MD_REMAP_HOLDER_TO)
+        )
+    
+def update_data_holder_from(self, context):
+    """callback for data_holder to"""
+    wm = context.window_manager
+    update_data_holder_collection(
+        filepath=self.map_from_filepath, 
+        data_type=DataAttrNameDict.get(self.data_type),
+        data_holder=getattr(wm, ct.MD_REMAP_HOLDER_FROM)
+        )
+
+def update_data_holder_data_type(self, context):
+    """callback for remap data_type"""
+    update_data_holder_from(self, context)
+    update_data_holder_to(self, context)
+
+def update_data_holder_collection(filepath:str, data_type:str, data_holder:bpy.types.CollectionProperty):
+    """Update data holder collection.
+    This will be used in remap data feature.
+    """
+    data_names = []
+    if filepath == None or filepath == '' or data_type=='' or data_type==None:
+        return data_names
+
+    if myu.is_same_path(filepath, bpy.data.filepath):
+        data_names = [d.name for d in getattr(bpy.data, data_type)]
+    else:
+        with bpy.data.libraries.load(filepath=filepath, link=True) as (data_from, data_to):
+            data_names = [name for name in getattr(data_from, data_type)]
+
+
+    for _ in range(len(data_holder)):
+        data_holder.remove(0)
+    
+    for n in data_names:
+        d = data_holder.add()
+        d.name = n
+    
+    return
+
+
+
+def remap_data_sync_project(
+        data_type:str, 
+        map_from_filepath:str, 
+        map_to_filepath:str,
+        map_from_data_name:str,
+        map_to_data_name:str,
+        exclude_f:str,
+        exclude_t:str
+        ):
+    """Remap Data Sync Project.
+
+    Args:
+        data_type: Such that 'Collection', 'Object', etc.
+        map_from_filepath: search data on this filepath 
+        map_to_filepath: remap to data to this filepath
+        map_from_data_name: Search data with this name
+        map_to_data_name: Remap to data with this name
+        exclude_f: If True, exclude search and remap operation on map_from_filepath blend file.
+        exclude_t: If True, exclude search and remap operation on map_to_filepath blend file.
+    """
+    if not is_valid_argument_remap_data_sync_project(
+        data_type=data_type, 
+        map_from_filepath=map_from_filepath, 
+        map_to_filepath=map_to_filepath,
+        map_from_data_name=map_from_data_name,
+        map_to_data_name=map_to_data_name):
+        return 1
+
+    data_name:str = DataAttrNameDict.get(data_type)
+    current_filepath = bpy.data.filepath
+    bpy.ops.wm.save_mainfile()
+    
+    all_fpaths = myu.find_blend_files(search_path=get_cwd(), exclude_prefix=None)
+    all_other_fpaths = [
+        p for p in all_fpaths 
+        if not (myu.is_same_path(p, map_from_filepath) or (myu.is_same_path(p, map_from_filepath)))
+    ]
+
+    for p in all_other_fpaths:
+        bpy.ops.wm.open_mainfile(filepath=p)
+        remap_data(
+            data_type=data_type, 
+            map_from_filepath=map_from_filepath, 
+            map_to_filepath=map_to_filepath,
+            map_from_data_name=map_from_data_name,
+            map_to_data_name=map_to_data_name
+        )
+        bpy.ops.wm.save_as_mainfile()
+
+
+    if not exclude_f:
+        pass
+    if not exclude_t:
+        pass
+
+    bpy.ops.wm.open_mainfile(filepath=current_filepath)
+    return
+
+
+def remap_data(
+        data_type:str, 
+        map_from_filepath:str, 
+        map_to_filepath:str,
+        map_from_data_name:str,
+        map_to_data_name:str
+        ):
+    data_name:str = DataAttrNameDict.get(data_type)
+    if Path(bpy.path.abspath(map_from_filepath)) not in [Path(bpy.path.abspath(lib.filepath)).resolve() for lib in bpy.data.libraries[:]]:
+        print(f"'{bpy.data.filepath}' does not use library '{map_from_filepath}'")
+        return
+    
+    data_ids:List[bpy.types.ID] = getattr(bpy.data, data_name)
+    
+    if map_from_data_name not in data_ids:
+        print(f"'{map_from_data_name}' not in '{map_from_filepath}'")
+        return
+    data_with_same_name:List[bpy.types.ID] = [d for d in data_ids if d.name == map_from_data_name]
+    
+    map_from_id:bpy.types.ID = None
+    for d in data_with_same_name:
+        if d.library is None:
+            continue
+
+        if myu.is_same_path(d.library.filepath, map_from_filepath):
+            map_from_id = d
+            break
+    else:
+        print(f"'{map_from_data_name}' is not used in '{bpy.data.filepath}'.")
+    
+
+    map_to_id:bpy.types.ID = myu.load_from_lib_and_return(filepath=map_to_filepath, attr_name=data_name, name=map_to_data_name, link=True, relative=True)
+    map_from_id.user_remap(new_id=map_to_id)
+
+    return
+
+
+def is_valid_argument_remap_data_sync_project(        
+        data_type:str, 
+        map_from_filepath:str, 
+        map_to_filepath:str,
+        map_from_data_name:str,
+        map_to_data_name:str):
+    
+    if data_type == '' or data_type is None:
+        print('data_type is invalid')
+        return False
+    if (not map_from_filepath.endswith('.blend')) or map_from_filepath == '' or map_from_filepath == None or (not Path(map_from_filepath).resolve().exists()):
+        print('map_from_filepath is invalid.')
+        return False
+    if (not map_to_filepath.endswith('.blend')) or map_to_filepath == '' or map_to_filepath == None or (not Path(map_to_filepath).resolve().exists()):
+        print('map_to_filepath is invalid')
+        return False
+    if map_from_data_name == '' or map_from_data_name is None:
+        print('map_from_data_name is invalid')
+        return False
+    if map_to_data_name == '' or map_to_data_name is None:
+        print('map_to_data_name is invalid')
+        return False
+    
+    return True

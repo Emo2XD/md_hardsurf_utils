@@ -1137,16 +1137,16 @@ class MDHARD_OT_remap_data_sync_project(bpy.types.Operator):
         name='Data',
         description='Data type to remap.',
         items=ut.get_data_dir_callback,
-        update=ut.update_data_holder_data_type
+        update=mdp.update_data_holder_data_type
     ) # type: ignore
 
-    map_from_filepath: bpy.props.StringProperty(name='map_from_filepath', default=str(Path.home()), subtype='FILE_PATH', update=ut.update_data_holder_from) # type: ignore
-    map_to_filepath: bpy.props.StringProperty(name='map_to_filepath', default=str(Path.home()), subtype='FILE_PATH', update=ut.update_data_holder_to) # type: ignore
+    map_from_filepath: bpy.props.StringProperty(name='map_from_filepath', default=str(Path.home()), subtype='FILE_PATH', update=mdp.update_data_holder_from) # type: ignore
+    map_to_filepath: bpy.props.StringProperty(name='map_to_filepath', default=str(Path.home()), subtype='FILE_PATH', update=mdp.update_data_holder_to) # type: ignore
     map_from_data_name: bpy.props.StringProperty(name='map_from_data_name') # type:ignore
     map_to_data_name: bpy.props.StringProperty(name='map_to_data_name') # type:ignore
 
-    exclude_f:bpy.props.BoolProperty(name='exclude_f') # type:ignore
-    exclude_t:bpy.props.BoolProperty(name='exclude_t') # type:ignore
+    exclude_f:bpy.props.BoolProperty(name='exclude_f', default=True, description="If True, exclude library dependency update operation for 'map_from_filepath") # type:ignore
+    exclude_t:bpy.props.BoolProperty(name='exclude_t', default=True, description="If True, exclude library dependency update operation for 'map_to_filepath'") # type:ignore
     
 
     @classmethod
@@ -1169,8 +1169,22 @@ class MDHARD_OT_remap_data_sync_project(bpy.types.Operator):
         # if data_id is None or (self.filepath is None) or (self.filepath == ''): # if there are empty value, then abort
         #     self.report({'WARNING'}, f"Specify properties.")
         #     return {"CANCELLED"} 
-        # result = mdp.move_data_sync_project(data_id=data_id, filepath=self.filepath)
-        print(f"Remap Data WIP:")
+        result = mdp.remap_data_sync_project(
+            data_type=self.data_type,
+            map_from_filepath=self.map_from_filepath,
+            map_to_filepath=self.map_to_filepath,
+            map_from_data_name=self.map_from_data_name,
+            map_to_data_name=self.map_to_data_name,
+            exclude_f=self.exclude_f,
+            exclude_t=self.exclude_t
+        )
+
+        if result == 1:
+            self.report({'WARNING'}, f"Arguments are invalid. See console for more detail")
+            return {'CANCELLED'}
+
+
+        print(f"Remap Data")
         return {"FINISHED"}
 
     def draw(self, context):
@@ -1182,10 +1196,12 @@ class MDHARD_OT_remap_data_sync_project(bpy.types.Operator):
         layout.label(text="Remap From")
         layout.prop(self, 'map_from_filepath', text='')
         layout.prop_search(self, 'map_from_data_name', wm, ct.MD_REMAP_HOLDER_FROM, text='')
+        layout.prop(self, 'exclude_f', text='Exclude')
 
         layout.label(text="To")
         layout.prop(self, 'map_to_filepath', text='')
         layout.prop_search(self, 'map_to_data_name', wm, ct.MD_REMAP_HOLDER_TO, text='')
+        layout.prop(self, 'exclude_t', text='Exclude')
 
         # layout.label(text="Move To: ")
         # row = layout.row()
