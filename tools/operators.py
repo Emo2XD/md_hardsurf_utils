@@ -1073,57 +1073,57 @@ class MDHARD_OT_rename_file_sync_project(bpy.types.Operator):
         row.prop(self, 'filepath', text='')
 
 
-
-@register_wrap
-class MDHARD_OT_move_data_sync_project(bpy.types.Operator):
-    """Move Data and Sync Project
-    """
-    bl_idname = "md_hard.move_data_sync_project"
-    bl_label = "MD Move Data And Sync Project"
+# TODO: move is difficult to handle when data_id has lots of dependency.
+# @register_wrap
+# class MDHARD_OT_move_data_sync_project(bpy.types.Operator):
+#     """Move Data and Sync Project
+#     """
+#     bl_idname = "md_hard.move_data_sync_project"
+#     bl_label = "MD Move Data And Sync Project"
     
-    data_type: bpy.props.EnumProperty(
-        name='Data',
-        description='Data type to rename.',
-        items=ut.get_data_dir_callback
-    ) # type: ignore
+#     data_type: bpy.props.EnumProperty(
+#         name='Data',
+#         description='Data type to rename.',
+#         items=ut.get_data_dir_callback
+#     ) # type: ignore
 
-    filepath: bpy.props.StringProperty(name='filepath', default=str(Path.home()), subtype='FILE_PATH', get=ut.getter_blend_filepath_callback, set=ut.setter_blend_filepath_callback) # type: ignore
+#     filepath: bpy.props.StringProperty(name='filepath', default=str(Path.home()), subtype='FILE_PATH', get=ut.getter_blend_filepath_callback, set=ut.setter_blend_filepath_callback) # type: ignore
   
     
-    @classmethod
-    def poll(cls, context):
-        return bpy.data.is_saved and (mdp.get_cwd() is not None)
+#     @classmethod
+#     def poll(cls, context):
+#         return bpy.data.is_saved and (mdp.get_cwd() is not None)
 
-    def invoke(self, context, event):
-        wm = context.window_manager
-        self.filepath = bpy.data.filepath
-        return wm.invoke_props_dialog(self)
+#     def invoke(self, context, event):
+#         wm = context.window_manager
+#         self.filepath = bpy.data.filepath
+#         return wm.invoke_props_dialog(self)
 
-    def execute(self, context):
-        data_id = get_md_data_id_placeholder(self.data_type)
-        if data_id is None or (self.filepath is None) or (self.filepath == ''): # if there are empty value, then abort
-            self.report({'WARNING'}, f"Specify properties.")
-            return {"CANCELLED"} 
-        result = mdp.move_data_sync_project(data_id=data_id, filepath=self.filepath)
-        print(f" Move Data WIP:")
-        return {"FINISHED"}
+#     def execute(self, context):
+#         data_id = get_md_data_id_placeholder(self.data_type)
+#         if data_id is None or (self.filepath is None) or (self.filepath == ''): # if there are empty value, then abort
+#             self.report({'WARNING'}, f"Specify properties.")
+#             return {"CANCELLED"} 
+#         result = mdp.move_data_sync_project(data_id=data_id, filepath=self.filepath)
+#         print(f" Move Data WIP:")
+#         return {"FINISHED"}
 
-    def draw(self, context):
-        wm = context.window_manager
-        layout = self.layout
-        layout.prop(self, 'data_type')
-        # layout.prop(wm, f"MD_{self.data_type}")
-        layout.prop_search(wm, f"{ct.MD_PREFIX}_{self.data_type}", bpy.data, DataAttrNameDict.get(self.data_type))
+#     def draw(self, context):
+#         wm = context.window_manager
+#         layout = self.layout
+#         layout.prop(self, 'data_type')
+#         # layout.prop(wm, f"MD_{self.data_type}")
+#         layout.prop_search(wm, f"{ct.MD_PREFIX}_{self.data_type}", bpy.data, DataAttrNameDict.get(self.data_type))
 
-        layout.label(text="Move To: ")
-        row = layout.row()
+#         layout.label(text="Move To: ")
+#         row = layout.row()
         
-        if mdp.is_dst_filepath_valid_for_move(dst_filepath=self.filepath): # move destination exists
-            row.alert = False
-        else: # move destination not found
-            row.alert = True
+#         if mdp.is_dst_filepath_valid_for_move(dst_filepath=self.filepath): # move destination exists
+#             row.alert = False
+#         else: # move destination not found
+#             row.alert = True
 
-        row.prop(self, 'filepath', text="")
+#         row.prop(self, 'filepath', text="")
 
 
 @register_wrap
@@ -1145,8 +1145,15 @@ class MDHARD_OT_remap_data_sync_project(bpy.types.Operator):
     map_from_data_name: bpy.props.StringProperty(name='map_from_data_name') # type:ignore
     map_to_data_name: bpy.props.StringProperty(name='map_to_data_name') # type:ignore
 
-    exclude_f:bpy.props.BoolProperty(name='exclude_f', default=True, description="If False it replaces current user with 'map_to' data in 'map_from' blend file. THIS MAY CAUSE UNEXPECTED RESULTS, USE CAREFULLY. if you don't know, then True is good. If True, exclude library dependency update operation for 'map_from_filepath.") # type:ignore
-    exclude_t:bpy.props.BoolProperty(name='exclude_t', default=True, description="If False it replaces current user with 'map_to' data in 'map_to' blend file. If True, exclude library dependency update operation for 'map_to_filepath'") # type:ignore
+    exclude_f:bpy.props.BoolProperty(
+        name='exclude_f',
+        default=True,
+        description="If False it replaces current user with 'map_to' data in 'map_from' blend file. THIS MAY CAUSE UNEXPECTED RESULTS, USE CAREFULLY. if you don't know, then True is good. If True, exclude library dependency update operation for 'map_from_filepath.") # type:ignore
+    
+    exclude_t:bpy.props.BoolProperty(
+        name='exclude_t',
+        default=True,
+        description="If False it replaces current user with 'map_to' data in 'map_to' blend file. If True, exclude library dependency update operation for 'map_to_filepath'") # type:ignore
     
 
     @classmethod
@@ -1160,15 +1167,10 @@ class MDHARD_OT_remap_data_sync_project(bpy.types.Operator):
             self.map_from_filepath = bpy.data.filepath 
         if not str(self.map_to_filepath).startswith(mdp.get_cwd()):
             self.map_to_filepath = bpy.data.filepath
-            
 
         return wm.invoke_props_dialog(self)
 
     def execute(self, context):
-        # data_id = get_md_data_id_placeholder(self.data_type)
-        # if data_id is None or (self.filepath is None) or (self.filepath == ''): # if there are empty value, then abort
-        #     self.report({'WARNING'}, f"Specify properties.")
-        #     return {"CANCELLED"} 
         result = mdp.remap_data_sync_project(
             data_type=self.data_type,
             map_from_filepath=self.map_from_filepath,
@@ -1191,8 +1193,6 @@ class MDHARD_OT_remap_data_sync_project(bpy.types.Operator):
         wm = context.window_manager
         layout = self.layout
         layout.prop(self, 'data_type')
-        # layout.prop(wm, f"MD_{self.data_type}")
-        # layout.prop_search(wm, f"{ct.MD_PREFIX}_{self.data_type}", bpy.data, DataAttrNameDict.get(self.data_type))
         layout.label(text="Remap From")
         layout.prop(self, 'map_from_filepath', text='')
         layout.prop_search(self, 'map_from_data_name', wm, ct.MD_REMAP_HOLDER_FROM, text='')
@@ -1202,16 +1202,9 @@ class MDHARD_OT_remap_data_sync_project(bpy.types.Operator):
         layout.prop(self, 'map_to_filepath', text='')
         layout.prop_search(self, 'map_to_data_name', wm, ct.MD_REMAP_HOLDER_TO, text='')
         layout.prop(self, 'exclude_t', text='Exclude')
+        return
 
-        # layout.label(text="Move To: ")
-        # row = layout.row()
-        
-        # if mdp.is_dst_filepath_valid_for_move(dst_filepath=self.filepath): # move destination exists
-        #     row.alert = False
-        # else: # move destination not found
-        #     row.alert = True
 
-        # row.prop(self, 'filepath', text="")
 
 
 @register_wrap
