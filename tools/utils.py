@@ -1117,28 +1117,48 @@ def get_index_for_hide_collection_ops(scene:bpy.types.Scene, target_collection:b
     Return Index is already added one for used in oeprator.
     """
     scene_col = scene.collection
-    index = _find_index_of_collection_in_scene(collection_list=list(scene_col.children), target_col=target_collection, index=0)
-    return index
-
-
-def _find_index_of_collection_in_scene(collection_list:List[bpy.types.Collection], target_col:bpy.types.Collection, index:int):
-    """Recursively search index of given collection in collection list. Count is done according to the bpy.ops.hide_collection collection_index.
-    """
-    if collection_list == []: # if collection is empty, then no more collections to search. Not found.
-        return None
-    
-    next_collection_list = []
-    for c in collection_list:
-        index += 1
-        if c == target_col:
-            return index
-        next_collection_list += list(c.children)
-
-    else:
-        index = _find_index_of_collection_in_scene(next_collection_list, target_col, index)
+    index, found = _find_index_of_collection_in_scene(collection_list=list(scene_col.children), target_col=target_collection, index=0)
+    if found:
         return index
+    else:
+        return None
+
+
+# def _find_index_of_collection_in_scene(collection_list:List[bpy.types.Collection], target_col:bpy.types.Collection, index:int):
+#     """Recursively search index of given collection in collection list. Count is done according to the bpy.ops.hide_collection collection_index.
+#     """
+#     if collection_list == []: # if collection is empty, then no more collections to search. Not found.
+#         return None
+    
+#     next_collection_list = []
+#     for c in collection_list:
+#         index += 1
+#         if c == target_col:
+#             return index
+#         next_collection_list += list(c.children)
+
+#     else:
+#         index = _find_index_of_collection_in_scene(next_collection_list, target_col, index)
+#         return index
             
+def _find_index_of_collection_in_scene(collection_list:List[bpy.types.Collection], target_col:bpy.types.Collection, index:int):
+    """Recursively search index of given collection in collection list. 
+    Count is the format of bpy.ops.hide_collection collection_index. I.e. first collection index is 1.
+    """
+    if collection_list == []:
+        return index, False
+    
+    for c in collection_list:
+        index+=1
+        if c == target_col:
+            return index, True
+
+    for c in collection_list:
+        index, found = _find_index_of_collection_in_scene(collection_list=list(c.children), target_col=target_col, index=index)
+        if found:
+            return index, True
         
+    return index, False
     
             
 def get_view_3d_context()->bpy.types.Context:
