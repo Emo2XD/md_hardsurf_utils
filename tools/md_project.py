@@ -252,7 +252,10 @@ def harpoon_add_file_slot(filepath:str=''):
         slot.name = 'Empty'
     else:
         slot.filepath = filepath
-        slot.name = str(Path(filepath).relative_to(Path(get_cwd())))
+        try:
+            slot.name = str(Path(filepath).relative_to(Path(get_cwd())))
+        except ValueError: # when relative path fails i.e. out of project folder
+            slot.name = f"... {str(Path(filepath).name)}"
         
     setattr(wm, ct.MD_HARPOON_INDEX, len(uilist)-1)
     save_harpoon()
