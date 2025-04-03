@@ -570,15 +570,19 @@ class MDHARD_OT_face_strength_material_override_toggle(bpy.types.Operator):
 
 
 @register_wrap
-class MDHARD_OT_fix_all_part_render_viewport_visibilities(bpy.types.Operator):
-    """Fix Render and Viewport Visibility of All Part collection."""
-    bl_idname = "md_hard.fix_all_part_render_viewport_visibilities"
-    bl_label = "Fix Render and Viewport Visibility of All Part collections."
+class MDHARD_OT_fix_part_render_viewport_visibilities(bpy.types.Operator):
+    """Fix Render and Viewport Visibility of Active Part collection."""
+    bl_idname = "md_hard.fix_part_render_viewport_visibilities"
+    bl_label = "Fix Render and Viewport Visibility of Active Part collections."
     bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return getattr(context.scene, ct.ACTIVE_PART_COLLECTION) is not None
 
     def execute(self, context):
         ut.fix_part_render_and_viewport_visibilities()
-        self.report({"INFO"}, f"Fix Render and Viewport Visibility of All Part collections called.")
+        self.report({"INFO"}, f"Fix Render and Viewport Visibility of Active Part collections called.")
         return {"FINISHED"}
 
 

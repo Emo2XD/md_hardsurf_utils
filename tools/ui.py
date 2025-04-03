@@ -27,7 +27,7 @@ class MDHARD_PT_md_hard(bpy.types.Panel):
         split.operator(ot.MDHARD_OT_regenerate_collections_under_part.bl_idname, text="", icon="FILE_REFRESH")
         row = layout.row()
         row.operator(ot.MDHARD_OT_rename_part_collection.bl_idname, text="Rename Part")
-        row.operator(ot.MDHARD_OT_fix_all_part_render_viewport_visibilities.bl_idname, text="Fix Visibility")
+        row.operator(ot.MDHARD_OT_fix_part_render_viewport_visibilities.bl_idname, text="Fix Visibility")
 
         layout.separator(factor=2.0)
         layout.prop(bpy.context.scene, ct.IS_MD_FACE_STRENGTH_MATERIAL_OVERRIDE, text="Face Strength Override", icon="MATERIAL", expand=True)
