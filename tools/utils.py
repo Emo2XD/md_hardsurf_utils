@@ -812,14 +812,14 @@ class PartManager:
                 col.hide_render = render
                 for c in col.children_recursive:
                     c.hide_render = render
-                for o in col.all_objects:
+                for o in col.all_objects[:]:
                     o.hide_render = render
             
             if viewport is not None:
                 col.hide_viewport = viewport
                 for c in col.children_recursive:
                     c.hide_viewport = render
-                for o in col.all_objects:
+                for o in col.all_objects[:]:
                     o.hide_viewport = render
 
     
@@ -1219,10 +1219,13 @@ def fix_part_render_and_viewport_visibilities():
     This function fixes hide_render and hide_viewport property on collections
     under every part collections.
     """
-    parts_collections = [c for c in bpy.data.collections if getattr(c, ct.IS_MD_HARDSURF_PART_COLLECTION)]
+    # parts_collections = [c for c in bpy.data.collections if getattr(c, ct.IS_MD_HARDSURF_PART_COLLECTION)]
+    # parts_collections = [c for c in bpy.data.collections if getattr(c, ct.IS_MD_HARDSURF_PART_COLLECTION)]
+    part_col = getattr(bpy.context.scene, ct.ACTIVE_PART_COLLECTION)
+    PartManager.fix_part_visibility(part_col)
     
-    for part_col in parts_collections:
-        PartManager.fix_part_visibility(part_col)
+    # for part_col in parts_collections:
+    #     PartManager.fix_part_visibility(part_col)
 
     return
 
