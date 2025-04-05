@@ -247,16 +247,8 @@ def harpoon_add_file_slot(filepath:str=''):
     
     slot = uilist.add()
 
-    if filepath == '': # always create empty slot.
-        slot.filepath = ''
-        slot.name = 'Empty'
-    else:
-        slot.filepath = filepath
-        try:
-            slot.name = str(Path(filepath).relative_to(Path(get_cwd())))
-        except ValueError: # when relative path fails i.e. out of project folder
-            slot.name = f"... {str(Path(filepath).name)}"
         
+    slot.filepath, slot.name = _harpoon_prep_filepath_and_name(filepath)
     setattr(wm, ct.MD_HARPOON_INDEX, len(uilist)-1)
     save_harpoon()
     return
@@ -266,17 +258,23 @@ def harpoon_assign_to_slot(filepath:str=''):
     uilist:bpy.types.CollectionProperty = getattr(wm, ct.MD_HARPOON_UILIST_COLLECTION)
     active_index = getattr(wm, ct.MD_HARPOON_INDEX)
     slot = uilist[active_index]
-
-    if filepath == '': # always create empty slot.
-        slot.filepath = ''
-        slot.name = 'Empty'
-    else:
-        slot.filepath = filepath
-        slot.name = str(Path(filepath).relative_to(Path(get_cwd())))
     
+    slot.filepath, slot.name = _harpoon_prep_filepath_and_name(filepath)
     save_harpoon()
     return 
 
+def _harpoon_prep_filepath_and_name(filepath:str):
+    """Prepare harpoon filepath and name (Display name)"""
+    if filepath == '': # always create empty slot.
+        new_filepath = ''
+        slot_name = 'Empty'
+    else:
+        new_filepath = filepath
+        try:
+            slot_name = str(Path(filepath).relative_to(Path(get_cwd())))
+        except ValueError: # when relative path fails i.e. out of project folder
+            slot_name = f"... {str(Path(filepath).name)}"
+    return new_filepath, slot_name
 
 
 def harpoon_remove_file_slot():
