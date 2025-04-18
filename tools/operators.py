@@ -339,20 +339,31 @@ class MDHARD_OT_go_to_part(bpy.types.Operator):
     """
     bl_idname = "md_hard.go_to_part"
     bl_label = "Go To Part"
-    bl_options = {'REGISTER', 'UNDO'}
+    # bl_options = {'REGISTER', 'UNDO'}
+    bl_property = "part_name"
 
+    part_name: bpy.props.EnumProperty(name='Part Name', items=ut.callback_go_to_part_collection) # type: ignore
     # @classmethod
     # def poll(self, context:bpy.types.Context):
     #     return context.active_object is not None
 
     def invoke(self, context, event):
         wm = context.window_manager
-        setattr(wm, ct.OPEN_PART_COLLECTION_PLACEHOLDER, None)
-        return wm.invoke_props_dialog(self)
+        # setattr(wm, ct.OPEN_PART_COLLECTION_PLACEHOLDER, None)
+
+        wm.invoke_search_popup(self)
+        return {'FINISHED'}
+        # return wm.invoke_props_dialog(self)
         
     def execute(self, context):
-        wm = context.window_manager
-        part_col = getattr(wm, ct.OPEN_PART_COLLECTION_PLACEHOLDER)
+        # wm = context.window_manager
+        # part_col = getattr(wm, ct.OPEN_PART_COLLECTION_PLACEHOLDER)
+        try:
+            part_col = bpy.data.collections[self.part_name, None] # get local one.
+        except Exception as e:
+            print(f"part collection {self.part_name} not found: {e}")
+            part_col = None
+
         if part_col is not None:
             ut.go_to_part_collection(part_col)
         else:
@@ -363,12 +374,12 @@ class MDHARD_OT_go_to_part(bpy.types.Operator):
         return {"FINISHED"}
     
 
-    def draw(self, context):
-        wm = context.window_manager
-        layout = self.layout
-        row = layout.row()
-        row.activate_init = True
-        row.prop(wm, ct.OPEN_PART_COLLECTION_PLACEHOLDER, text="")
+    # def draw(self, context):
+    #     wm = context.window_manager
+    #     layout = self.layout
+    #     row = layout.row()
+    #     row.activate_init = True
+    #     row.prop(wm, ct.OPEN_PART_COLLECTION_PLACEHOLDER, text="")
 
 
 @register_wrap

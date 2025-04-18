@@ -867,6 +867,16 @@ def go_to_part_collection(part_collection:bpy.types.Collection):
     return
 
 
+def callback_go_to_part_collection(self, context):
+    """Callback function for go to part.
+    """
+    # get local part collection names.
+    part_col_names = [c.name for c in bpy.data.collections if getattr(c, ct.IS_MD_HARDSURF_PART_COLLECTION, False) and (c.library is None)]
+    enum_list = [(name, name, "") for name in part_col_names]
+    
+    return enum_list
+
+
 #-------------------------------------------------------------------------------
 # Link Part Collection
 #-------------------------------------------------------------------------------
