@@ -429,14 +429,24 @@ def search_parts_in_project_callback(self, context):
 
 
     for path, disp_name in zip( id_path_list, disp_path_list):
-        with bpy.data.libraries.load(path, link=True)  as (data_from, data_to):
-            collection_name_list = [name for name in data_from.collections if name.startswith("F-")]
+        # load from current file will cause error so branch operation.
+        if Path(path) == Path(bpy.data.filepath):
+            collection_name_list = [c.name for c in bpy.data.collections[:] if c.name.startswith("F-")]
 
-        for c_name in collection_name_list:
-            enum_list.append((
-                f"{path}|collections|{c_name}", 
-                f"{disp_name}:{c_name}",
-                  ''))
+            for c_name in collection_name_list:
+                enum_list.append((
+                    f"{path}|collections|{c_name}", 
+                    f"{disp_name}:{c_name}",
+                    ''))
+        else:
+            with bpy.data.libraries.load(path, link=True)  as (data_from, data_to):
+                collection_name_list = [name for name in data_from.collections if name.startswith("F-")]
+
+            for c_name in collection_name_list:
+                enum_list.append((
+                    f"{path}|collections|{c_name}", 
+                    f"{disp_name}:{c_name}",
+                    ''))
 
     return enum_list
 
